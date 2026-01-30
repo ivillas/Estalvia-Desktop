@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Properties;
 import jakarta.mail.PasswordAuthentication;
 
+import java.net.InetSocketAddress;
+import java.net.ProxySelector;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -51,7 +53,11 @@ public class AuthController {
     @FXML private TextField txtEmailForgot;
     
         
-    private final HttpClient httpClient = HttpClient.newHttpClient();
+    //private final HttpClient httpClient = HttpClient.newHttpClient();
+    private final HttpClient httpClient = HttpClient.newBuilder()
+            .proxy(ProxySelector.of(new InetSocketAddress("192.168.2.1", 3128))) 
+            .build();
+    
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String BASE_URL = "http://estalvia.ddns.net:8081/auth";
     
@@ -91,7 +97,7 @@ public class AuthController {
         String pass = txtPassReg.getText();
 
         if (user.isEmpty() || email.isEmpty() || pass.isEmpty()) {
-            mostrarAlerta("Error", "Todos los campos son obligatorios.");
+            mostrarAlerta("Error", "Tots els camps son obligatoris.");
             return;
         }
 
@@ -101,7 +107,7 @@ public class AuthController {
             "password", pass
         );
 
-        enviarPeticion("/register", datos, "Usuario registrado correctamente.");
+        enviarPeticion("/register", datos, "Usuari registrat correctament.");
     }
     
     private void enviarPeticion(String endpoint, Map<String, String> data, String mensajeExito) {
@@ -131,20 +137,20 @@ public class AuthController {
                                     txtUserLogin.getScene().getWindow().hide(); 
                                 } else {
                                     // Si es registro u otro, solo mostramos éxito
-                                    mostrarAlertaExito("Éxito", mensajeExito);
+                                    mostrarAlertaExito("Éxit", mensajeExito);
                                     showLogin();
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                mostrarAlerta("Error", "Error al procesar los datos del servidor");
+                                mostrarAlerta("Error", "Error alm processar les dades al servidor");
                             }
                         } else {
-                            mostrarAlerta("Error", "El servidor respondió: " + response.statusCode());
+                            mostrarAlerta("Error", "El servidor respon: " + response.statusCode());
                         }
                     });
                 })
                 .exceptionally(e -> {
-                    Platform.runLater(() -> mostrarAlerta("Error", "No hay conexión con el servidor"));
+                    Platform.runLater(() -> mostrarAlerta("Error", "no hi ha conexio amb el servidor"));
                     return null;
                 });
 
@@ -162,7 +168,7 @@ public class AuthController {
 	// Opción Recuperar Contraseña
     @FXML
     private void handleForgotPass() {
-        System.out.println("Cambiando a vista recuperar...");
+        System.out.println("Canvian vista a recuperar...");
         // Ocultamos Login
         paneLogin.setVisible(false);
         paneLogin.setManaged(false);
@@ -193,11 +199,11 @@ public class AuthController {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(remitente));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
-            message.setSubject("Código de Recuperación - Estalvia!");
-            message.setText("Tu código de seguridad es: " + codigo);
+            message.setSubject("Codi de Recuperació - Estalvia!");
+            message.setText("El teu codi de seguretat es: " + codigo);
 
             Transport.send(message);
-            System.out.println("Email enviado con éxito.");
+            System.out.println("Email eniat exitosament.");
         } catch (MessagingException e) {
             e.printStackTrace();
         }
@@ -209,22 +215,22 @@ public class AuthController {
         String pass = txtPassLogin.getText();
 
         if (user.isEmpty() || pass.isEmpty()) {
-            mostrarAlerta("Error", "Por favor, rellena todos los campos.");
+            mostrarAlerta("Error", "Per favor, omple tots els camps.");
             return;
         }
 
-        enviarPeticion("/login", Map.of("username", user, "password", pass), "¡Bienvenido!");
+        enviarPeticion("/login", Map.of("username", user, "password", pass), "¡Benvingut!");
     }
     
     @FXML 
     private void processRecovery() {
         String email = txtEmailForgot.getText();
         if(email.isEmpty()) {
-            mostrarAlerta("Error", "Por favor, introduce un email.");
+            mostrarAlerta("Error", "Per favor, introdueix un email.");
         } else {
             System.out.println("Enviando recuperación a: " + email);
             // Aquí podrías añadir la lógica de BD más tarde
-            mostrarAlertaExito("Enviado", "Se han enviado instrucciones a tu correo.");
+            mostrarAlertaExito("Enviat", "S'han enviat les instruccions al correu.");
             showLogin(); // Vuelve al login automáticamente
         }
     }
