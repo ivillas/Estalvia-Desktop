@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+
+<StackPane prefHeight="450.0" prefWidth="350.0" 
+           xmlns="http://javafx.com" 
+           xmlns:fx="http://javafx.com" 
+           fx:controller="com.ivillas.controller.AuthController">
+   <children>
+      <!-- 1. PANEL DE LOGIN -->
+      <VBox fx:id="paneLogin" alignment="CENTER" spacing="15.0" style="-fx-background-color: white;">
+         <children>
+            <Text style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Iniciar Sesión" />
+            <TextField fx:id="txtUserLogin" promptText="Usuario" maxWidth="250.0" />
+            <PasswordField fx:id="txtPassLogin" promptText="Contraseña" maxWidth="250.0" />
+            <Button onAction="#handleLogin" text="Entrar" prefWidth="250.0" style="-fx-background-color: #2196F3; -fx-text-fill: white;" />
+            <Hyperlink onAction="#handleForgotPass" text="¿Olvidaste tu contraseña?" />
+            <HBox alignment="CENTER" spacing="5.0">
+               <children>
+                  <Text text="¿No tienes cuenta?" />
+                  <Hyperlink onAction="#showRegister" text="Regístrate aquí" />
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </VBox>
+
+      <!-- 2. PANEL DE REGISTRO -->
+      <VBox fx:id="paneRegister" alignment="CENTER" managed="false" spacing="15.0" style="-fx-background-color: white;" visible="false">
+         <children>
+            <Text style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Crear Cuenta" />
+            <TextField fx:id="txtUserReg" promptText="Nombre de usuario" maxWidth="250.0" />
+            <TextField fx:id="txtEmailReg" promptText="Correo electrónico (@)" maxWidth="250.0" />
+            <PasswordField fx:id="txtPassReg" promptText="Contraseña nueva" maxWidth="250.0" />
+            <Button onAction="#handleRegister" text="Registrarme" prefWidth="250.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
+            <HBox alignment="CENTER" spacing="5.0">
+               <children>
+                  <Text text="¿Ya tienes cuenta?" />
+                  <Hyperlink onAction="#showLogin" text="Inicia sesión" />
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </VBox>
+
+      <!-- 3. PANEL RECUPERAR (Ahora sí está dentro de children) -->
+      <VBox fx:id="paneForgot" alignment="CENTER" managed="false" spacing="20.0" style="-fx-background-color: white;" visible="false">
+         <children>
+            <Text style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Recuperar" />
+            <TextField fx:id="txtEmailForgot" promptText="Tu correo electrónico" maxWidth="250.0" />
+            <Button onAction="#processRecovery" text="Enviar Código" prefWidth="250.0" style="-fx-background-color: #FF9800; -fx-text-fill: white;" />
+            <Hyperlink onAction="#showLogin" text="Volver al inicio" />
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </VBox>
+   </children>
+</StackPane>

@@ -1,0 +1,12 @@
+com\ivillas\api\EstalviaApiClient.class
+com\ivillas\controller\AuthController.class
+App.class
+com\ivillas\model\UsuariDTO.class
+com\ivillas\controller\AuthController$1.class
+com\ivillas\controller\MainController.class
+com\ivillas\desktop\App.class
+com\ivillas\service\ProducteServiceClient.class
+Productes.class
+com\ivillas\utils\SessionManager.class
+com\ivillas\model\ProductePreusDTO.class
+com\ivillas\service\ProducteServiceClient$1.class
