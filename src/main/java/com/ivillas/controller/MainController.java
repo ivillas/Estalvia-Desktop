@@ -19,47 +19,51 @@ import javafx.stage.Stage;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
-
-import java.awt.TextField;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import com.ivillas.model.ProductePreusDTO;
 import com.ivillas.model.UsuariDTO;
 import com.ivillas.service.ProducteServiceClient;
 import com.ivillas.utils.SessionManager;
 import com.jfoenix.controls.JFXButton;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.control.TextField;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MainController {
 
-    @FXML private VBox contentArea; // Vinculado al fx:id del centro
+    @FXML private Label txtTitol; // CAMBIADO: JFXLabel -> Label
     @FXML private JFXButton btnUserSession;
     @FXML private JFXButton btnLogout;
-   // @FXML private HBox mainDisplayArea;
-    @FXML private StackPane mainDisplayArea;
+    @FXML private JFXButton btnProductes;
+    @FXML private TableView<ProductePreusDTO> tablaProductos;
     @FXML private TextField txtBuscador;
-    private FlowPane flowProductos = new FlowPane();
     
     private List<ProductePreusDTO> listaMaestra = new ArrayList<>();
-    
+
     @FXML
-    public void showProductsView() {
-        // Limpiamos el área central y ponemos nuestro contenedor de productos
-        flowProductos.setHgap(20);
-        flowProductos.setVgap(20);
-        flowProductos.setPadding(new Insets(20));
-        
-        ScrollPane scroll = new ScrollPane(flowProductos);
-        scroll.setFitToWidth(true);
-        scroll.setStyle("-fx-background-color: transparent; -fx-background: #F3F4F6;");
-        
-        mainDisplayArea.getChildren().setAll(scroll);
+    public void initialize() {
+        // Ocultar tabla al inicio
+        tablaProductos.setVisible(false);
+        tablaProductos.setManaged(false);
+    }
+
+    @FXML
+    private void handleBtnProductes() {
+        txtTitol.setText("Catàleg de Productes");
+        tablaProductos.setVisible(true);
+        tablaProductos.setManaged(true);
         cargarProductosDesdeNAS();
     }
 
+    
     private void cargarProductosDesdeNAS() {
         Task<List<ProductePreusDTO>> task = new Task<>() {
             @Override protected List<ProductePreusDTO> call() throws Exception {
@@ -74,13 +78,51 @@ public class MainController {
         new Thread(task).start();
     }
 
+    /*
     private void renderizarProductos(List<ProductePreusDTO> lista) {
         flowProductos.getChildren().clear();
         for (ProductePreusDTO p : lista) {
             flowProductos.getChildren().add(crearCard(p));
         }
     }
+*/
+    /*
+    private void renderizarProductos(List<ProductePreusDTO> lista) {
+        tablaProductos.getColumns().clear(); // Limpiar configuración previa
 
+        // 1. Columna fija para el nombre del producto
+        TableColumn<ProductePreusDTO, String> colNombre = new TableColumn<>("Producto");
+        colNombre.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getNombre()));
+        tablaProductos.getColumns().add(colNombre);
+
+        // 2. Crear columnas dinámicas para cada Supermercado
+        // Suponiendo que ProductePreusDTO tiene un Map<String, Double> precios;
+        Set<String> supermercados = lista.stream()
+            .flatMap(p -> p.getPrecios().keySet().stream())
+            .collect(Collectors.toSet());
+
+        for (String superm : supermercados) {
+            TableColumn<ProductePreusDTO, String> colSuper = new TableColumn<>(superm);
+            colSuper.setCellValueFactory(data -> {
+                BigDecimal precio = data.getValue().getPrecios().get(superm);
+                return new SimpleStringProperty(precio != null ? precio + " €" : "-");
+            });
+            tablaProductos.getColumns().add(colSuper);
+        }
+
+        // 3. Cargar los datos (Instantáneo gracias a la virtualización)
+        tablaProductos.getItems().setAll(lista);
+    }
+    
+       */
+    private void renderizarProductos(List<ProductePreusDTO> lista) {
+        this.listaMaestra = lista; // Actualizamos la lista para las columnas
+        configurarColumnasDinamicas(); 
+        tablaProductos.getItems().setAll(lista); 
+    }
+ 
+    
+    
     @FXML
     private void handleSearch() {
         String texto = txtBuscador.getText().toLowerCase();
@@ -121,8 +163,8 @@ public class MainController {
         btnUserSession.setText("Login");
         btnLogout.setVisible(false);
         btnLogout.setManaged(false);
-        mainDisplayArea.getChildren().clear(); 
-        // Aquí podrías recargar las tarjetas por defecto si quisieras
+        tablaProductos.getItems().clear(); 
+        tablaProductos.getColumns().clear(); 
     }
     
     @FXML
@@ -145,7 +187,7 @@ public class MainController {
                       "-fx-padding: 15;");
 
         // 2. Título (Nombre del producto)
-        Label lblNombre = new Label(p.nombre != null ? p.nombre.toUpperCase() : "PRODUCTO SIN NOMBRE");
+        Label lblNombre = new Label(p.nombre != null ? p.nombre.toUpperCase() : "Producte sense nom");
         lblNombre.setWrapText(true);
         lblNombre.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333;");
         lblNombre.setMinHeight(40); // Para que todos tengan el mismo alto de texto
@@ -174,7 +216,7 @@ public class MainController {
                 vboxPrecios.getChildren().add(filaPrecio);
             });
         } else {
-            vboxPrecios.getChildren().add(new Label("Sin precios disponibles"));
+            vboxPrecios.getChildren().add(new Label("Sense preus disponobles"));
         }
 
         // 5. Unir todo
@@ -183,6 +225,40 @@ public class MainController {
         return card;
     }
 
+    
+
+    private void configurarColumnasDinamicas() {
+        if (tablaProductos == null) return; // Seguridad extra
+
+        tablaProductos.getColumns().clear();
+
+        // 1. Columna Producto
+        TableColumn<ProductePreusDTO, String> colNombre = new TableColumn<>("Producto");
+        colNombre.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().nombre));
+        tablaProductos.getColumns().add(colNombre);
+
+        // 2. Columna Marca
+        TableColumn<ProductePreusDTO, String> colMarca = new TableColumn<>("Marca");
+        colMarca.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().marca));
+        tablaProductos.getColumns().add(colMarca);
+
+        // 3. Columnas Dinámicas por Supermercado (Asumiendo que listaMaestra ya tiene datos)
+        if (!listaMaestra.isEmpty()) {
+            Set<String> supers = listaMaestra.stream()
+                .flatMap(p -> p.precios.keySet().stream())
+                .collect(Collectors.toSet());
+
+            for (String s : supers) {
+                TableColumn<ProductePreusDTO, String> col = new TableColumn<>(s);
+                col.setCellValueFactory(data -> {
+                    BigDecimal precio = data.getValue().precios.get(s);
+                    return new SimpleStringProperty(precio != null ? precio.toString() + " €" : "-");
+                });
+                tablaProductos.getColumns().add(col);
+            }
+        }
+    }
+    
     public void actualizarInterfazTrasLogin() {
         UsuariDTO user = SessionManager.getUsuario();
         if (user == null) return;
@@ -193,7 +269,8 @@ public class MainController {
         btnLogout.setManaged(true);
 
         // 2. Limpiamos el área principal (el HBox de las tarjetas pequeñas)
-        mainDisplayArea.getChildren().clear();
+        tablaProductos.getItems().clear(); 
+        tablaProductos.getColumns().clear(); 
         
         // OPCIONAL: Si quieres que ocupe todo el alto, 
         // asegúrate de que el padre de mainDisplayArea no tenga otros hijos estorbando
@@ -227,7 +304,8 @@ public class MainController {
         superCard.getChildren().addAll(title, new Separator(), name, email, fecha);
         
         // 4. Inyectar la super card en el área principal
-        mainDisplayArea.getChildren().add(superCard);
+        tablaProductos.getItems().clear(); 
+        tablaProductos.getColumns().clear(); 
     }
     
 }

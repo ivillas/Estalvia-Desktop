@@ -10,6 +10,8 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="900.0" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #F3F4F6;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ivillas.controller.MainController">
    <!-- BARRA LATERAL (Look Desktop) -->
@@ -102,12 +104,11 @@
             
             <!-- Contenedor de Tarjetas (Cards) -->
 		<!-- Contenedor dinámico -->
-		<StackPane fx:id="mainDisplayArea" VBox.vgrow="ALWAYS">
-		   <padding>
-		      <Insets bottom="20.0" left="30.0" right="30.0" />
-		   </padding>
-		   <!-- Aquí el controlador inyectará el ScrollPane con el FlowPane -->
-		</StackPane>
+		<TableView fx:id="tablaProductos" visible="false" managed="false" VBox.vgrow="ALWAYS">
+		    <columnResizePolicy>
+		        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+		    </columnResizePolicy>
+		</TableView>
          </children>
       </VBox>
    </center>
