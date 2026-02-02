@@ -2,6 +2,7 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -10,10 +11,8 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TableColumn?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="900.0" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #F3F4F6;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ivillas.controller.MainController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="900.0" prefHeight="800" prefWidth="1200" style="-fx-background-color: #F3F4F6;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ivillas.controller.MainController">
    <!-- BARRA LATERAL (Look Desktop) -->
    <left>
       <VBox fx:id="contentArea" prefHeight="700.0" prefWidth="240.0" style="-fx-background-color: #1E1E2E;" BorderPane.alignment="CENTER">
@@ -24,11 +23,12 @@
                </padding>
                <children>
                   <AnchorPane prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #6200EE; -fx-background-radius: 10;" />
-                  <Label text="Estalvia!" textFill="WHITE">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                  </Label>
+                 <JFXButton fx:id="btnEstalvia" onAction="#openInici" text="Estalvia!" textFill="WHITE" 
+           style="-fx-background-color: transparent; -fx-cursor: hand;">
+   <font>
+      <Font name="System Bold" size="18.0" />
+   </font>
+</JFXButton>
                </children>   
             </HBox>
             <VBox prefHeight="400.0" prefWidth="117.0" spacing="10.0">
@@ -39,20 +39,20 @@
                   <JFXButton fx:id="btnLlistesPubliques" alignment="BASELINE_LEFT" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Llistes publiques" textFill="#a0a0a0">
                      <font> <Font size="14.0" /> </font>
                   </JFXButton>
-                  <JFXButton fx:id="btnProductes" alignment="BASELINE_LEFT" onAction="#showProductsView" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Productes" textFill="#a0a0a0">
+                  <JFXButton fx:id="btnProductes" alignment="BASELINE_LEFT" onAction="#openProducts" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Productes" textFill="#a0a0a0">
                      <font> <Font size="14.0" /> </font>
                   </JFXButton>
-                  <JFXButton fx:id="btnLlistesPrivades" alignment="BASELINE_LEFT" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Les meves llistes" textFill="#a0a0a0">
+                  <JFXButton fx:id="btnLlistesPrivades" alignment="BASELINE_LEFT" managed="false" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Les meves llistes" textFill="#a0a0a0" visible="false">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton fx:id="btnCrearLlista" alignment="BASELINE_LEFT" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Crear llista" textFill="#a0a0a0">
+                  <JFXButton fx:id="btnCrearLlista" alignment="BASELINE_LEFT" managed="false" onAction="#openCrearLlista" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Crear llista" textFill="#a0a0a0" visible="false">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton fx:id="btnSupers" alignment="BASELINE_LEFT" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Supermercats/Proveïdors" textFill="#a0a0a0">
+                  <JFXButton fx:id="btnSupers" alignment="BASELINE_LEFT" managed="false" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Supermercats/Proveïdors" textFill="#a0a0a0" visible="false">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -74,11 +74,15 @@
                   </JFXButton>
                </children>
             </VBox>
+            <Button fx:id="btnAjustos" onAction="#openConfig" alignment="BOTTOM_RIGHT" mnemonicParsing="false" prefHeight="56.0" prefWidth="53.0" styleClass="button-ajustes" stylesheets="@styles.css">
+               <VBox.margin>
+                  <Insets left="150.0" top="250.0" />
+               </VBox.margin>
+            </Button>
          </children>
       </VBox>
    </left>
-
-   <!-- CUERPO PRINCIPAL -->
+<!-- CUERPO PRINCIPAL -->
    <center>
       <VBox prefHeight="200.0" prefWidth="100.0" spacing="20.0" BorderPane.alignment="CENTER">
          <children>
@@ -104,12 +108,14 @@
             
             <!-- Contenedor de Tarjetas (Cards) -->
 		<!-- Contenedor dinámico -->
-		<TableView fx:id="tablaProductos" visible="false" managed="false" VBox.vgrow="ALWAYS">
-		    <columnResizePolicy>
-		        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-		    </columnResizePolicy>
-		</TableView>
+		<StackPane fx:id="mainDisplayArea" VBox.vgrow="ALWAYS">
+		   <padding>
+		      <Insets bottom="20.0" left="30.0" right="30.0" />
+		   </padding>
+		   <!-- Aquí el controlador inyectará el ScrollPane con el FlowPane -->
+		</StackPane>
          </children>
       </VBox>
    </center>
 </BorderPane>
+   

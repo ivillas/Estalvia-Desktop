@@ -6,8 +6,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -45,16 +47,137 @@ public class MainController {
     @FXML private JFXButton btnProductes;
     @FXML private TableView<ProductePreusDTO> tablaProductos;
     @FXML private TextField txtBuscador;
-    
+    @FXML private StackPane mainDisplayArea;
     private List<ProductePreusDTO> listaMaestra = new ArrayList<>();
 
     @FXML
     public void initialize() {
         // Ocultar tabla al inicio
-        tablaProductos.setVisible(false);
-        tablaProductos.setManaged(false);
+
     }
 
+    @FXML
+    private void openConfig() {
+        try {
+            txtTitol.setText("Configura les teves preferencies de la app");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/configuracio.fxml"));
+            
+            // Cargamos el nodo raíz
+            BorderPane root = loader.load();
+
+            // --- ESTA ES LA CONEXIÓN QUE TE FALTA PARA QUE EL BOTÓN 'SORTIR' FUNCIONE ---
+            ConfigController configCtrl = loader.getController();
+            configCtrl.setMainController(this); 
+            // --------------------------------------------------------------------------
+
+            // 1. FORZAR CRECIMIENTO
+            root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            root.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+
+            // 2. SOLUCIONAR EL PROBLEMA DEL <TOP> (Mover contenido al centro)
+            if (root.getTop() != null) {
+                Node contenido = root.getTop();
+                root.setTop(null);    
+                root.setCenter(contenido); 
+                
+                if (contenido instanceof Region) {
+                    Region pane = (Region) contenido;
+                    pane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                    pane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                }
+            }
+
+            // 3. BINDING TOTAL
+            root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
+            root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
+
+            mainDisplayArea.getChildren().setAll(root);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    	
+
+        
+    	
+    @FXML
+    public void  openInici() {
+    	try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/inici.fxml"));
+     // Cargamos el nodo raíz (que es un BorderPane)
+        BorderPane root = loader.load();
+
+        // 1. FORZAR CRECIMIENTO: El BorderPane viene con tamaños máximos del FXML. Los reseteamos.
+        root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        root.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+        
+        // 2. SOLUCIONAR EL PROBLEMA DEL <TOP>: 
+        // Tu FXML tiene el AnchorPane dentro de <top>. El <top> NUNCA se expande verticalmente.
+        // Extraemos el contenido y lo ponemos en el centro para que JavaFX lo obligue a estirarse.
+        if (root.getTop() != null) {
+            Node contenido = root.getTop();
+            root.setTop(null);    // Quitamos del top
+            root.setCenter(contenido); // Lo ponemos en el centro (el centro sí se expande)
+            
+            // Si el contenido es un AnchorPane (como en tu FXML), quitamos sus límites también
+            if (contenido instanceof Region) {
+                Region pane = (Region) contenido;
+                pane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                pane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+            }
+        }
+
+        // 3. BINDING TOTAL: Ajuste al contenedor padre
+        root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
+        root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
+       
+        mainDisplayArea.getChildren().setAll(root);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+
+    @FXML
+    private void openCrearLlista() {
+        try {
+        	txtTitol.setText("Crea la teva llista de la compra");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/CrearLlista.fxml"));
+            // Cargamos el nodo raíz (que es un BorderPane)
+            BorderPane root = loader.load();
+
+            // 1. FORZAR CRECIMIENTO: El BorderPane viene con tamaños máximos del FXML. Los reseteamos.
+            root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            root.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+
+            // 2. SOLUCIONAR EL PROBLEMA DEL <TOP>: 
+            // Tu FXML tiene el AnchorPane dentro de <top>. El <top> NUNCA se expande verticalmente.
+            // Extraemos el contenido y lo ponemos en el centro para que JavaFX lo obligue a estirarse.
+            if (root.getTop() != null) {
+                Node contenido = root.getTop();
+                root.setTop(null);    // Quitamos del top
+                root.setCenter(contenido); // Lo ponemos en el centro (el centro sí se expande)
+                
+                // Si el contenido es un AnchorPane (como en tu FXML), quitamos sus límites también
+                if (contenido instanceof Region) {
+                    Region pane = (Region) contenido;
+                    pane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                    pane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                }
+            }
+
+            // 3. BINDING TOTAL: Ajuste al contenedor padre
+            root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
+            root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
+
+            mainDisplayArea.getChildren().setAll(root);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
     @FXML
     private void handleBtnProductes() {
         txtTitol.setText("Catàleg de Productes");
@@ -256,6 +379,46 @@ public class MainController {
                 });
                 tablaProductos.getColumns().add(col);
             }
+        }
+    }
+    
+
+    @FXML
+    private void openProducts() {
+        try {
+        	txtTitol.setText("Els teus productes favorits");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/productes.fxml"));
+            // Cargamos el nodo raíz (que es un BorderPane)
+            BorderPane root = loader.load();
+
+            // 1. FORZAR CRECIMIENTO: El BorderPane viene con tamaños máximos del FXML. Los reseteamos.
+            root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            root.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+
+            // 2. SOLUCIONAR EL PROBLEMA DEL <TOP>: 
+            // Tu FXML tiene el AnchorPane dentro de <top>. El <top> NUNCA se expande verticalmente.
+            // Extraemos el contenido y lo ponemos en el centro para que JavaFX lo obligue a estirarse.
+            if (root.getTop() != null) {
+                Node contenido = root.getTop();
+                root.setTop(null);    // Quitamos del top
+                root.setCenter(contenido); // Lo ponemos en el centro (el centro sí se expande)
+                
+                // Si el contenido es un AnchorPane (como en tu FXML), quitamos sus límites también
+                if (contenido instanceof Region) {
+                    Region pane = (Region) contenido;
+                    pane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                    pane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                }
+            }
+
+            // 3. BINDING TOTAL: Ajuste al contenedor padre
+            root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
+            root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
+
+            mainDisplayArea.getChildren().setAll(root);
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
     
