@@ -48,7 +48,10 @@ public class ProductePreusDTO {
 		this.precios = precios;
 	}
     
-    
+	@Override
+	public String toString() {
+	    return nombre; // O el nombre del campo donde guardas el nombre del producto
+	}
     
     
     

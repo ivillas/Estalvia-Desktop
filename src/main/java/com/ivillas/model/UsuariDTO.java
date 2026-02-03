@@ -3,6 +3,7 @@ package com.ivillas.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UsuariDTO {
     private Long userId;
@@ -10,19 +11,18 @@ public class UsuariDTO {
     private String email;
     private String dataCreacio; 
 
-    // Constructor vacío para Jackson
     public UsuariDTO() {}
 
-    // Getters y Setters
+    // Getters y Setters (TODOS sin la palabra static)
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
 
-    public String getUsername() { return username; }
+    public String getUsername() { return username; } // Quitamos static
     public void setUsername(String username) { this.username = username; }
 
-    public String getEmail() { return email; }
+    public String getEmail() { return email; } // Quitamos static
     public void setEmail(String email) { this.email = email; }
 
-    public String getDataCreacio() { return dataCreacio; }
+    public String getDataCreacio() { return dataCreacio; } // Quitamos static
     public void setDataCreacio(String dataCreacio) { this.dataCreacio = dataCreacio; }
 }

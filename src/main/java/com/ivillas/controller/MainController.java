@@ -45,6 +45,9 @@ public class MainController {
     @FXML private JFXButton btnUserSession;
     @FXML private JFXButton btnLogout;
     @FXML private JFXButton btnProductes;
+    @FXML private JFXButton btnLlistesPrivades;
+    @FXML private JFXButton btnCrearLlista;
+    @FXML private JFXButton btnSupers;
     @FXML private TableView<ProductePreusDTO> tablaProductos;
     @FXML private TextField txtBuscador;
     @FXML private StackPane mainDisplayArea;
@@ -52,7 +55,7 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        // Ocultar tabla al inicio
+       
 
     }
 
@@ -139,6 +142,8 @@ public class MainController {
 		}
     }
 
+    
+    
     @FXML
     private void openCrearLlista() {
         try {
@@ -201,43 +206,6 @@ public class MainController {
         new Thread(task).start();
     }
 
-    /*
-    private void renderizarProductos(List<ProductePreusDTO> lista) {
-        flowProductos.getChildren().clear();
-        for (ProductePreusDTO p : lista) {
-            flowProductos.getChildren().add(crearCard(p));
-        }
-    }
-*/
-    /*
-    private void renderizarProductos(List<ProductePreusDTO> lista) {
-        tablaProductos.getColumns().clear(); // Limpiar configuración previa
-
-        // 1. Columna fija para el nombre del producto
-        TableColumn<ProductePreusDTO, String> colNombre = new TableColumn<>("Producto");
-        colNombre.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getNombre()));
-        tablaProductos.getColumns().add(colNombre);
-
-        // 2. Crear columnas dinámicas para cada Supermercado
-        // Suponiendo que ProductePreusDTO tiene un Map<String, Double> precios;
-        Set<String> supermercados = lista.stream()
-            .flatMap(p -> p.getPrecios().keySet().stream())
-            .collect(Collectors.toSet());
-
-        for (String superm : supermercados) {
-            TableColumn<ProductePreusDTO, String> colSuper = new TableColumn<>(superm);
-            colSuper.setCellValueFactory(data -> {
-                BigDecimal precio = data.getValue().getPrecios().get(superm);
-                return new SimpleStringProperty(precio != null ? precio + " €" : "-");
-            });
-            tablaProductos.getColumns().add(colSuper);
-        }
-
-        // 3. Cargar los datos (Instantáneo gracias a la virtualización)
-        tablaProductos.getItems().setAll(lista);
-    }
-    
-       */
     private void renderizarProductos(List<ProductePreusDTO> lista) {
         this.listaMaestra = lista; // Actualizamos la lista para las columnas
         configurarColumnasDinamicas(); 
@@ -286,8 +254,13 @@ public class MainController {
         btnUserSession.setText("Login");
         btnLogout.setVisible(false);
         btnLogout.setManaged(false);
-        tablaProductos.getItems().clear(); 
-        tablaProductos.getColumns().clear(); 
+        btnLlistesPrivades.setVisible(false);
+        btnLlistesPrivades.setManaged(false);
+        btnCrearLlista.setVisible(false);
+        btnCrearLlista.setManaged(false);
+        btnSupers.setVisible(false);
+        btnSupers.setManaged(false);
+
     }
     
     @FXML
@@ -422,53 +395,133 @@ public class MainController {
         }
     }
     
+    @FXML
+    private void openLlistesPubliques() {
+        try {
+            txtTitol.setText("Llistes creades pels usuaris");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/llistesPubliques.fxml"));
+            
+            BorderPane root = loader.load();
+
+            // Conexión con el controlador
+            LlistesPubliquesController llistapCtrl = loader.getController();
+            llistapCtrl.setMainController(this); 
+
+            // Vincular al área principal para que se estire
+            root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
+            root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
+
+            // Inyectar en la vista
+            mainDisplayArea.getChildren().setAll(root);
+
+        } catch (IOException e) {
+            System.err.println("Error cargando llistesPubliques.fxml");
+            e.printStackTrace();
+        }
+    }
+    
+    @FXML
+    private void openAjuda() {
+        try {
+            txtTitol.setText("Ajuda i informació de la app");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ajuda.fxml"));
+           
+            // Cargamos el nodo raíz
+            BorderPane root = loader.load();
+
+            // --- ESTA ES LA CONEXIÓN QUE TE FALTA PARA QUE EL BOTÓN 'SORTIR' FUNCIONE ---
+            AjudaController ajudaCtrl = loader.getController();
+            ajudaCtrl.setMainController(this); 
+            // --------------------------------------------------------------------------
+
+            // 1. FORZAR CRECIMIENTO
+            root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            root.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+
+            // 2. SOLUCIONAR EL PROBLEMA DEL <TOP> (Mover contenido al centro)
+            if (root.getTop() != null) {
+                Node contenido = root.getTop();
+                root.setTop(null);    
+                root.setCenter(contenido); 
+                
+                if (contenido instanceof Region) {
+                    Region pane = (Region) contenido;
+                    pane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                    pane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                }
+            }
+
+            // 3. BINDING TOTAL
+            root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
+            root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
+
+            mainDisplayArea.getChildren().setAll(root);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
     public void actualizarInterfazTrasLogin() {
         UsuariDTO user = SessionManager.getUsuario();
-        if (user == null) return;
+       // if (user == null) return;
 
-        // 1. Actualizamos botones laterales
+        // DEBUG 1: ¿Realmente SessionManager tiene al usuario?
+        if (user == null) {
+            System.out.println("ERROR: SessionManager devolvió NULL");
+            return;
+        } else {
+            System.out.println("OK: Usuario recuperado: " + user.getUsername());
+        }
+        
+        // 1. Actualizar botones laterales (tu código actual)
         btnUserSession.setText(user.getUsername());
         btnLogout.setVisible(true);
         btnLogout.setManaged(true);
+        btnCrearLlista.setVisible(true);
+        btnCrearLlista.setManaged(true);
+        btnLlistesPrivades.setVisible(true);
+        btnLlistesPrivades.setManaged(true);
+        // ... activar el resto de botones ...
 
-        // 2. Limpiamos el área principal (el HBox de las tarjetas pequeñas)
-        tablaProductos.getItems().clear(); 
-        tablaProductos.getColumns().clear(); 
-        
-        // OPCIONAL: Si quieres que ocupe todo el alto, 
-        // asegúrate de que el padre de mainDisplayArea no tenga otros hijos estorbando
-        
-        // 3. Crear una "Super Card" grande
-        VBox superCard = new VBox(20);
-        superCard.setAlignment(Pos.TOP_LEFT);
-        superCard.setPadding(new Insets(40));
-        
-        // Hacemos que la tarjeta se expanda
-        superCard.setPrefWidth(800); 
-        superCard.setMinWidth(600);
-        superCard.setStyle("-fx-background-color: white; -fx-background-radius: 20; " +
-                            "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 8);");
+        // 2. Cargar la "página" de usuario desde el FXML
+        try {
+            txtTitol.setText("Perfil d'Usuari");
+            
+            // Cargamos el archivo FXML específico
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/perfilUsuari.fxml"));
+            BorderPane root = loader.load();
 
-        // Título con estilo moderno
-        Label title = new Label("Perfil d'Usuari");
-        title.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1E1E2E;");
-        
-        // Datos con iconos o etiquetas claras
-        Label name = new Label("👤 Nom d'usuari:  " + user.getUsername());
-        Label email = new Label("✉️ Correu electrònic:  " + user.getEmail());
-        Label fecha = new Label("📅 Membre des de:  " + user.getDataCreacio());
+            // 3. Pasar datos al controlador de la vista cargada (si es necesario)
+            // Por ejemplo, si tienes un UsuarioController para gestionar esa vista:
+            Object controller = loader.getController();
+            if (controller instanceof UsuarioController) {
+                ((UsuarioController) controller).setMainController(this);
+                System.out.println("Enviando datos al UsuarioController...");
+                ((UsuarioController) controller).cargarDatos(user);
+            }
 
-        String estiloTexto = "-fx-font-size: 18px; -fx-text-fill: #444444;";
-        name.setStyle(estiloTexto);
-        email.setStyle(estiloTexto);
-        fecha.setStyle(estiloTexto);
+            // 4. Ajustes de expansión (idéntico a tus otros métodos)
+            root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            root.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
 
-        // Añadir todo a la super card
-        superCard.getChildren().addAll(title, new Separator(), name, email, fecha);
-        
-        // 4. Inyectar la super card en el área principal
-        tablaProductos.getItems().clear(); 
-        tablaProductos.getColumns().clear(); 
+            if (root.getTop() != null) {
+                Node contenido = root.getTop();
+                root.setTop(null);    
+                root.setCenter(contenido); 
+            }
+
+            // 5. Vincular tamaño e inyectar en el área central
+            root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
+            root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
+
+            mainDisplayArea.getChildren().setAll(root);
+
+        } catch (IOException e) {
+            System.err.println("Error cargando usuario.fxml: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
 }

@@ -36,10 +36,10 @@
                   <JFXButton fx:id="btnUserSession" alignment="BASELINE_LEFT" onAction="#openLoginWindow" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0; -fx-background-color: #313144;" text="Login" textFill="WHITE">
                      <font> <Font size="14.0" /> </font>
                   </JFXButton>
-                  <JFXButton fx:id="btnLlistesPubliques" alignment="BASELINE_LEFT" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Llistes publiques" textFill="#a0a0a0">
+                  <JFXButton fx:id="btnLlistesPubliques"  onAction="#openLlistesPubliques"  alignment="BASELINE_LEFT" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Llistes publiques" textFill="#a0a0a0">
                      <font> <Font size="14.0" /> </font>
                   </JFXButton>
-                  <JFXButton fx:id="btnProductes" alignment="BASELINE_LEFT" onAction="#openProducts" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Productes" textFill="#a0a0a0">
+                  <JFXButton fx:id="btnProductes" alignment="BASELINE_LEFT"  prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Productes" textFill="#a0a0a0">
                      <font> <Font size="14.0" /> </font>
                   </JFXButton>
                   <JFXButton fx:id="btnLlistesPrivades" alignment="BASELINE_LEFT" managed="false" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Les meves llistes" textFill="#a0a0a0" visible="false">
@@ -57,7 +57,7 @@
                         <Font size="14.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton fx:id="btnAjuda" alignment="BASELINE_LEFT" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Ayuda" textFill="#a0a0a0">
+                  <JFXButton fx:id="btnAjuda" onAction="#openAjuda" alignment="BASELINE_LEFT" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Ajuda" textFill="#a0a0a0">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -82,7 +82,7 @@
          </children>
       </VBox>
    </left>
-<!-- CUERPO PRINCIPAL -->
+    <!-- CUERPO PRINCIPAL -->
    <center>
       <VBox prefHeight="200.0" prefWidth="100.0" spacing="20.0" BorderPane.alignment="CENTER">
          <children>
@@ -97,7 +97,7 @@
                   </Label>
                   <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                      <children>
-                        <TextField fx:id="txbBuscar" promptText="Buscar..." style="-fx-background-radius: 20; -fx-border-color: #ddd; -fx-border-radius: 20; -fx-background-color: white;" />
+                        <TextField fx:id="txtBuscar" promptText="Buscar..." style="-fx-background-radius: 20; -fx-border-color: #ddd; -fx-border-radius: 20; -fx-background-color: white;" />
                         <JFXButton fx:id="btnOpcions" prefHeight="35.0" prefWidth="35.0" text="⋮" textFill="#666">
                            <font> <Font size="18.0" /> </font>
                         </JFXButton>
@@ -105,6 +105,7 @@
                   </HBox>
                </children>
             </HBox>
+            
             
             <!-- Contenedor de Tarjetas (Cards) -->
 		<!-- Contenedor dinámico -->
