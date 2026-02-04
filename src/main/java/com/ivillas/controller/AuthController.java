@@ -5,9 +5,6 @@ import java.sql.Connection;
 import java.util.Map;
 import java.util.Properties;
 import jakarta.mail.PasswordAuthentication;
-
-import java.net.InetSocketAddress;
-import java.net.ProxySelector;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -59,7 +56,7 @@ public class AuthController {
        //     .build();
     
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final String BASE_URL = "http://estalvia.ddns.net:8081/auth";
+    private final String BASE_URL = "localhost:8081/auth";
     
  // Datos del servidor (Ejemplo con Gmail)
     private final String remitente = "tu_correo@gmail.com";

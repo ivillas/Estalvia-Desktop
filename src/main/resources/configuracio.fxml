@@ -34,12 +34,12 @@
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
-            <JFXButton fx:id="btnAplicarConfig" layoutX="276.0" layoutY="642.0" pickOnBounds="false" prefHeight="34.0" prefWidth="163.0" snapToPixel="false" styleClass="jfx-button" text="Aplicar Canvis" textFill="#dd0f1a">
+            <JFXButton fx:id="btnAplicarConfig" onAction="#handleGuardarConfig" layoutX="276.0" layoutY="642.0" pickOnBounds="false" prefHeight="34.0" prefWidth="163.0" snapToPixel="false" styleClass="jfx-button" text="Aplicar Canvis" textFill="#dd0f1a">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
             </JFXButton>
-            <JFXButton fx:id="btnCancelarConfig" layoutX="500.0" layoutY="642.0" onAction="#openInici" pickOnBounds="false" prefHeight="34.0" prefWidth="163.0" snapToPixel="false" stylesheets="@styles.css" text="Sortir" textFill="#dd0f1a">
+            <JFXButton fx:id="btnCancelarConfig"  layoutX="500.0" layoutY="642.0" onAction="#openInici" pickOnBounds="false" prefHeight="34.0" prefWidth="163.0" snapToPixel="false" stylesheets="@styles.css" text="Sortir" textFill="#dd0f1a">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
