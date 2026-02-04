@@ -1,7 +1,6 @@
 com\ivillas\request\ForgotRequest.class
 com\ivillas\controller\ProveidorsController.class
 com\ivillas\controller\TargetaController.class
-com\ivillas\controller\MainController$1.class
 com\ivillas\controller\IniciController.class
 App.class
 com\ivillas\service\LlistaServiceClient$3.class
