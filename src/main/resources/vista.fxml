@@ -39,10 +39,10 @@
                   <JFXButton fx:id="btnLlistesPubliques"  onAction="#openLlistesPubliques"  alignment="BASELINE_LEFT" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Llistes publiques" textFill="#a0a0a0">
                      <font> <Font size="14.0" /> </font>
                   </JFXButton>
-                  <JFXButton fx:id="btnProductes" alignment="BASELINE_LEFT"  prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Productes" textFill="#a0a0a0">
+                  <JFXButton fx:id="btnProductes" onAction="#openProductes" alignment="BASELINE_LEFT"  prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Productes" textFill="#a0a0a0">
                      <font> <Font size="14.0" /> </font>
                   </JFXButton>
-                  <JFXButton fx:id="btnLlistesPrivades" alignment="BASELINE_LEFT" managed="false" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Les meves llistes" textFill="#a0a0a0" visible="false">
+                  <JFXButton fx:id="btnLlistesPrivades"  onAction="#openLlistesPrivades" alignment="BASELINE_LEFT" managed="false" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Les meves llistes" textFill="#a0a0a0" visible="false">
                      <font>
                         <Font size="14.0" />
                      </font>

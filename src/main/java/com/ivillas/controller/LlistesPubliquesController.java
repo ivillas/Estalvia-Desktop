@@ -33,6 +33,8 @@ public class LlistesPubliquesController {
         cargarListasPubliques();
     }
 
+    
+    
     public void cargarListasPubliques() {
         // 1. Crear una tarea en segundo plano
         Task<List<LlistaDTO>> task = new Task<>() {

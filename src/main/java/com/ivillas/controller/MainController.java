@@ -46,12 +46,11 @@ public class MainController {
     @FXML private JFXButton btnLogout;
     @FXML private JFXButton btnProductes;
     @FXML private JFXButton btnLlistesPrivades;
+    @FXML private JFXButton btnLlistesPubliques;
     @FXML private JFXButton btnCrearLlista;
     @FXML private JFXButton btnSupers;
-    @FXML private TableView<ProductePreusDTO> tablaProductos;
     @FXML private TextField txtBuscador;
     @FXML private StackPane mainDisplayArea;
-    private List<ProductePreusDTO> listaMaestra = new ArrayList<>();
 
     @FXML
     public void initialize() {
@@ -183,45 +182,10 @@ public class MainController {
         }
     }
     
-    @FXML
-    private void handleBtnProductes() {
-        txtTitol.setText("Catàleg de Productes");
-        tablaProductos.setVisible(true);
-        tablaProductos.setManaged(true);
-        cargarProductosDesdeNAS();
-    }
 
     
-    private void cargarProductosDesdeNAS() {
-        Task<List<ProductePreusDTO>> task = new Task<>() {
-            @Override protected List<ProductePreusDTO> call() throws Exception {
-                return ProducteServiceClient.getProductos(); // Tu método existente
-            }
-        };
-
-        task.setOnSucceeded(e -> {
-            listaMaestra = task.getValue();
-            renderizarProductos(listaMaestra);
-        });
-        new Thread(task).start();
-    }
-
-    private void renderizarProductos(List<ProductePreusDTO> lista) {
-        this.listaMaestra = lista; // Actualizamos la lista para las columnas
-        configurarColumnasDinamicas(); 
-        tablaProductos.getItems().setAll(lista); 
-    }
- 
     
-    
-    @FXML
-    private void handleSearch() {
-        String texto = txtBuscador.getText().toLowerCase();
-        List<ProductePreusDTO> filtrados = listaMaestra.stream()
-            .filter(p -> p.nombre.toLowerCase().contains(texto) || p.marca.toLowerCase().contains(texto))
-            .collect(Collectors.toList());
-        renderizarProductos(filtrados);
-    }
+
 
 
     @FXML
@@ -269,91 +233,10 @@ public class MainController {
         System.exit(0);
     }
     
-    private VBox crearCard(ProductePreusDTO p) {
-        // 1. Crear el contenedor principal del cuadrito
-        VBox card = new VBox(8); // 8 es el espaciado entre elementos
-        card.setPrefWidth(220);
-        card.setMinWidth(220);
-        card.setMaxWidth(220);
-        
-        // Estilo visual (Sombra y bordes redondeados)
-        card.setStyle("-fx-background-color: white; " +
-                      "-fx-background-radius: 15; " +
-                      "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5); " +
-                      "-fx-padding: 15;");
-
-        // 2. Título (Nombre del producto)
-        Label lblNombre = new Label(p.nombre != null ? p.nombre.toUpperCase() : "Producte sense nom");
-        lblNombre.setWrapText(true);
-        lblNombre.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333;");
-        lblNombre.setMinHeight(40); // Para que todos tengan el mismo alto de texto
-
-        // 3. Subtítulo (Marca)
-        Label lblMarca = new Label(p.marca != null ? p.marca : "Marca blanca");
-        lblMarca.setStyle("-fx-text-fill: #888; -fx-font-size: 12px;");
-
-        // 4. Contenedor de Precios
-        VBox vboxPrecios = new VBox(4);
-        vboxPrecios.setStyle("-fx-padding: 10 0 0 0; -fx-border-color: #EEE; -fx-border-width: 1 0 0 0;");
-        
-        if (p.precios != null && !p.precios.isEmpty()) {
-            p.precios.forEach((supermercado, precio) -> {
-                HBox filaPrecio = new HBox();
-                Label lblSuper = new Label(supermercado + ": ");
-                Label lblPrecio = new Label(String.format("%.2f €", precio.doubleValue()));
-                
-                lblSuper.setStyle("-fx-font-size: 11px; -fx-text-fill: #666;");
-                lblPrecio.setStyle("-fx-font-weight: bold; -fx-text-fill: #6200EE; -fx-font-size: 11px;");
-                
-                Region spacer = new Region();
-                HBox.setHgrow(spacer, Priority.ALWAYS); // Empuja el precio a la derecha
-                
-                filaPrecio.getChildren().addAll(lblSuper, spacer, lblPrecio);
-                vboxPrecios.getChildren().add(filaPrecio);
-            });
-        } else {
-            vboxPrecios.getChildren().add(new Label("Sense preus disponobles"));
-        }
-
-        // 5. Unir todo
-        card.getChildren().addAll(lblNombre, lblMarca, vboxPrecios);
-        
-        return card;
-    }
 
     
 
-    private void configurarColumnasDinamicas() {
-        if (tablaProductos == null) return; // Seguridad extra
 
-        tablaProductos.getColumns().clear();
-
-        // 1. Columna Producto
-        TableColumn<ProductePreusDTO, String> colNombre = new TableColumn<>("Producto");
-        colNombre.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().nombre));
-        tablaProductos.getColumns().add(colNombre);
-
-        // 2. Columna Marca
-        TableColumn<ProductePreusDTO, String> colMarca = new TableColumn<>("Marca");
-        colMarca.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().marca));
-        tablaProductos.getColumns().add(colMarca);
-
-        // 3. Columnas Dinámicas por Supermercado (Asumiendo que listaMaestra ya tiene datos)
-        if (!listaMaestra.isEmpty()) {
-            Set<String> supers = listaMaestra.stream()
-                .flatMap(p -> p.precios.keySet().stream())
-                .collect(Collectors.toSet());
-
-            for (String s : supers) {
-                TableColumn<ProductePreusDTO, String> col = new TableColumn<>(s);
-                col.setCellValueFactory(data -> {
-                    BigDecimal precio = data.getValue().precios.get(s);
-                    return new SimpleStringProperty(precio != null ? precio.toString() + " €" : "-");
-                });
-                tablaProductos.getColumns().add(col);
-            }
-        }
-    }
     
 
     @FXML
@@ -396,6 +279,31 @@ public class MainController {
     }
     
     @FXML
+    private void openLlistesPrivades() {
+        try {
+            txtTitol.setText("Les meves llistes");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/llistesPrivades.fxml"));
+            
+            BorderPane root = loader.load();
+
+            // Conexión con el controlador
+            LlistesPrivadesController llistapCtrl = loader.getController();
+            llistapCtrl.setMainController(this); 
+
+            // Vincular al área principal para que se estire
+            root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
+            root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
+
+            // Inyectar en la vista
+            mainDisplayArea.getChildren().setAll(root);
+
+        } catch (IOException e) {
+            System.err.println("Error carregant llistesPrivades.fxml");
+            e.printStackTrace();
+        }
+    }
+    
+    @FXML
     private void openLlistesPubliques() {
         try {
             txtTitol.setText("Llistes creades pels usuaris");
@@ -416,6 +324,32 @@ public class MainController {
 
         } catch (IOException e) {
             System.err.println("Error cargando llistesPubliques.fxml");
+            e.printStackTrace();
+        }
+    }
+    
+    
+    @FXML
+    private void openProductes() {
+        try {
+            txtTitol.setText("Llista de productes disponibles amb els seus preus");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/productes.fxml"));
+            
+            BorderPane root = loader.load();
+
+            // Conexión con el controlador
+            ProductesController productsCtrl = loader.getController();
+            productsCtrl.setMainController(this); 
+
+            // Vincular al área principal para que se estire
+            root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
+            root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
+
+            // Inyectar en la vista
+            mainDisplayArea.getChildren().setAll(root);
+
+        } catch (IOException e) {
+            System.err.println("Error carregant productes.fxml");
             e.printStackTrace();
         }
     }
