@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="20.0" prefWidth="600.0" prefHeight="500.0" style="-fx-background-color: white;" xmlns="http://javafx.com" xmlns:fx="http://javafx.com" fx:controller="com.ivillas.controller.DetalleController">
+    <padding>
+        <Insets top="25" right="25" bottom="25" left="25"/>
+    </padding>
+    <children>
+        <HBox alignment="CENTER_LEFT" spacing="15">
+            <children>
+                <VBox HBox.hgrow="ALWAYS">
+                    <Label fx:id="lblTitulo" text="Nombre de la Lista" style="-fx-font-weight: bold; -fx-font-size: 24; -fx-text-fill: #2C3E50;" />
+                    <Label fx:id="lblAutor" text="Creado por: Usuario" style="-fx-text-fill: #7F8C8D;" />
+                </VBox>
+                <Button text="Cerrar" onAction="#cerrarVentana" style="-fx-background-color: #E74C3C; -fx-text-fill: white;" />
+            </children>
+        </HBox>
+
+        <Label fx:id="lblDescripcion" wrapText="true" text="Descripción detallada aquí..." style="-fx-font-size: 14;" />
+
+        <TableView fx:id="tablaProductos" VBox.vgrow="ALWAYS" style="-fx-background-radius: 10;">
+            <columns>
+                <TableColumn fx:id="colNombre" prefWidth="300.0" text="Producte" />
+                <TableColumn fx:id="colCantidad" prefWidth="100.0" text="Quantitat" />
+                <TableColumn fx:id="colUnidad" prefWidth="120.0" text="Unitat" />
+            </columns>
+        </TableView>
+
+        <HBox alignment="CENTER_RIGHT">
+            <Button fx:id="btnCopiarDetalle" text="Afegir tota la llista a la meva compra" onAction="#copiarLista" 
+                    style="-fx-background-color: #79EDED; -fx-font-weight: bold; -fx-padding: 10 20;" />
+        </HBox>
+    </children>
+</VBox>
