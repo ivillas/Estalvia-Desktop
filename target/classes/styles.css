@@ -1,0 +1,19 @@
+.jfx-button {
+    -fx-background-color: #87CEEB; /* Color de fons: blau celeste */
+    -fx-text-fill: black; /* Color del text: negre */
+    -fx-border-color: #4682B4; /* Color del reborde: blau més fosc */
+    -fx-border-radius: 15; /* Radi del reborde per a cantonades arrodonides */
+    -fx-background-radius: 15; /* Radi del fons per a cantonades arrodonides */
+    -fx-border-width: 2; /* Amplada del reborde */
+    -fx-padding: 5 10; /* Espai interior: 5 amunt i avall, 10 a l'esquerra i a la dreta */
+    -fx-font-size: 14px; /* Mida de la font */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0.0, 0, 1); /* Ombra */
+}
+
+.button-ajustes {
+    -fx-background-image: url("engranatge.png");
+    -fx-background-size: contain; /* Ajusta la imagen al tamaño del botón */
+    -fx-background-repeat: no-repeat; /* Evita que la imagen se repita */
+    -fx-background-color: transparent; /* Fondo transparente */
+    -fx-padding: 10; /* Espaciado interno */
+}

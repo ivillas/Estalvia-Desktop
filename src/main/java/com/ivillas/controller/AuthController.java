@@ -5,9 +5,6 @@ import java.sql.Connection;
 import java.util.Map;
 import java.util.Properties;
 import jakarta.mail.PasswordAuthentication;
-
-import java.net.InetSocketAddress;
-import java.net.ProxySelector;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -53,13 +50,13 @@ public class AuthController {
     @FXML private TextField txtEmailForgot;
     
         
-    //private final HttpClient httpClient = HttpClient.newHttpClient();
-    private final HttpClient httpClient = HttpClient.newBuilder()
-            .proxy(ProxySelector.of(new InetSocketAddress("192.168.2.1", 3128))) 
-            .build();
+    private final HttpClient httpClient = HttpClient.newHttpClient();
+   // private final HttpClient httpClient = HttpClient.newBuilder()
+     //       .proxy(ProxySelector.of(new InetSocketAddress("192.168.2.1", 3128))) 
+       //     .build();
     
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final String BASE_URL = "http://estalvia.ddns.net:8081/auth";
+    private final String BASE_URL = "localhost:8081/auth";
     
  // Datos del servidor (Ejemplo con Gmail)
     private final String remitente = "tu_correo@gmail.com";
@@ -122,43 +119,59 @@ public class AuthController {
 
             httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
-                    Platform.runLater(() -> { // Ponemos el Platform.runLater aquí para que cubra todo lo que toca la UI
-                        if (response.statusCode() == 200) {
-                            try {
-                                // Si es Login, procesamos el usuario
+                    Platform.runLater(() -> {
+                        try {
+                            int status = response.statusCode();
+                            String responseBody = response.body();
+
+                            System.out.println("RESPUESTA DEL SERVIDOR (" + status + "): " + responseBody);
+
+                            if (status == 200) {
                                 if (endpoint.contains("login")) {
-                                    UsuariDTO user = objectMapper.readValue(response.body(), UsuariDTO.class);
-                                    SessionManager.setUsuario(user);
-                                    
-                                    if (mainController != null) {
-                                        mainController.actualizarInterfazTrasLogin();
+                                    // Intentamos parsear solo si la respuesta es JSON
+                                    if (responseBody != null && responseBody.startsWith("{")) {
+                                        UsuariDTO user = objectMapper.readValue(responseBody, UsuariDTO.class);
+                                        SessionManager.setUsuario(user);
+
+                                        if (mainController != null) {
+                                            mainController.actualizarInterfazTrasLogin();
+                                        }
+                                        // Cerramos la ventana de login
+                                        txtUserLogin.getScene().getWindow().hide(); 
+                                    } else {
+                                        mostrarAlerta("Error", "Respuesta inesperada del servidor: " + responseBody);
                                     }
-                                    // Cerramos la ventana actual (la de login)
-                                    txtUserLogin.getScene().getWindow().hide(); 
                                 } else {
-                                    // Si es registro u otro, solo mostramos éxito
+                                    // Registro u otros endpoints
                                     mostrarAlertaExito("Éxit", mensajeExito);
                                     showLogin();
                                 }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                mostrarAlerta("Error", "Error alm processar les dades al servidor");
+                            } else {
+                                // Si el backend devuelve error con mensaje
+                                String msg = responseBody != null && !responseBody.isEmpty()
+                                        ? responseBody
+                                        : "Código " + status;
+                                mostrarAlerta("Error", "El servidor respondió: " + msg);
                             }
-                        } else {
-                            mostrarAlerta("Error", "El servidor respon: " + response.statusCode());
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            mostrarAlerta("Error", "Error al procesar los datos del servidor: " + e.getMessage());
                         }
                     });
                 })
                 .exceptionally(e -> {
-                    Platform.runLater(() -> mostrarAlerta("Error", "no hi ha conexio amb el servidor"));
+                    e.printStackTrace();
+                    Platform.runLater(() -> mostrarAlerta("Error", "No hay conexión con el servidor"));
                     return null;
                 });
 
         } catch (Exception e) {
             e.printStackTrace();
+            mostrarAlerta("Error", "Error al enviar la petición: " + e.getMessage());
         }
     }
-    
+
     private String hashPassword(String passwordPlana) {
         // El método hashpw genera el hash. 
         // gensalt() determina la complejidad (por defecto es 10)
@@ -263,6 +276,4 @@ public class AuthController {
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
-   
-
 }

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="900.0" prefHeight="700.0" prefWidth="883.0" style="-fx-background-color: #F3F4F6;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ivillas.controller.ConfigController">
+   <right>
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="702.0" prefWidth="903.0" snapToPixel="false" style="-fx-background-color: #E6EAF2; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" styleClass="jfx-button" stylesheets="@styles.css" BorderPane.alignment="CENTER">
+         <children>
+            <TextField fx:id="txtPortProxi" layoutX="510.0" layoutY="166.0" managed="false" prefHeight="25.0" prefWidth="67.0" promptText="Port" visible="false" />
+            <JFXCheckBox fx:id="cxbProxi" layoutX="122.0" layoutY="101.0" onAction="#handleProxyAction" text="Utilitzar proxi">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXCheckBox>
+            <Label fx:id="lblPortProxi" layoutX="452.0" layoutY="170.0" managed="false" text="Port:" visible="false">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <TextField fx:id="txtIpProxi" layoutX="153.0" layoutY="166.0" managed="false" prefHeight="25.0" prefWidth="277.0" promptText="Ip del proxi" visible="false" />
+            <Label fx:id="lblIpProxi" layoutX="122.0" layoutY="170.0" managed="false" text="IP:" visible="false">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label layoutX="249.0" layoutY="34.0" prefHeight="40.0" prefWidth="306.0" text="Configuracio de la conexio">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <JFXButton fx:id="btnAplicarConfig" onAction="#handleGuardarConfig" layoutX="276.0" layoutY="642.0" pickOnBounds="false" prefHeight="34.0" prefWidth="163.0" snapToPixel="false" styleClass="jfx-button" text="Aplicar Canvis" textFill="#dd0f1a">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXButton>
+            <JFXButton fx:id="btnCancelarConfig"  layoutX="500.0" layoutY="642.0" onAction="#openInici" pickOnBounds="false" prefHeight="34.0" prefWidth="163.0" snapToPixel="false" stylesheets="@styles.css" text="Sortir" textFill="#dd0f1a">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXButton>
+            <Label layoutX="234.0" layoutY="233.0" prefHeight="40.0" prefWidth="306.0" text="Configuracio dels supermercats">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label layoutX="129.0" layoutY="292.0" prefHeight="40.0" prefWidth="306.0" text="Elegeix els supermercats que vols utilitzar:">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <JFXCheckBox fx:id="cxbMercadona" layoutX="122.0" layoutY="362.0" selected="true" text="Mercadona">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXCheckBox>
+            <JFXCheckBox fx:id="cxbCarrefour" layoutX="269.0" layoutY="362.0" selected="true" text="Carrefour">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXCheckBox>
+            <JFXCheckBox fx:id="cxbPlus" layoutX="406.0" layoutY="362.0" selected="true" text="Plus Fresc">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXCheckBox>
+            <JFXCheckBox fx:id="cxbConsum" layoutX="269.0" layoutY="433.0" selected="true" text="Consum">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXCheckBox>
+            <JFXCheckBox fx:id="cxbAlcampo" layoutX="122.0" layoutY="433.0" selected="true" text="Alcampo">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXCheckBox>
+         </children>
+      </AnchorPane>
+   </right>
+</BorderPane>

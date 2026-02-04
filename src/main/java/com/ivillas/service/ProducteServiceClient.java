@@ -19,11 +19,13 @@ public class ProducteServiceClient {
 
     public static List<ProductePreusDTO> getProductos() throws Exception {
 
-        //HttpClient client = HttpClient.newHttpClient();
-        HttpClient client = HttpClient.newBuilder()
+       HttpClient client = HttpClient.newHttpClient();
+       /*
+    	
+    	HttpClient client = HttpClient.newBuilder()
                 .proxy(ProxySelector.of(new InetSocketAddress("192.168.2.1", 3128))) 
                 .build();
-  
+  */
 
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(URL))
