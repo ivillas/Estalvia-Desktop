@@ -21,7 +21,6 @@ import com.ivillas.request.CrearLlistaRequest;
 public class LlistaServiceClient {
 
     private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule()); // Imprescindible para LocalDateTime
-
     
     // 1. Obtener Listas Públicas (para todos)
     public static List<LlistaDTO> getPublicas() throws Exception {
@@ -33,16 +32,10 @@ public class LlistaServiceClient {
 
         HttpResponse<String> response = HttpClientProvider.getClient()
                 .send(request, HttpResponse.BodyHandlers.ofString());
-        
-        // ESTO ES CLAVE: Mira qué imprime en la consola del IDE
-        System.out.println("URL llamada: " + request.uri());
-        System.out.println("Status Code: " + response.statusCode());
-        System.out.println("Cuerpo recibido: " + response.body());
 
         if (response.statusCode() != 200) {
             throw new RuntimeException("Error: " + response.statusCode());
         }
-
         // Si el cuerpo es HTML (empieza por <), esto fallará. 
         // El print de arriba te dirá por qué el servidor manda HTML.
         return mapper.readValue(response.body(), new TypeReference<List<LlistaDTO>>() {});
@@ -72,8 +65,8 @@ public class LlistaServiceClient {
         return mapper.readValue(response.body(), new TypeReference<Map<String, Long>>() {});
     }
 
-
     public static void copiarAmiLista(LlistaDTO listaPublica, Long miUserId) throws Exception {
+    	
         Map<String, Object> req = new HashMap<>();
         req.put("usuariId", miUserId);
         req.put("nombre", "Copia: " + listaPublica.getNombre());

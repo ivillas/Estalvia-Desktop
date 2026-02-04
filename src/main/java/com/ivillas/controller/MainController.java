@@ -190,11 +190,15 @@ public class MainController {
 
     @FXML
     private void openLoginWindow() throws IOException {
-        // 1. Localizar el FXML
-        URL fxmlLocation = getClass().getResource("/login.fxml");
-        if (fxmlLocation == null) {
-            throw new IOException("¡Error! No es troba login.fxml");
+        // Si ya hay sesión, no abrimos el login, vamos al perfil
+        if (SessionManager.isLoggedIn()) {
+            actualizarInterfazTrasLogin();
+            return;
         }
+
+        // Si no hay sesión, abrimos la ventana modal de siempre
+        URL fxmlLocation = getClass().getResource("/login.fxml");
+        if (fxmlLocation == null) throw new IOException("¡Error! No es troba login.fxml");
 
         // 2. USAR EL CARGADOR DE FORMA NO ESTÁTICA
         FXMLLoader loader = new FXMLLoader(fxmlLocation);
@@ -422,34 +426,22 @@ public class MainController {
         // 2. Cargar la "página" de usuario desde el FXML
         try {
             txtTitol.setText("Perfil d'Usuari");
-            
-            // Cargamos el archivo FXML específico
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/perfilUsuari.fxml"));
             BorderPane root = loader.load();
 
-            // 3. Pasar datos al controlador de la vista cargada (si es necesario)
-            // Por ejemplo, si tienes un UsuarioController para gestionar esa vista:
+            // Obtener el controlador de forma segura
             Object controller = loader.getController();
-            if (controller instanceof UsuarioController) {
-                ((UsuarioController) controller).setMainController(this);
-                System.out.println("Enviando datos al UsuarioController...");
-                ((UsuarioController) controller).cargarDatos(user);
+            
+            // CAMBIA 'UsuarioController' por el nombre EXACTO de tu clase (ej: UsuariController)
+            // Si aún no la tienes, comenta estas líneas para que no falle al compilar
+            if (controller instanceof UsuarioController) { 
+                UsuarioController uc = (UsuarioController) controller;
+                uc.setMainController(this);
+                uc.cargarDatos(user);
             }
 
-            // 4. Ajustes de expansión (idéntico a tus otros métodos)
-            root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-            root.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-
-            if (root.getTop() != null) {
-                Node contenido = root.getTop();
-                root.setTop(null);    
-                root.setCenter(contenido); 
-            }
-
-            // 5. Vincular tamaño e inyectar en el área central
             root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
             root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
-
             mainDisplayArea.getChildren().setAll(root);
 
         } catch (IOException e) {

@@ -1,6 +1,9 @@
 package com.ivillas.controller;
 
+import com.ivillas.model.ItemLlistaDTO;
 import com.ivillas.model.LlistaDTO;
+import com.ivillas.request.CrearLlistaRequest;
+import com.ivillas.request.ItemLlistaRequest;
 import com.ivillas.service.LlistaServiceClient;
 import com.ivillas.utils.SessionManager;
 
@@ -28,14 +31,26 @@ public class TargetaController {
         lblProductos.setText("Productes: " + totalItems);
         
         btnAfegir.setOnAction(e -> {
-            try {
-                Long miId = SessionManager.getUsuario().getUserId();
-                LlistaServiceClient.copiarAmiLista(listaActual, miId);
-                btnAfegir.setText("¡Guardada!");
-                btnAfegir.setDisable(true);
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            // 1. Obtener el borrador del manager
+            CrearLlistaRequest borrador = SessionManager.getListaTemporal();
+            
+            // 2. Volcar los productos de la lista pública al borrador
+            for (ItemLlistaDTO item : listaActual.getItems()) {
+                ItemLlistaRequest nuevo = new ItemLlistaRequest();
+                nuevo.setProductoId(item.getProductoId());
+                nuevo.setProductoNombre(item.getNombreProducto());
+                nuevo.setCantidad(item.getCantidad());
+                nuevo.setUnidad(item.getUnidad());
+                
+                borrador.getItems().add(nuevo);
             }
+            
+            // 3. OPCIONAL: Si quieres que el nombre también se copie al borrador:
+            if(borrador.getNombre() == null || borrador.getNombre().isEmpty()) {
+                borrador.setNombre(listaActual.getNombre());
+            }
+
+            btnAfegir.setText("Afegit al borrador!");
         });
     }
  

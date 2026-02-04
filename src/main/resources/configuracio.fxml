@@ -54,27 +54,27 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Label>
-            <JFXCheckBox fx:id="cxbMercadona" layoutX="122.0" layoutY="362.0" selected="true" text="Mercadona">
+            <JFXCheckBox fx:id="cxbMercadona" layoutX="122.0" layoutY="362.0"  text="Mercadona">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
             </JFXCheckBox>
-            <JFXCheckBox fx:id="cxbCarrefour" layoutX="269.0" layoutY="362.0" selected="true" text="Carrefour">
+            <JFXCheckBox fx:id="cxbCarrefour" layoutX="269.0" layoutY="362.0" text="Carrefour">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
             </JFXCheckBox>
-            <JFXCheckBox fx:id="cxbPlus" layoutX="406.0" layoutY="362.0" selected="true" text="Plus Fresc">
+            <JFXCheckBox fx:id="cxbPlus" layoutX="406.0" layoutY="362.0" text="Plus Fresc">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
             </JFXCheckBox>
-            <JFXCheckBox fx:id="cxbConsum" layoutX="269.0" layoutY="433.0" selected="true" text="Consum">
+            <JFXCheckBox fx:id="cxbConsum" layoutX="269.0" layoutY="433.0" text="Consum">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
             </JFXCheckBox>
-            <JFXCheckBox fx:id="cxbAlcampo" layoutX="122.0" layoutY="433.0" selected="true" text="Alcampo">
+            <JFXCheckBox fx:id="cxbAlcampo" layoutX="122.0" layoutY="433.0" text="Alcampo">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>

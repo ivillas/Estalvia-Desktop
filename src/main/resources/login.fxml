@@ -18,7 +18,7 @@
             <Text style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Inicia Sessió" />
             <TextField fx:id="txtUserLogin" maxWidth="250.0" promptText="Usuari" />
             <PasswordField fx:id="txtPassLogin" maxWidth="250.0" promptText="Contrasenya" />
-            <Button onAction="#handleLogin" prefWidth="250.0" style="-fx-background-color: #2196F3; -fx-text-fill: white;" text="Entrar" />
+            <Button fx:id="btnEntrar" onAction="#handleLogin" prefWidth="250.0" style="-fx-background-color: #2196F3; -fx-text-fill: white;" text="Entrar" />
             <Hyperlink onAction="#handleForgotPass" text="¿Has oblidat la contrasenya?" />
             <HBox alignment="CENTER" spacing="5.0">
                <children>

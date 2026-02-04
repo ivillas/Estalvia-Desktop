@@ -9,6 +9,7 @@ import com.ivillas.utils.SessionManager;
 import com.jfoenix.controls.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
@@ -17,6 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CrearLlistaController {
@@ -34,6 +36,23 @@ public class CrearLlistaController {
 
     @FXML
     public void initialize() {
+        // 1. Cargar lo que ya había
+        itemsEnLista.setAll(SessionManager.getListaTemporal().getItems());
+        txtNomLlista.setText(SessionManager.getListaTemporal().getNombre());
+        txtDescripcio.setText(SessionManager.getListaTemporal().getDescripcion());
+    	    
+    	    // 2. ESCUCHAR CAMBIOS: Cada vez que se borre o añada algo, se guarda en el Manager
+    	    itemsEnLista.addListener((ListChangeListener<ItemLlistaRequest>) c -> {
+    	        SessionManager.getListaTemporal().setItems(new ArrayList<>(itemsEnLista));
+    	    });
+
+    	    // 3. ESCUCHAR TEXTOS: Si el usuario escribe y cambia de vista, que se guarde
+    	    txtNomLlista.textProperty().addListener((obs, oldV, newV) -> SessionManager.getListaTemporal().setNombre(newV));
+    	    txtDescripcio.textProperty().addListener((obs, oldV, newV) -> SessionManager.getListaTemporal().setDescripcion(newV));
+
+    	    
+    	    listaVisual.setItems(itemsEnLista);
+    	
         cargarComboProductes();
         
         listaVisual.setItems(itemsEnLista);
@@ -134,6 +153,10 @@ public class CrearLlistaController {
                 nuevoItem.setUnidad(seleccionado.getUnidad());
 
                 itemsEnLista.add(nuevoItem);
+             // ACTUALIZAR EL TEMPORAL: Guardamos el estado actual en el SessionManager
+                SessionManager.getListaTemporal().setItems(new ArrayList<>(itemsEnLista));
+                SessionManager.getListaTemporal().setNombre(txtNomLlista.getText());
+                SessionManager.getListaTemporal().setDescripcion(txtDescripcio.getText());
                 txtCantidad.clear();
             } catch (NumberFormatException e) {
                 mostrarAlerta("Error", "La quantitat ha de ser un número.");
