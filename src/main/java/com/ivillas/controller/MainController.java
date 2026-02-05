@@ -54,7 +54,7 @@ public class MainController {
 
     @FXML
     public void initialize() {
-       
+    	    SessionManager.setMainController(this);
 
     }
 
@@ -189,7 +189,7 @@ public class MainController {
 
 
     @FXML
-    private void openLoginWindow() throws IOException {
+    public void openLoginWindow() throws IOException {
         // Si ya hay sesión, no abrimos el login, vamos al perfil
         if (SessionManager.isLoggedIn()) {
             actualizarInterfazTrasLogin();
@@ -217,7 +217,7 @@ public class MainController {
     }
     
     @FXML
-    private void handleLogout() {
+    public void handleLogout() {
         SessionManager.logout();
         btnUserSession.setText("Login");
         btnLogout.setVisible(false);

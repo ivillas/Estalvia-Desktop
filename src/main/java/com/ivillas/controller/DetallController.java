@@ -15,7 +15,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 
-public class DetalleController {
+public class DetallController {
     @FXML private Label lblTitulo, lblAutor, lblDescripcion;
     @FXML private TableView<ItemLlistaDTO> tablaProductos;
     @FXML private TableColumn<ItemLlistaDTO, String> colNombre, colCantidad, colUnidad;
@@ -48,6 +48,11 @@ public class DetalleController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    @FXML
+    private void eliminarLlista() {
+
     }
 
     @FXML

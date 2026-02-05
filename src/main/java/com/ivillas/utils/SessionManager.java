@@ -2,12 +2,14 @@ package com.ivillas.utils;
 
 import java.util.ArrayList;
 
+import com.ivillas.controller.MainController;
 import com.ivillas.model.UsuariDTO;
 import com.ivillas.request.CrearLlistaRequest;
 
 public class SessionManager {
     private static UsuariDTO usuarioLogueado;
     private static CrearLlistaRequest listaTemporal = new CrearLlistaRequest();
+    private static MainController mainController;
     
     public static CrearLlistaRequest getListaTemporal() {
         if (listaTemporal.getItems() == null) {
@@ -33,7 +35,15 @@ public class SessionManager {
     public static void logout() {
     	usuarioLogueado = null;
     }
-    
+
+
+	public static MainController getMainController() {
+		return mainController;
+	}
+	
+    public static void setMainController(MainController controller) {
+        mainController = controller;
+    }
     
     
 }

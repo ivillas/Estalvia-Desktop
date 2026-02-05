@@ -97,7 +97,7 @@ public class LlistesPubliquesController {
             Parent root = loader.load();
             
             // Supongamos que creas un DetalleController
-            DetalleController controller = loader.getController();
+            DetallController controller = loader.getController();
             controller.cargarDatos(lista);
 
             Stage stage = new Stage();

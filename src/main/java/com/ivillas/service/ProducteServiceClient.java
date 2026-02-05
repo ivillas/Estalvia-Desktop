@@ -36,7 +36,7 @@ public class ProducteServiceClient {
             client.send(request, HttpResponse.BodyHandlers.ofString());
 
         ObjectMapper mapper = new ObjectMapper();
-
+        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         return mapper.readValue(
             response.body(),
             new TypeReference<List<ProductePreusDTO>>() {}
