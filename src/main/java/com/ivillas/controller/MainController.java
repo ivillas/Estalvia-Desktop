@@ -182,12 +182,6 @@ public class MainController {
         }
     }
     
-
-    
-    
-
-
-
     @FXML
     public void openLoginWindow() throws IOException {
         // Si ya hay sesión, no abrimos el login, vamos al perfil
@@ -237,12 +231,6 @@ public class MainController {
         System.exit(0);
     }
     
-
-    
-
-
-    
-
     @FXML
     private void openProducts() {
         try {

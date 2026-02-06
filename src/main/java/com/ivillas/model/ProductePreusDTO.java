@@ -81,7 +81,5 @@ public class ProductePreusDTO {
 	public void setLastUpdate(java.time.LocalDateTime lastUpdate) {
 		this.lastUpdate = lastUpdate;
 	}
-    
-    
-    
+        
 }

@@ -1,32 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import com.jfoenix.controls.JFXCheckBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="900.0" prefHeight="700.0" prefWidth="883.0" style="-fx-background-color: #F3F4F6;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ivillas.controller.ProductesController">
    <top>
-      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="702.0" prefWidth="903.0" snapToPixel="false" style="-fx-background-color: #79EDED; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" stylesheets="@styles.css" BorderPane.alignment="CENTER">
+      <!-- Reducimos el prefHeight para que solo ocupe la barra superior de filtros -->
+      <AnchorPane prefHeight="60.0" prefWidth="903.0" style="-fx-background-color: #79EDED; -fx-background-radius: 0 0 15 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" stylesheets="@styles.css" BorderPane.alignment="CENTER">
          <children>
-            <Label layoutX="258.0" layoutY="477.0" prefHeight="70.0" prefWidth="402.0" text="Productes favorits">
+            <JFXCheckBox fx:id="chbTarget" layoutX="152.0" layoutY="17.0" text="Targetes">
+               <font><Font name="System Bold" size="18.0" /></font>
+            </JFXCheckBox>
+            <JFXCheckBox fx:id="ckbFavorit" layoutX="379.0" layoutY="17.0" text="Favorits">
+               <font><Font name="System Bold" size="18.0" /></font>
+            </JFXCheckBox>
+            <JFXCheckBox fx:id="chbLlista" layoutX="282.0" layoutY="17.0" text="Llista">
+               <font><Font name="System Bold" size="18.0" /></font>
+            </JFXCheckBox>
+            <Label fx:id="lblVista" layoutX="33.0" layoutY="12.0" text="Vista en:">
+               <font><Font name="System Bold" size="24.0" /></font>
+            </Label>
+            <Label fx:id="lblTotalProductes" layoutX="498.0" layoutY="13.0" prefHeight="35.0" prefWidth="358.0" text="0">
                <font>
-                  <Font size="48.0" />
+                  <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <HBox prefHeight="307.0" prefWidth="900.0" spacing="20.0">
-               <padding>
-                  <Insets left="30.0" right="30.0" />
-               </padding>
-               <children>
-                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="220.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" />
-                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="220.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" />
-                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="220.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" />
-                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="220.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" />
-               </children>
-            </HBox>
-         </children></AnchorPane>
+         </children>
+      </AnchorPane>
    </top>
+<center>
+   <!-- Usamos un StackPane para alternar las dos vistas en el mismo espacio -->
+   <StackPane>
+      <!-- VISTA 1: TARJETAS (Mosaico) -->
+      <ScrollPane fx:id="scrollTargetes" fitToWidth="true" style="-fx-background-color: transparent;">
+         <content>
+            <FlowPane fx:id="containerProductes" hgap="15.0" style="-fx-padding: 15;" vgap="15.0" />
+         </content>
+      </ScrollPane>
+
+      <!-- VISTA 2: TABLA (Lista optimizada) -->
+      <TableView fx:id="tablaProductes" visible="false">
+         <columns>
+            <TableColumn fx:id="colNom" prefWidth="350.0" text="Producte" />
+            <TableColumn fx:id="colMarca" prefWidth="150.0" text="Marca" />
+            <TableColumn fx:id="colPreu" prefWidth="120.0" text="Preu Mínim" />
+            <TableColumn fx:id="colAccions" prefWidth="60.0" text="" />
+         </columns>
+      </TableView>
+   </StackPane>
+</center>
 </BorderPane>
