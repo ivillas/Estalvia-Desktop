@@ -438,4 +438,12 @@ public class MainController {
         }
     }
     
+    public void refrescarVistaActualSiEsPerfil() {
+        // Si lo que hay ahora mismo en el área central es el perfil, volvemos a cargar los datos
+        // Esto se ejecutará en cuanto la API responda.
+        if ("Perfil d'Usuari".equals(txtTitol.getText())) {
+            actualizarInterfazTrasLogin(); // Esto recargará el perfil con los datos ya bajados de la API
+        }
+    }
+    
 }

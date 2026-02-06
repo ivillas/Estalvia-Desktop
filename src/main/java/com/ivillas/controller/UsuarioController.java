@@ -37,6 +37,9 @@ public class UsuarioController {
             lblData.setText(user.getDataCreacio());  
             lblLlistesPubliques.setText(String.valueOf(user.getnLlistesPublices()));
             lblLlistesPrivades.setText(String.valueOf(user.getnLlistesPrivades()));
+            if (SessionManager.isLoggedIn()) {
+                lblProductes.setText(String.valueOf(SessionManager.getIdsFavoritos().size()));
+            }
             
         }
     }

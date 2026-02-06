@@ -13,16 +13,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ivillas.model.ProductePreusDTO;
 import com.ivillas.network.HttpClientProvider;
 import com.ivillas.request.ItemLlistaRequest;
+import com.ivillas.service.ProducteServiceClient;
 import com.ivillas.service.SupermercatServiceClient;
 import com.ivillas.utils.SessionManager;
 import com.jfoenix.controls.JFXCheckBox;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
@@ -32,6 +36,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -42,6 +47,7 @@ import javafx.scene.layout.FlowPane;
 
 public class ProductesController implements Initializable {
 	@FXML private Label lblTotalProductes;
+	@FXML private Button btnFavorit;
     @FXML private FlowPane containerProductes;
     @FXML private JFXCheckBox chbTarget, chbLlista, ckbFavorit;
     @FXML private TableView<ProductePreusDTO> tablaProductes;
@@ -50,18 +56,16 @@ public class ProductesController implements Initializable {
     @FXML private ScrollPane scrollTargetes;
     private MainController mainController;
     @FXML private TableColumn<ProductePreusDTO, Void> colAccions;
-
+    @FXML private TableColumn<ProductePreusDTO, Void> colAnyadir;
     
     private List<ProductePreusDTO> llistaProductes = new ArrayList<>();
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule()); // Para el LocalDateTime
-
     
     // Añade este método para que el MainController pueda "registrarse"
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
-    }
-    
+    }   
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -72,12 +76,10 @@ public class ProductesController implements Initializable {
         if (!SessionManager.isLoggedIn()) {
             ckbFavorit.setVisible(false);
             colAccions.setVisible(false); // Oculta la columna de los corazones en la tabla
-        }
-        
+        }        
         carregarDades();
     }
-    
-    
+        
     private void abrirDetallePopup(ProductePreusDTO p) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Especificacions: " + p.getNombre());
@@ -155,137 +157,176 @@ public class ProductesController implements Initializable {
     }
 
     private void renderitzarUI() {
+        // Filtramos la lista según el checkbox de favoritos
+        List<ProductePreusDTO> listaFiltrada;
+        if (ckbFavorit.isSelected()) {
+            listaFiltrada = llistaProductes.stream()
+                    .filter(p -> SessionManager.esFavorito(p.getProducteId()))
+                    .collect(Collectors.toList());
+        } else {
+            listaFiltrada = llistaProductes;
+        }
+
         if (chbLlista.isSelected()) {
-            // MODO TABLA
             scrollTargetes.setVisible(false);
             tablaProductes.setVisible(true);
-            tablaProductes.setItems(FXCollections.observableArrayList(llistaProductes));
+            tablaProductes.setItems(FXCollections.observableArrayList(listaFiltrada));
         } else {
-            // MODO TARJETAS
             tablaProductes.setVisible(false);
             scrollTargetes.setVisible(true);
-            cargarTarjetasDinamicas();
+            cargarTarjetasDinamicasFiltradas(listaFiltrada);
         }
     }
     
-    private void cargarTarjetasDinamicas() {
+    private void cargarTarjetasDinamicasFiltradas(List<ProductePreusDTO> lista) {
         containerProductes.getChildren().clear();
-        
-        // Mostramos solo un máximo (ej. 50) para no colapsar la memoria en modo tarjetas
-        // Si hay miles, el usuario debería usar la Tabla
-        int limite = Math.min(llistaProductes.size(), 100); 
+        int limite = Math.min(lista.size(), 100); 
 
         for (int i = 0; i < limite; i++) {
-            ProductePreusDTO p = llistaProductes.get(i);
-            
-            // Filtro favoritos
-        //    if (ckbFavorit.isSelected() && !p.isFavorit()) continue;
-
+            ProductePreusDTO p = lista.get(i);
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/ProducteCard.fxml"));
                 Node card = loader.load();
-
-                // Obtenemos el controlador de la tarjeta y le pasamos los datos
                 ProducteItemController controller = loader.getController();
                 controller.setData(p);
-                if (!SessionManager.isLoggedIn()) {
-                   // controller.ocultarCorazon(); 
-                }
                 
-                // Opcional: Pasar el MainController si la tarjeta necesita hacer login/compras
-                // controller.setMainController(this.mainController);
+                // Lógica para el corazón de la tarjeta
+                if (!SessionManager.isLoggedIn()) {
+                    controller.ocultarCorazon(); 
+                } else if (SessionManager.esFavorito(p.getProducteId())) {
+                    controller.marcarCorazonRojo(); // Deberás crear este método en el item controller
+                }
 
                 containerProductes.getChildren().add(card);
-
             } catch (IOException e) {
-                System.err.println("Error cargando tarjeta para: " + p.getNombre());
+                e.printStackTrace();
             }
         }
     }
     
-    /*
-    public void ocultarCorazon() {
-        if (btnFavorit != null) {
-            btnFavorit.setVisible(false);
-            btnFavorit.setManaged(false); // Esto hace que no ocupe espacio al desaparecer
-        }
-    }
-        */
-
+    
+        
     
     private void configurarTabla() {
+        // 1. Columnas básicas
         colNom.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colMarca.setCellValueFactory(new PropertyValueFactory<>("marca"));
         
-        // 1. Mostrar Precio Mínimo + Supermercado
+        // 2. Columna Precio + Supermercado
         colPreu.setCellValueFactory(cellData -> {
             ProductePreusDTO p = cellData.getValue();
             Map<String, BigDecimal> precios = p.getPrecios();
-
             if (precios != null && !precios.isEmpty()) {
-                try {
-                    // Buscamos la entrada con el precio más bajo
-                    Map.Entry<String, BigDecimal> minEntry = precios.entrySet().stream()
-                        .filter(e -> e.getValue() != null) // Evitamos nulos por si acaso
-                        .min(Map.Entry.comparingByValue())
-                        .orElse(null);
-
-                    if (minEntry != null) {
-                        // Forzamos el String final
-                        String texto = String.format("%.2f € (%s)", 
-                                       minEntry.getValue(), 
-                                       minEntry.getKey().toUpperCase());
-                        return new SimpleStringProperty(texto);
-                    }
-                } catch (Exception e) {
-                    return new SimpleStringProperty("Error preu");
+                Map.Entry<String, BigDecimal> minEntry = precios.entrySet().stream()
+                    .filter(e -> e.getValue() != null)
+                    .min(Map.Entry.comparingByValue())
+                    .orElse(null);
+                if (minEntry != null) {
+                    String texto = String.format("%.2f € (%s)", minEntry.getValue(), minEntry.getKey().toUpperCase());
+                    return new SimpleStringProperty(texto);
                 }
             }
             return new SimpleStringProperty("Sense preu");
         });
 
-        // 2. Columna de Favoritos (Icono de Corazón)
+        // 3. COLUMNA ACCIONS (CORAZÓN FAVORITOS)
         colAccions.setCellFactory(param -> new TableCell<>() {
-            private final Label iconFavorit = new Label("❤"); // Puedes usar un ImageView con un .png si prefieres
+            private final Label iconFavorit = new Label("❤");
             {
                 iconFavorit.setCursor(Cursor.HAND);
-                iconFavorit.setStyle("-fx-text-fill: #ccc; -fx-font-size: 20px;"); // Gris por defecto
-                
                 iconFavorit.setOnMouseClicked(event -> {
                     ProductePreusDTO p = getTableView().getItems().get(getIndex());
-                    gestionarFavorito(p, iconFavorit);
+                    if (p != null) gestionarFavorito(p, iconFavorit);
                 });
             }
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableView().getItems().get(getIndex()) == null) {
+                    setGraphic(null);
+                } else {
+                    ProductePreusDTO p = getTableView().getItems().get(getIndex());
+                    if (SessionManager.esFavorito(p.getProducteId())) {
+                        iconFavorit.setStyle("-fx-text-fill: #e74c3c; -fx-font-size: 20px;");
+                    } else {
+                        iconFavorit.setStyle("-fx-text-fill: #ccc; -fx-font-size: 20px;");
+                    }
+                    setGraphic(iconFavorit);
+                    setAlignment(Pos.CENTER);
+                }
+            }
+        });
 
+        // 4. COLUMNA ANYADIR (BOTÓN MÁS)
+        colAnyadir.setCellFactory(param -> new TableCell<>() {
+            private final Button btnPlus = new Button("＋");
+            {
+                btnPlus.setStyle("-fx-background-color: #79EDED; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;");
+                btnPlus.setCursor(Cursor.HAND);
+                btnPlus.setOnAction(event -> {
+                    ProductePreusDTO p = getTableView().getItems().get(getIndex());
+                    if (p != null) afegirALlista(p); // Usamos tu método que ya funciona
+                });
+            }
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty) {
                     setGraphic(null);
                 } else {
-                    // Aquí podrías cambiar el color si ya es favorito
-                    setGraphic(iconFavorit);
+                    setGraphic(btnPlus);
                     setAlignment(Pos.CENTER);
                 }
             }
         });
     }
+
     
     private void gestionarFavorito(ProductePreusDTO p, Label icon) {
         if (!SessionManager.isLoggedIn()) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Sessió necessària");
-            alert.setHeaderText(null);
             alert.setContentText("Has d'estar loguejat per afegir productes a preferits.");
             alert.showAndWait();
             return;
         }
 
-        // Lógica visual temporal (Cambia a rojo al pulsar)
-        icon.setStyle("-fx-text-fill: #e74c3c; -fx-font-size: 20px;");
-        
-        // Aquí llamarías a tu API para guardar el favorito
-        System.out.println("Afegint a preferits: " + p.getNombre());
+        Long userId = SessionManager.getUsuario().getUserId();
+        Long prodId = p.getProducteId();
+        boolean yaEsFavorito = SessionManager.esFavorito(prodId);
+
+        // Hilo secundario para no congelar la UI
+        new Thread(() -> {
+            try {
+                // true para añadir, false para quitar
+                boolean exito = ProducteServiceClient.gestionarFavoritoAPI(userId, prodId, !yaEsFavorito);
+                
+                if (exito) {
+                    // Actualizamos la memoria del SessionManager
+                    if (yaEsFavorito) SessionManager.getIdsFavoritos().remove(prodId);
+                    else SessionManager.getIdsFavoritos().add(prodId);
+
+                    // Refrescamos color en el hilo de JavaFX
+                    Platform.runLater(() -> {
+                        // Si estamos filtrando por favoritos, debemos refrescar la UI
+                        if (ckbFavorit.isSelected()) {
+                            renderitzarUI(); // Esto volverá a filtrar y el producto desaparecerá
+                        } else {
+                            // Si no estamos filtrando, solo cambiamos el color del corazón
+                            if (yaEsFavorito) icon.setStyle("-fx-text-fill: #ccc;");
+                            else icon.setStyle("-fx-text-fill: #e74c3c;");
+                        }
+                        
+                        // Actualizar contador del perfil si es necesario
+                        if (SessionManager.getMainController() != null) {
+                            SessionManager.getMainController().refrescarVistaActualSiEsPerfil();
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     private void afegirALlista(ProductePreusDTO p) {

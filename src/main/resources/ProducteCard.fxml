@@ -1,18 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox fx:controller="com.ivillas.controller.ProducteItemController" 
-      xmlns="http://javafx.com" xmlns:fx="http://javafx.com" 
-      onMouseClicked="#abrirDetalle" alignment="CENTER" spacing="10" 
-      style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
-   <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+<VBox fx:id="rootPane" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5); -fx-cursor: hand;" xmlns="http://javafx.com" xmlns:fx="http://javafx.com" fx:controller="com.ivillas.controller.ProducteItemController" onMouseClicked="#abrirDetalle">
+   <padding>
+      <Insets bottom="15.0" left="15.0" right="15.0" top="10.0" />
+   </padding>
    <children>
-      <ImageView fx:id="imgProducte" fitHeight="120.0" fitWidth="120.0" preserveRatio="true" />
-      <Label fx:id="lblNom" style="-fx-font-weight: bold; -fx-text-fill: black;" text="Nom" wrapText="true" />
-      <Label fx:id="lblPreu" style="-fx-text-fill: #2ecc71; -fx-font-weight: bold;" text="0.00 €" />
+      <!-- Fila superior: Solo el corazón alineado a la derecha -->
+      <HBox alignment="TOP_RIGHT">
+         <children>
+            <Label fx:id="btnFavorit" onMouseClicked="#toggleFavorito" style="-fx-font-size: 22; -fx-text-fill: #bdc3c7;" text="❤" />
+         </children>
+      </HBox>
+      
+      <VBox alignment="CENTER" spacing="8">
+         <ImageView fx:id="imgProducte" fitHeight="110.0" fitWidth="110.0" preserveRatio="true" />
+         <Label fx:id="lblNom" style="-fx-font-weight: bold; -fx-font-size: 15; -fx-text-fill: #2C3E50;" text="Nom Producte" wrapText="true" textAlignment="CENTER" prefHeight="40"/>
+         <Label fx:id="lblPreu" style="-fx-text-fill: #2ecc71; -fx-font-weight: bold; -fx-font-size: 16;" text="0.00 €" />
+      </VBox>
+
+      <Button fx:id="btnAfegir" onAction="#afegirALlista" maxWidth="Infinity" style="-fx-background-color: #79EDED; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;" text="Afegir a la compra" />
    </children>
 </VBox>

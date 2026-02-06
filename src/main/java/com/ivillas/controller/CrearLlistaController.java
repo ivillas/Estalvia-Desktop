@@ -31,7 +31,8 @@ public class CrearLlistaController {
     @FXML private JFXTextArea txtDescripcio;
     @FXML private JFXComboBox<ProductePreusDTO> cmbProductes;
     @FXML private JFXListView<ItemLlistaRequest> listaVisual; // CORREGIDO: Tipo ItemLlistaRequest
-
+    @FXML private JFXCheckBox chbNomesFavorits;
+    @FXML private JFXButton btnAfegirFavorit;
     // 2. Listas de datos
     private ObservableList<ProductePreusDTO> listaMaestraProductes = FXCollections.observableArrayList();
     private FilteredList<ProductePreusDTO> productosFiltrados;
@@ -69,7 +70,6 @@ public class CrearLlistaController {
                 setText(empty || item == null ? null : item.getNombre());
             }
         });
-
         cmbProductes.setButtonCell(cmbProductes.getCellFactory().call(null));
         // SOLUCIÓN AL TYPE MISMATCH: Quitamos el genérico de la izquierda en la lambda
      // 2. CONFIGURAR LA LISTA VISUAL (Donde ya están añadidos los productos)
@@ -139,8 +139,35 @@ public class CrearLlistaController {
                         itemsEnLista.remove(item);
                         sincronizarConSessionManager();
                     });
+                    
+                    Button btnFavRow = new Button(SessionManager.esFavorito(item.getProductoId()) ? "❤" : "♡");
+                    btnFavRow.setStyle("-fx-text-fill: " + (SessionManager.esFavorito(item.getProductoId()) ? "red" : "gray") + "; -fx-background-color: transparent;");
 
-                    filaSuperior.getChildren().addAll(lblNom, btnMenos, lblCantVal, btnMas, btnDelete);
+                    btnFavRow.setOnAction(e -> {
+                        Long userId = SessionManager.getUsuario().getUserId();
+                        Long prodId = item.getProductoId();
+                        boolean esYaFav = SessionManager.esFavorito(prodId);
+
+                        new Thread(() -> {
+                            try {
+                                if (ProducteServiceClient.gestionarFavoritoAPI(userId, prodId, !esYaFav)) {
+                                    if (esYaFav) SessionManager.getIdsFavoritos().remove(prodId);
+                                    else SessionManager.getIdsFavoritos().add(prodId);
+                                    
+                                    Platform.runLater(() -> {
+                                        // Refrescar el ComboBox por si el usuario está buscando favoritos
+                                        if (chbNomesFavorits.isSelected()) {
+                                            productosFiltrados.setPredicate(p -> SessionManager.esFavorito(p.getProducteId()));
+                                        }
+                                        // Refrescar la propia lista para cambiar el corazón de la fila
+                                        listaVisual.refresh();
+                                    });
+                                }
+                            } catch (Exception ex) { ex.printStackTrace(); }
+                        }).start();
+                    });
+
+                    filaSuperior.getChildren().addAll(lblNom, btnMenos, lblCantVal, btnMas, btnFavRow, btnDelete);
                     
                     // Metemos la fila de botones y la fila de precios en el contenedor vertical
                     contenedorFila.getChildren().addAll(filaSuperior, filaPrecios);
@@ -150,6 +177,17 @@ public class CrearLlistaController {
                 }
             }
         });
+        
+        chbNomesFavorits.selectedProperty().addListener((obs, oldV, newV) -> {
+            if (newV) {
+                // Filtramos para que solo salgan los favoritos del SessionManager
+                productosFiltrados.setPredicate(p -> SessionManager.esFavorito(p.getProducteId()));
+            } else {
+                // Restauramos el predicado normal (o el del buscador si hay algo escrito)
+                productosFiltrados.setPredicate(p -> true);
+            }
+        });
+        
     }
 
     private void sincronizarConSessionManager() {
@@ -248,6 +286,64 @@ public class CrearLlistaController {
             mostrarAlerta("Error", "No s'ha pogut guardar: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+    
+    @FXML
+    private void toggleFavoritoEnCombo() {
+        ProductePreusDTO seleccionado = cmbProductes.getSelectionModel().getSelectedItem();
+        if (seleccionado == null || !SessionManager.isLoggedIn()) return;
+
+        Long userId = SessionManager.getUsuario().getUserId();
+        Long prodId = seleccionado.getProducteId();
+        boolean esYaFav = SessionManager.esFavorito(prodId);
+
+        new Thread(() -> {
+            try {
+                // Llamamos a la API (true si no es fav para añadirlo, false si ya lo es)
+                boolean exito = ProducteServiceClient.gestionarFavoritoAPI(userId, prodId, !esYaFav);
+                if (exito) {
+                    if (esYaFav) SessionManager.getIdsFavoritos().remove(prodId);
+                    else SessionManager.getIdsFavoritos().add(prodId);
+
+                    Platform.runLater(() -> {
+                        if (chbNomesFavorits.isSelected()) {
+                            // Esto hace que el producto desaparezca del ComboBox al instante
+                            productosFiltrados.setPredicate(p -> SessionManager.esFavorito(p.getProducteId()));
+                        }
+                        // Esto actualiza los corazones de la lista visual de abajo
+                        listaVisual.refresh(); 
+                    });
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+        }).start();
+    }
+    
+    @FXML
+    private void toggleFavoritoSeleccionado() {
+        ProductePreusDTO seleccionado = cmbProductes.getSelectionModel().getSelectedItem();
+        if (seleccionado == null || !SessionManager.isLoggedIn()) return;
+
+        Long userId = SessionManager.getUsuario().getUserId();
+        Long prodId = seleccionado.getProducteId();
+        boolean esYaFavorito = SessionManager.esFavorito(prodId);
+
+        new Thread(() -> {
+            try {
+                // Llamamos al Service que actualizamos antes
+                boolean exito = ProducteServiceClient.gestionarFavoritoAPI(userId, prodId, !esYaFavorito);
+                if (exito) {
+                    if (esYaFavorito) SessionManager.getIdsFavoritos().remove(prodId);
+                    else SessionManager.getIdsFavoritos().add(prodId);
+                    
+                    // Si tienes el checkbox de "Només Favorits" activo, refrescamos el filtro
+                    Platform.runLater(() -> {
+                        if (chbNomesFavorits.isSelected()) {
+                            productosFiltrados.setPredicate(p -> SessionManager.esFavorito(p.getProducteId()));
+                        }
+                    });
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+        }).start();
     }
     
     private void mostrarAlerta(String titulo, String mensaje) {

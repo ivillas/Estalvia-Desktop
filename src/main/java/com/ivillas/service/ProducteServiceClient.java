@@ -2,44 +2,62 @@ package com.ivillas.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ivillas.model.ProductePreusDTO;
+import com.ivillas.network.HttpClientProvider;
 
-import java.net.InetSocketAddress;
-import java.net.ProxySelector;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 
 public class ProducteServiceClient {
 
-    private static final String URL =
-        "http://estalvia.ddns.net:8081/api/productos/con-precios";
+    private static final ObjectMapper mapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
 
+    // Obtener todos los productos (Usa la URL base del provider)
     public static List<ProductePreusDTO> getProductos() throws Exception {
-
-       HttpClient client = HttpClient.newHttpClient();
-       /*
-    	
-    	HttpClient client = HttpClient.newBuilder()
-                .proxy(ProxySelector.of(new InetSocketAddress("192.168.2.1", 3128))) 
-                .build();
-  */
-
+        String url = HttpClientProvider.getBaseUrl() + "/productos/con-precios";
+        
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(URL))
+            .uri(URI.create(url))
             .GET()
             .build();
 
-        HttpResponse<String> response =
-            client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = HttpClientProvider.getClient()
+            .send(request, HttpResponse.BodyHandlers.ofString());
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-        return mapper.readValue(
-            response.body(),
-            new TypeReference<List<ProductePreusDTO>>() {}
-        );
+        return mapper.readValue(response.body(), new TypeReference<List<ProductePreusDTO>>() {});
+    }
+
+    // NUEVO: Obtener solo los IDs favoritos del usuario
+    public static List<Long> getIdsFavoritos(Long userId) throws Exception {
+        String url = HttpClientProvider.getBaseUrl() + "/favoritos/ids/" + userId;
+        
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .GET()
+            .build();
+
+        HttpResponse<String> response = HttpClientProvider.getClient()
+            .send(request, HttpResponse.BodyHandlers.ofString());
+
+        return mapper.readValue(response.body(), new TypeReference<List<Long>>() {});
+    }
+
+    // NUEVO: Añadir o Quitar favorito (Acción POST/DELETE)
+    public static boolean gestionarFavoritoAPI(Long userId, Long prodId, boolean esAñadir) throws Exception {
+        String url = HttpClientProvider.getBaseUrl() + "/favoritos/" + userId + "/" + prodId;
+        
+        HttpRequest.Builder builder = HttpRequest.newBuilder().uri(URI.create(url));
+        
+        if (esAñadir) builder.POST(HttpRequest.BodyPublishers.noBody());
+        else builder.DELETE();
+
+        HttpResponse<String> response = HttpClientProvider.getClient()
+            .send(builder.build(), HttpResponse.BodyHandlers.ofString());
+
+        return response.statusCode() == 200;
     }
 }
