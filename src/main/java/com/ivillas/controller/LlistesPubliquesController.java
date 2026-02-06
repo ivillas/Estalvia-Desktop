@@ -32,8 +32,7 @@ public class LlistesPubliquesController {
     public void initialize() {
         cargarListasPubliques();
     }
-
-    
+   
     
     public void cargarListasPubliques() {
         // 1. Crear una tarea en segundo plano

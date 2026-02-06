@@ -79,7 +79,7 @@ public class TargetaController {
                     borrador.getItems().add(nuevo);
                 }
 
-                btnAfegir.setText("Afegit!");
+                btnAfegir.setText("               Afegit!                ");
                 btnAfegir.setDisable(true);
 
             } catch (Exception ex) {

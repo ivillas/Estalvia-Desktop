@@ -13,7 +13,7 @@ public class HttpClientProvider {
     private static final Preferences prefs = Preferences.userRoot().node("com/estalvia/config");
 
     // --- LA CLAVE: Leer del disco al arrancar ---
-    private static String baseUrl = prefs.get("base_url", "http://192.168.1.250:8081/api");
+    private static String baseUrl = prefs.get("base_url", "http://estalvia.ddns.net:8081/api");
     private static boolean useProxy = prefs.getBoolean("proxy_enabled", false);
     private static String proxyHost = prefs.get("proxy_host", "");
     private static int proxyPort = prefs.getInt("proxy_port", 0);

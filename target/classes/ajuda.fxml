@@ -1,19 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXButton?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="900.0" prefHeight="700.0" prefWidth="883.0" style="-fx-background-color: #F3F4F6;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ivillas.controller.AjudaController" >
-   <top>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="900.0" prefHeight="700.0" prefWidth="883.0" style="-fx-background-color: #F3F4F6;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ivillas.controller.AjudaController">
+   <center>
       <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="702.0" prefWidth="903.0" snapToPixel="false" style="-fx-background-color: #79EDED; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" stylesheets="@styles.css" BorderPane.alignment="CENTER">
          <children>
-            <Label layoutX="367.0" layoutY="263.0" prefHeight="70.0" prefWidth="162.0" text="Ajuda">
+            <Label fx:id="lblTitol" layoutX="180.0" layoutY="32.0" prefHeight="70.0" prefWidth="466.0" text="Informacio de la app">
                <font>
                   <Font size="48.0" />
                </font>
             </Label>
+            <Label fx:id="lbliNproductes" layoutX="71.0" layoutY="179.0" text="Nombre total de productes:" AnchorPane.leftAnchor="70.0" AnchorPane.topAnchor="175.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblINsupers" layoutX="71.0" layoutY="217.0" text="Nombre total de supermercats:" AnchorPane.leftAnchor="70.0" AnchorPane.topAnchor="215.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblINLlistesPubli" layoutX="71.0" layoutY="258.0" text="Nombre total de Llistes publiques:" AnchorPane.leftAnchor="70.0" AnchorPane.topAnchor="255.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblINusuaris" layoutX="71.0" layoutY="137.0" text="Nombre total d'usuaris:" AnchorPane.leftAnchor="70.0" AnchorPane.topAnchor="135.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblINllistesPri" layoutX="71.0" layoutY="296.0" text="Nombre total de Llistes privades:" AnchorPane.leftAnchor="70.0" AnchorPane.topAnchor="295.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblIdataProductes" layoutX="66.0" layoutY="430.0" text="Ultima actualitzacio dels productes:" AnchorPane.leftAnchor="70.0" AnchorPane.topAnchor="415.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblIVersioApp" layoutX="71.0" layoutY="337.0" text="Versio de la app: " AnchorPane.leftAnchor="70.0" AnchorPane.topAnchor="335.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblIdataVersio" layoutX="69.0" layoutY="382.0" text="Data de la ultima versio de la app:" AnchorPane.leftAnchor="70.0" AnchorPane.topAnchor="375.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblNusuaris" layoutX="81.0" layoutY="147.0" text="0" AnchorPane.leftAnchor="460.0" AnchorPane.topAnchor="135.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblNproductes" layoutX="92.0" layoutY="175.0" text="0" AnchorPane.leftAnchor="460.0" AnchorPane.topAnchor="175.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblNsupers" layoutX="81.0" layoutY="227.0" text="0" AnchorPane.leftAnchor="460.0" AnchorPane.topAnchor="215.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblNLlistesPubli" layoutX="81.0" layoutY="268.0" text="0" AnchorPane.leftAnchor="460.0" AnchorPane.topAnchor="255.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblNllistesPri" layoutX="81.0" layoutY="306.0" text="0" AnchorPane.leftAnchor="460.0" AnchorPane.topAnchor="295.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblVersioApp" layoutX="81.0" layoutY="347.0" text="Desktop V1.0.9" AnchorPane.leftAnchor="460.0" AnchorPane.topAnchor="335.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lbldataVersio" layoutX="79.0" layoutY="392.0" text="06/02/2026" AnchorPane.leftAnchor="460.0" AnchorPane.topAnchor="375.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="lbldataProductes" layoutX="76.0" layoutY="440.0" AnchorPane.leftAnchor="460.0" AnchorPane.topAnchor="415.0">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <JFXButton fx:id="btnTornar" layoutX="380.0" layoutY="568.0" prefWidth="121.0" text="Tornar" />
+            <JFXButton fx:id="btnUpdate" layoutX="465.0" layoutY="418.0" text="Buscar actualitzacions" AnchorPane.leftAnchor="460.0" AnchorPane.topAnchor="415.0" />
          </children></AnchorPane>
-   </top>
+   </center>
 </BorderPane>
