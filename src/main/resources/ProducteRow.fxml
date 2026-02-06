@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.geometry.Insets?>
+
+<HBox fx:controller="com.ivillas.controller.ProducteItemController" 
+      xmlns="http://javafx.com" xmlns:fx="http://javafx.com" 
+      onMouseClicked="#abrirDetalle" alignment="CENTER_LEFT" spacing="20" 
+      style="-fx-background-color: white; -fx-background-radius: 10;">
+   <padding><Insets bottom="10.0" left="20.0" right="20.0" top="10.0" /></padding>
+   <children>
+      <ImageView fx:id="imgProducte" fitHeight="50.0" fitWidth="50.0" preserveRatio="true" />
+      <Label fx:id="lblNom" prefWidth="300.0" style="-fx-font-weight: bold; -fx-text-fill: black;" />
+      <Region HBox.hgrow="ALWAYS" />
+      <Label fx:id="lblPreu" style="-fx-text-fill: #2ecc71; -fx-font-weight: bold;" />
+   </children>
+</HBox>
