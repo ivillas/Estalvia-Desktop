@@ -1,6 +1,6 @@
 package com.ivillas.controller;
 
-import com.ivillas.model.ProductePreusDTO; // Tu DTO
+import com.ivillas.model.ProductePreusDTO;
 import com.ivillas.request.ItemLlistaRequest;
 
 import javafx.fxml.FXML;
@@ -10,18 +10,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.math.BigDecimal;
 
-
-import com.ivillas.model.ProductePreusDTO;
 import com.ivillas.service.ProducteServiceClient;
 import com.ivillas.utils.SessionManager;
 import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import java.math.BigDecimal;
 import java.util.Collections;
 
 public class ProducteItemController {

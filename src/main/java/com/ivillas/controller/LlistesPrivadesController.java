@@ -3,7 +3,6 @@ package com.ivillas.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.ivillas.model.LlistaDTO;
@@ -149,10 +148,4 @@ import javafx.stage.Stage;
         }
     }
     
-    private void mostrarEstadisticas(Map<String, Long> stats) {
-        Platform.runLater(() -> {
-            // Lógica para pintar tus stats en la UI (Labels, Gráficos, etc.)
-            System.out.println("Estadísticas cargadas: " + stats);
-        });
-    }
 }

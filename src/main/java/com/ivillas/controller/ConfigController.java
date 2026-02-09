@@ -12,7 +12,6 @@ import com.jfoenix.controls.JFXCheckBox;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -143,8 +142,7 @@ public class ConfigController {
 	            if (usarProxy) {
 	                String portText = txtPortProxi.getText();
 	                if (portText == null || portText.isBlank()) {
-	                    // Aquí podrías mostrar una alerta al usuario
-	                    System.out.println("Error: El puerto es obligatorio si usas proxy.");
+	                    mostrarAlertaExit("Configuració", "El port es obligatori si es fa anar proxi.");
 	                    return; 
 	                }
 	                puerto = Integer.parseInt(portText.trim());
@@ -154,8 +152,8 @@ public class ConfigController {
 	            HttpClientProvider.configureProxy(usarProxy, host, puerto);
 	          
 	        } catch (NumberFormatException e) {
-	            System.err.println("Error: El puerto debe ser un número válido.");
-	            // Opcional: Mostrar alerta visual al usuario
+	        	mostrarAlertaExit("Configuració", "El port ha de ser un numero valid.");
+
 	        }
 	        
 	        // 2. Guardar supermercados
@@ -165,23 +163,18 @@ public class ConfigController {
 	        SupermercatServiceClient.saveStatus("consum", cxbConsum.isSelected());
 	        SupermercatServiceClient.saveStatus("plusfresc", cxbPlus.isSelected());
 
-
-	        // DEBUG: Verificar qué estamos intentando guardar
-	        System.out.println("DEBUG UI: Guardando Plusfresc como: " + cxbPlus.isSelected());
-
-	        mostrarAlertaExito("Configuració", "Preferències guardades.");
+	        mostrarAlertaExit("Configuració", "Preferències guardades.");
 	        
 	        // SOLO AL FINAL DE TODO cerramos o navegamos
 	        openInici(); 
 	        
 	    }
-	    
-	    private void mostrarAlerta(String titulo, String msg) { crearAlerta(titulo, msg, AlertType.ERROR); }
-	    private void mostrarAlertaExito(String titulo, String msg) { crearAlerta(titulo, msg, AlertType.INFORMATION); }
 
-	    private void crearAlerta(String titulo, String msg, AlertType tipo) {
+	    private void mostrarAlertaExit(String titol, String msg) { crearAlerta(titol, msg, AlertType.INFORMATION); }
+
+	    private void crearAlerta(String titol, String msg, AlertType tipo) {
 	        Alert alert = new Alert(tipo);
-	        alert.setTitle(titulo);
+	        alert.setTitle(titol);
 	        alert.setHeaderText(null);
 	        alert.setContentText(msg);
 	        alert.showAndWait();

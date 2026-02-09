@@ -35,7 +35,7 @@ public class IniciController {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                // 1. Obtener Listas Públicas y ordenar por dataCreacio (Descendente)
+                // obtenim les llistes publiques y ordenem per dataCreacio (descendent)
                 List<LlistaDTO> listas = LlistaServiceClient.getPublicas();
                 listas.sort((a, b) -> b.getDataCreacio().compareTo(a.getDataCreacio()));
                 List<LlistaDTO> topListas = listas.stream().limit(10).collect(Collectors.toList());

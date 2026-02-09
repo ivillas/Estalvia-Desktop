@@ -8,10 +8,8 @@ import com.ivillas.model.LlistaDTO;
 import com.ivillas.model.ProductePreusDTO;
 import com.ivillas.request.CrearLlistaRequest;
 import com.ivillas.request.ItemLlistaRequest;
-import com.ivillas.service.LlistaServiceClient;
 import com.ivillas.service.ProducteServiceClient;
 import com.ivillas.utils.SessionManager;
-
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
