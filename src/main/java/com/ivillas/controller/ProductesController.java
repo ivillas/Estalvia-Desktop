@@ -80,38 +80,7 @@ public class ProductesController implements Initializable {
         carregarDades();
     }
         
-    private void abrirDetallePopup(ProductePreusDTO p) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Especificacions: " + p.getNombre());
-        alert.setHeaderText(p.getNombre().toUpperCase());
-
-        // Construcción del contenido siguiendo tu lógica de filtros
-        StringBuilder sb = new StringBuilder();
-        sb.append("Marca: ").append(p.getMarca() != null ? p.getMarca() : "N/A").append("\n");
-        sb.append("Envàs: ").append(p.getEnvase() != null ? p.getEnvase() : "N/A").append("\n");
-        sb.append("Última actualització: ").append(p.getLastUpdate()).append("\n\n");
-        
-        sb.append("COMPARATIVA DE PREUS ACTIUS:\n");
-        sb.append("------------------------------------------\n");
-
-        if (p.getPrecios() != null && !p.getPrecios().isEmpty()) {
-            p.getPrecios().forEach((superNombre, precio) -> {
-                // Usamos tu lógica de configuración para filtrar
-                if (SupermercatServiceClient.getLocalStatus(superNombre)) {
-                    sb.append(String.format(" • %-15s : %s €\n", superNombre.toUpperCase(), precio));
-                }
-            });
-        } else {
-            sb.append("No hi ha preus disponibles actualment.");
-        }
-
-        // Aplicar un estilo básico para que no se vea el Alert de Windows nativo tan seco
-        alert.getDialogPane().setPrefWidth(450);
-        alert.setContentText(sb.toString());
-        
-        // Si quieres que se abra al clicar en la tabla o en la tarjeta, llama a este método
-        alert.showAndWait();
-    }
+    
 
     private void configurarCheckboxes() {
         // Exclusividad entre Tarjetas y Lista
@@ -176,6 +145,39 @@ public class ProductesController implements Initializable {
             scrollTargetes.setVisible(true);
             cargarTarjetasDinamicasFiltradas(listaFiltrada);
         }
+    }
+    
+    private void abrirDetallePopup(ProductePreusDTO p) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Especificacions: " + p.getNombre());
+        alert.setHeaderText(p.getNombre().toUpperCase());
+
+        // Construcción del contenido siguiendo tu lógica de filtros
+        StringBuilder sb = new StringBuilder();
+        sb.append("Marca: ").append(p.getMarca() != null ? p.getMarca() : "N/A").append("\n");
+        sb.append("Envàs: ").append(p.getEnvase() != null ? p.getEnvase() : "N/A").append("\n");
+        sb.append("Última actualització: ").append(p.getLastUpdate()).append("\n\n");
+        
+        sb.append("COMPARATIVA DE PREUS ACTIUS:\n");
+        sb.append("------------------------------------------\n");
+
+        if (p.getPrecios() != null && !p.getPrecios().isEmpty()) {
+            p.getPrecios().forEach((superNombre, precio) -> {
+                // Usamos tu lógica de configuración para filtrar
+                if (SupermercatServiceClient.getLocalStatus(superNombre)) {
+                    sb.append(String.format(" • %-15s : %s €\n", superNombre.toUpperCase(), precio));
+                }
+            });
+        } else {
+            sb.append("No hi ha preus disponibles actualment.");
+        }
+
+        // Aplicar un estilo básico para que no se vea el Alert de Windows nativo tan seco
+        alert.getDialogPane().setPrefWidth(450);
+        alert.setContentText(sb.toString());
+        
+        // Si quieres que se abra al clicar en la tabla o en la tarjeta, llama a este método
+        alert.showAndWait();
     }
     
     private void cargarTarjetasDinamicasFiltradas(List<ProductePreusDTO> lista) {

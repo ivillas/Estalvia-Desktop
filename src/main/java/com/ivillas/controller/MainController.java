@@ -51,10 +51,21 @@ public class MainController {
     @FXML private JFXButton btnSupers;
     @FXML private TextField txtBuscador;
     @FXML private StackPane mainDisplayArea;
-
+    private static MainController instance;
+    
+    
+    public MainController() {
+        instance = this;
+    }
+    
+    public static MainController getInstance() {
+        return instance;
+    }
+    
     @FXML
     public void initialize() {
-    	    SessionManager.setMainController(this);
+    	openInici();
+    	SessionManager.setMainController(this);
 
     }
 
@@ -141,10 +152,42 @@ public class MainController {
 		}
     }
 
-    
-    
     @FXML
-    private void openCrearLlista() {
+    public void openLlistaEco() {
+        try {
+            txtTitol.setText("Comparativa i Estalvi Optimitzat");
+            // Asegúrate de que la ruta sea correcta según tu estructura de carpetas
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/LlistaEco.fxml"));
+            BorderPane root = loader.load();
+
+            root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            root.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+
+            // Aplicamos tu lógica de mover el contenido del top al center si es necesario
+            if (root.getCenter() == null && root.getTop() != null) {
+                Node contenido = root.getTop();
+                root.setTop(null);
+                root.setCenter(contenido);
+                if (contenido instanceof Region) {
+                    Region pane = (Region) contenido;
+                    pane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                    pane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+                }
+            }
+
+            root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
+            root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
+
+            mainDisplayArea.getChildren().setAll(root);
+
+        } catch (IOException e) {
+            System.err.println("Error cargando LlistaEco.fxml");
+            e.printStackTrace();
+        }
+    }
+    
+    
+    @FXML void openCrearLlista() {
         try {
         	txtTitol.setText("Crea la teva llista de la compra");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/CrearLlista.fxml"));

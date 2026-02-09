@@ -9,7 +9,9 @@ import com.ivillas.network.HttpClientProvider;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 public class ProducteServiceClient {
 
@@ -31,6 +33,16 @@ public class ProducteServiceClient {
         return mapper.readValue(response.body(), new TypeReference<List<ProductePreusDTO>>() {});
     }
 
+    public static LocalDateTime ultimaDataProductes(List<ProductePreusDTO> productos) {
+        if (productos == null || productos.isEmpty()) return null;
+        return productos.stream()
+                .map(ProductePreusDTO::getLastUpdate)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo)
+                .orElse(null);
+    }
+    
+    
     // NUEVO: Obtener solo los IDs favoritos del usuario
     public static List<Long> getIdsFavoritos(Long userId) throws Exception {
         String url = HttpClientProvider.getBaseUrl() + "/favoritos/ids/" + userId;

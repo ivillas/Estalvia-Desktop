@@ -40,6 +40,21 @@ public class LlistaServiceClient {
         // El print de arriba te dirá por qué el servidor manda HTML.
         return mapper.readValue(response.body(), new TypeReference<List<LlistaDTO>>() {});
     }
+    
+    // Nou: Obtenir el total de llistes privades
+    public static int getTotalPrivades() throws Exception {
+        String url = HttpClientProvider.getBaseUrl() + "/listas/privades/stats";
+        
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .GET()
+            .build();
+
+        HttpResponse<String> response = HttpClientProvider.getClient()
+            .send(request, HttpResponse.BodyHandlers.ofString());
+
+        return mapper.readValue(response.body(), Integer.class);
+    }
 
     // 2. Obtener Listas de un Usuario (Privadas/Propias)
     public static List<LlistaDTO> getPorUsuario(Long userId) throws Exception {
@@ -107,6 +122,7 @@ public class LlistaServiceClient {
         validarRespuesta(response);
         return Long.parseLong(response.body());
     }
+    
     // Método de utilidad para no repetir validaciones
     private static void validarRespuesta(HttpResponse<String> response) {
         if (response.statusCode() < 200 || response.statusCode() >= 300) {

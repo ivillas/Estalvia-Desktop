@@ -11,7 +11,9 @@ public class ItemLlistaDTO {
     private String unidad;
     private boolean marcada;
     private Long supermercadoPreferidoId;
-	public Long getItemId() {
+	
+    
+    public Long getItemId() {
 		return itemId;
 	}
 	public void setItemId(Long itemId) {

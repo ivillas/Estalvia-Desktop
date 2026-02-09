@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="900.0" prefHeight="700.0" prefWidth="900.0" style="-fx-background-color: #F3F4F6;" xmlns="http://javafx.com" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ivillas.controller.LlistaEconomicaController">
+   <center>
+      <AnchorPane prefHeight="700.0" prefWidth="900.0" style="-fx-background-color: #79EDED; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" BorderPane.alignment="CENTER">
+         <children>
+            <!-- Título -->
+            <Label layoutX="40.0" layoutY="20.0" text="Comparativa i Estalvi Optimitzat">
+               <font><Font name="System Bold" size="20.0" /></font>
+            </Label>
+
+            <!-- ESTE ES EL QUE FALTABA: hbCheckboxes -->
+            <HBox fx:id="hbCheckboxes" layoutX="40.0" layoutY="60.0" prefHeight="45.0" prefWidth="820.0" spacing="15.0" alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 10;" />
+
+            <SplitPane fx:id="splitPanePrincipal" dividerPositions="0.6" layoutX="40.0" layoutY="115.0" prefHeight="480.0" prefWidth="820.0" orientation="VERTICAL" style="-fx-background-radius: 10;">
+               <items>
+                  <AnchorPane minHeight="100.0">
+                     <children>
+                        <TableView fx:id="tblComparativa" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <columns>
+                              <TableColumn fx:id="colProducto" text="Producte" prefWidth="250.0" />
+                              <TableColumn fx:id="colCantidad" text="Quantitat" prefWidth="100.0" />
+                           </columns>
+                        </TableView>
+                     </children>
+                  </AnchorPane>
+                  
+                  <AnchorPane minHeight="150.0" style="-fx-background-color: white;">
+                     <children>
+                        <VBox spacing="5" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <Label text="Estratègia de Compra més Barata:" style="-fx-font-weight: bold; -fx-padding: 5;" />
+                              <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+                                 <content>
+                                    <VBox fx:id="vbResultadosCalculo" spacing="10" style="-fx-padding: 10; -fx-background-color: white;" />
+                                 </content>
+                              </ScrollPane>
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+               </items>
+            </SplitPane>
+
+            <!-- Botones de Acción -->
+            <JFXButton layoutX="40.0" layoutY="615.0" onAction="#volverAtras" prefHeight="34.0" prefWidth="120.0" style="-fx-background-color: white;" text="Tornar" />
+            <JFXButton layoutX="175.0" layoutY="615.0" onAction="#guardarArchivo" prefHeight="34.0" prefWidth="120.0" style="-fx-background-color: white;" text="Guardar .lst" />
+            <JFXButton layoutX="310.0" layoutY="615.0" onAction="#enviarEmail" prefHeight="34.0" prefWidth="120.0" style="-fx-background-color: white;" text="Enviar" />
+            
+            <JFXButton layoutX="660.0" layoutY="610.0" onAction="#calcularEstalvi" prefHeight="45.0" prefWidth="200.0" style="-fx-background-color: #2ecc71; -fx-text-fill: white;" text="CALCULAR ESTALVI">
+               <font><Font name="System Bold" size="14.0" /></font>
+            </JFXButton>
+         </children>
+      </AnchorPane>
+   </center>
+</BorderPane>
