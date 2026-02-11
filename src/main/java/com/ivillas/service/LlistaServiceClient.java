@@ -1,7 +1,5 @@
 package com.ivillas.service;
 
-import java.net.InetSocketAddress;
-import java.net.ProxySelector;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -9,7 +7,6 @@ import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +18,7 @@ import com.ivillas.request.CrearLlistaRequest;
 public class LlistaServiceClient {
 
     private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule()); // Imprescindible para LocalDateTime
-    
+
     // 1. Obtener Listas Públicas (para todos)
     public static List<LlistaDTO> getPublicas() throws Exception {
     	String url = HttpClientProvider.getBaseUrl() + "/listas/publiques";
@@ -36,15 +33,15 @@ public class LlistaServiceClient {
         if (response.statusCode() != 200) {
             throw new RuntimeException("Error: " + response.statusCode());
         }
-        // Si el cuerpo es HTML (empieza por <), esto fallará. 
+        // Si el cuerpo es HTML (empieza por <), esto fallará.
         // El print de arriba te dirá por qué el servidor manda HTML.
         return mapper.readValue(response.body(), new TypeReference<List<LlistaDTO>>() {});
     }
-    
+
     // Nou: Obtenir el total de llistes privades
     public static int getTotalPrivades() throws Exception {
         String url = HttpClientProvider.getBaseUrl() + "/listas/privades/stats";
-        
+
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(url))
             .GET()
@@ -81,15 +78,15 @@ public class LlistaServiceClient {
     }
 
     public static void copiarAmiLista(LlistaDTO listaPublica, Long miUserId) throws Exception {
-    	
+
         Map<String, Object> req = new HashMap<>();
         req.put("usuariId", miUserId);
         req.put("nombre", "Copia: " + listaPublica.getNombre());
         req.put("descripcion", listaPublica.getDescripcion());
         req.put("visibilidad", "PRIVADA");
-        
+
         // Mapeo manual de items simplificado
-        req.put("items", listaPublica.getItems()); 
+        req.put("items", listaPublica.getItems());
 
         String body = mapper.writeValueAsString(req);
         String url = HttpClientProvider.getBaseUrl() + "/listas";
@@ -102,14 +99,14 @@ public class LlistaServiceClient {
 
         HttpResponse<String> response = HttpClientProvider.getClient()
                 .send(request, HttpResponse.BodyHandlers.ofString());
-        
+
         validarRespuesta(response);
     }
-    
+
     public static Long crearLlista(CrearLlistaRequest req) throws Exception {
         String json = mapper.writeValueAsString(req);
         String url = HttpClientProvider.getBaseUrl() + "/listas";
-        
+
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("Content-Type", "application/json")
@@ -118,11 +115,11 @@ public class LlistaServiceClient {
 
         HttpResponse<String> response = HttpClientProvider.getClient()
                 .send(request, HttpResponse.BodyHandlers.ofString());
-        
+
         validarRespuesta(response);
         return Long.parseLong(response.body());
     }
-    
+
     // Método de utilidad para no repetir validaciones
     private static void validarRespuesta(HttpResponse<String> response) {
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
