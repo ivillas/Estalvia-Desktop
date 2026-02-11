@@ -10,7 +10,12 @@ public class ProductePreusDTO {
     public String nombre;
     public String unidad;
     public String pack;
+    private String descripcio;
+    private String imatge;
+    private String envase;
+    private java.time.LocalDateTime lastUpdate;
     public Map<String, BigDecimal> precios;
+        
 	public Long getProducteId() {
 		return producteId;
 	}
@@ -52,7 +57,29 @@ public class ProductePreusDTO {
 	public String toString() {
 	    return nombre; // O el nombre del campo donde guardas el nombre del producto
 	}
-    
-    
-    
+	public String getDescripcio() {
+		return descripcio;
+	}
+	public void setDescripcio(String descripcio) {
+		this.descripcio = descripcio;
+	}
+	public String getImatge() {
+		return imatge;
+	}
+	public void setImatge(String imatge) {
+		this.imatge = imatge;
+	}
+	public String getEnvase() {
+		return envase;
+	}
+	public void setEnvase(String envase) {
+		this.envase = envase;
+	}
+	public java.time.LocalDateTime getLastUpdate() {
+		return lastUpdate;
+	}
+	public void setLastUpdate(java.time.LocalDateTime lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
+        
 }

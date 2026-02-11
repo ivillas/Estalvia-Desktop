@@ -1,0 +1,11 @@
+<VBox spacing="10" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" prefWidth="200" xmlns:fx="http://javafx.com">
+    <padding><Insets top="15" right="15" bottom="15" left="15"/></padding>
+    <children>
+        <StackPane prefHeight="100" style="-fx-background-color: #F3F4F6; -fx-background-radius: 10;">
+            <Label text="IMAGEN" textFill="#ccc" /> <!-- Aquí irá el ImageView futuro -->
+        </StackPane>
+        <Label fx:id="lblNombre" text="Nombre Producto" wrapText="true" style="-fx-font-weight: bold; -fx-font-size: 14;"/>
+        <Label fx:id="lblMarca" text="Marca" textFill="#888"/>
+        <VBox fx:id="vboxPrecios" spacing="5" /> <!-- Aquí inyectaremos los precios de cada súper -->
+    </children>
+</VBox>

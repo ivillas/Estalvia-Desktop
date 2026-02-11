@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="900.0" prefHeight="700.0" prefWidth="883.0" style="-fx-background-color: #F3F4F6;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ivillas.controller.UsuarioController">
+   <bottom>
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="702.0" prefWidth="903.0" snapToPixel="false" style="-fx-background-color: #79EDED; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);" stylesheets="@styles.css" BorderPane.alignment="CENTER">
+         <children>
+            <Label layoutX="105.0" layoutY="79.0" text="Nom D'usuari:">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="105.0" layoutY="132.0" text="Direcció de correo electronic:">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Label layoutX="106.0" layoutY="186.0" text="Usuari des de:">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblData" layoutX="503.0" layoutY="186.0" prefHeight="35.0" prefWidth="255.0" text="data">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblUsuari" layoutX="504.0" layoutY="79.0" prefHeight="35.0" prefWidth="242.0" text="Usuari">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblEmail" layoutX="504.0" layoutY="132.0" prefHeight="35.0" prefWidth="242.0" text="email">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblNLlistesPubliques" layoutX="108.0" layoutY="243.0" text="Nombre de llistes publiques:">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblLlistesPubliques" layoutX="505.0" layoutY="243.0" text="llistesPubliques">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblNLlistesPrivades" layoutX="108.0" layoutY="298.0" text="Nombre de llistes privades">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblLlistesPrivades" layoutX="505.0" layoutY="298.0" text="llistesPrivades">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblNProductes" layoutX="111.0" layoutY="357.0" text="Nombre de productes favorits">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblProductes" layoutX="508.0" layoutY="357.0" text="productesFavorits">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <JFXButton fx:id="btnEliminarCompte" layoutX="189.0" layoutY="587.0" onAction="#baixaUser" pickOnBounds="false" prefHeight="34.0" prefWidth="163.0" snapToPixel="false" styleClass="jfx-button" text="Eliminar compte" textFill="#dd0f1a">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXButton>
+            <JFXButton fx:id="btnTornar" layoutX="549.0" layoutY="587.0" onAction="#openInici" pickOnBounds="false" prefHeight="34.0" prefWidth="163.0" snapToPixel="false" styleClass="jfx-button" text="Inici" textFill="#dd0f1a">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXButton>
+         </children></AnchorPane>
+   </bottom>
+</BorderPane>

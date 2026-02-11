@@ -1,14 +1,21 @@
 package com.ivillas.controller;
 
 import java.awt.event.ActionEvent;
+import java.util.List;
 
+import com.ivillas.model.SupermercatDTO;
 import com.ivillas.network.HttpClientProvider;
+import com.ivillas.service.SupermercatServiceClient;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXCheckBox;
+
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 
 public class ConfigController {
 	  
@@ -48,14 +55,46 @@ public class ConfigController {
 	        
 	        // ... resto de tu inicialización de supermercados ...
 	        // 1. Ponemos los supers seleccionados por defecto
-	    	cxbMercadona.setSelected(true);
-	        cxbCarrefour.setSelected(true);
-	        cxbPlus.setSelected(true);
-	        cxbConsum.setSelected(true);
-	        cxbAlcampo.setSelected(true);
+	        cargarEstadoSupermercados();
 	    }
 	    
 
+	    
+	    private void cargarEstadoSupermercados() {
+	        Task<List<SupermercatDTO>> task = new Task<>() {
+	            @Override protected List<SupermercatDTO> call() throws Exception {
+	                return SupermercatServiceClient.getAll();
+	            }
+	        };
+
+	        
+	        task.setOnFailed(e -> {
+	            System.out.println("!!! EL TASK FALLÓ !!!");
+	            task.getException().printStackTrace(); 
+	        });
+	        
+	        task.setOnSucceeded(e -> {
+	            List<SupermercatDTO> resultado = task.getValue();
+	            // ESTO ES LO QUE FALTA: Obligar a la UI a actualizarse
+	            Platform.runLater(() -> {
+	                for (SupermercatDTO s : resultado) {
+	                    String nom = s.getNom().toLowerCase().replace(" ", "").trim();
+	                    boolean estado = s.isActiu();
+	                    
+	                    System.out.println("UI: Marcando " + nom + " como " + estado);
+
+	                    if (nom.contains("mercadona")) cxbMercadona.setSelected(estado);
+	                    else if (nom.contains("alcampo"))   cxbAlcampo.setSelected(estado);
+	                    else if (nom.contains("carrefour")) cxbCarrefour.setSelected(estado);
+	                    else if (nom.contains("consum"))    cxbConsum.setSelected(estado);
+	                    else if (nom.contains("plusfresc")) cxbPlus.setSelected(estado);
+	                }
+	            });
+	        });
+
+	        new Thread(task).start();
+	    }
+	    
 	    @FXML
 	    private void handleProxyAction() {
 	        actualizarEstadoProxy(cxbProxi.isSelected());
@@ -103,8 +142,7 @@ public class ConfigController {
 	            if (usarProxy) {
 	                String portText = txtPortProxi.getText();
 	                if (portText == null || portText.isBlank()) {
-	                    // Aquí podrías mostrar una alerta al usuario
-	                    System.out.println("Error: El puerto es obligatorio si usas proxy.");
+	                    mostrarAlertaExit("Configuració", "El port es obligatori si es fa anar proxi.");
 	                    return; 
 	                }
 	                puerto = Integer.parseInt(portText.trim());
@@ -112,13 +150,35 @@ public class ConfigController {
 
 	            // Llamamos al provider para aplicar los cambios
 	            HttpClientProvider.configureProxy(usarProxy, host, puerto);
-	            openInici();
+	          
 	        } catch (NumberFormatException e) {
-	            System.err.println("Error: El puerto debe ser un número válido.");
-	            // Opcional: Mostrar alerta visual al usuario
+	        	mostrarAlertaExit("Configuració", "El port ha de ser un numero valid.");
+
 	        }
+	        
+	        // 2. Guardar supermercados
+	        SupermercatServiceClient.saveStatus("alcampo", cxbAlcampo.isSelected());
+	        SupermercatServiceClient.saveStatus("mercadona", cxbMercadona.isSelected());
+	        SupermercatServiceClient.saveStatus("carrefour", cxbCarrefour.isSelected());
+	        SupermercatServiceClient.saveStatus("consum", cxbConsum.isSelected());
+	        SupermercatServiceClient.saveStatus("plusfresc", cxbPlus.isSelected());
+
+	        mostrarAlertaExit("Configuració", "Preferències guardades.");
+	        
+	        // SOLO AL FINAL DE TODO cerramos o navegamos
+	        openInici(); 
+	        
 	    }
-	    
+
+	    private void mostrarAlertaExit(String titol, String msg) { crearAlerta(titol, msg, AlertType.INFORMATION); }
+
+	    private void crearAlerta(String titol, String msg, AlertType tipo) {
+	        Alert alert = new Alert(tipo);
+	        alert.setTitle(titol);
+	        alert.setHeaderText(null);
+	        alert.setContentText(msg);
+	        alert.showAndWait();
+	    }
 	}
 
 

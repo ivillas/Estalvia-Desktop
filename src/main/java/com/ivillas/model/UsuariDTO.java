@@ -10,6 +10,8 @@ public class UsuariDTO {
     private String username;
     private String email;
     private String dataCreacio; 
+    private int nLlistesPrivades;
+    private int nLlistesPublices;
 
     public UsuariDTO() {}
 
@@ -25,4 +27,24 @@ public class UsuariDTO {
 
     public String getDataCreacio() { return dataCreacio; } // Quitamos static
     public void setDataCreacio(String dataCreacio) { this.dataCreacio = dataCreacio; }
+
+	public int getnLlistesPrivades() {
+		return nLlistesPrivades;
+	}
+
+	public void setnLlistesPrivades(int nLlistesPrivades) {
+		this.nLlistesPrivades = nLlistesPrivades;
+	}
+
+	public int getnLlistesPublices() {
+		return nLlistesPublices;
+	}
+
+	public void setnLlistesPublices(int nLlistesPublices) {
+		this.nLlistesPublices = nLlistesPublices;
+	}
+    
+    
+    
+    
 }

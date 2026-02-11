@@ -12,7 +12,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -32,8 +31,7 @@ public class LlistesPubliquesController {
     public void initialize() {
         cargarListasPubliques();
     }
-
-    
+   
     
     public void cargarListasPubliques() {
         // 1. Crear una tarea en segundo plano
@@ -97,7 +95,7 @@ public class LlistesPubliquesController {
             Parent root = loader.load();
             
             // Supongamos que creas un DetalleController
-            DetalleController controller = loader.getController();
+            DetallController controller = loader.getController();
             controller.cargarDatos(lista);
 
             Stage stage = new Stage();
