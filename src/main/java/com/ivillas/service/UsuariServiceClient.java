@@ -11,37 +11,47 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ivillas.network.HttpClientProvider;
 
+/**
+ * Clase Service per gestionar el compte d'usuari
+ */
 public class UsuariServiceClient {
-	 private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+	private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    public static boolean eliminarCuenta(Long userId, String modo) throws IOException {
-        // Accedemos a la URL a través de tu proveedor centralizado
-        String urlString = HttpClientProvider.getBaseUrl() + "/usuarios/" + userId + "?modo=" + modo;
-        
-        URL url = new URL(urlString);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("DELETE");
-        
-        // Opcional: Si tu Provider tiene un método para configurar headers (como el JSON), úsalo
-        // HttpClientProvider.setCommonHeaders(conn);
+	/**
+	 * Metode per eliminar compte
+	 * @param userId 
+	 * @param mode (tot el compte o deixar les llistes publiques
+	 * @return
+	 * @throws IOException
+	 */
+	public static boolean eliminarCompte(Long userId, String mode) throws IOException {
+		String urlString = HttpClientProvider.getBaseUrl() + "/usuarios/" + userId + "?modo=" + mode;
 
-        int code = conn.getResponseCode();
-        return code == 200;
-    }
-    
-    
-    // Nou: Obtenir el total de llistes privades
-    public static int getTotalUsuaris() throws Exception {
-        String url = HttpClientProvider.getBaseUrl() + "/usuarios/usuaris/count";
-        
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .GET()
-            .build();
+		URL url = new URL(urlString);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestMethod("DELETE");
 
-        HttpResponse<String> response = HttpClientProvider.getClient()
-            .send(request, HttpResponse.BodyHandlers.ofString());
+		int code = conn.getResponseCode();
+		return code == 200;
+	}
 
-        return mapper.readValue(response.body(), Integer.class);
-    }
+
+	/**
+	 * Metode per obtenir el total de llistes privades
+	 * @return
+	 * @throws Exception
+	 */
+	public static int getTotalUsuaris() throws Exception {
+		String url = HttpClientProvider.getBaseUrl() + "/usuarios/usuaris/count";
+
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create(url))
+				.GET()
+				.build();
+
+		HttpResponse<String> response = HttpClientProvider.getClient()
+				.send(request, HttpResponse.BodyHandlers.ofString());
+
+		return mapper.readValue(response.body(), Integer.class);
+	}
 }

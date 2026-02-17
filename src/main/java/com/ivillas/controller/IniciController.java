@@ -36,12 +36,12 @@ public class IniciController {
             @Override
             protected Void call() throws Exception {
                 // obtenim les llistes publiques y ordenem per dataCreacio (descendent)
-                List<LlistaDTO> listas = LlistaServiceClient.getPublicas();
+                List<LlistaDTO> listas = LlistaServiceClient.getPubliques();
                 listas.sort((a, b) -> b.getDataCreacio().compareTo(a.getDataCreacio()));
                 List<LlistaDTO> topListas = listas.stream().limit(10).collect(Collectors.toList());
 
                 // 2. Obtener Productos y ordenar por lastUpdate (Descendente)
-                List<ProductePreusDTO> productos = ProducteServiceClient.getProductos();
+                List<ProductePreusDTO> productos = ProducteServiceClient.getProductes();
                 productos.sort((a, b) -> b.getLastUpdate().compareTo(a.getLastUpdate()));
                 List<ProductePreusDTO> topProds = productos.stream().limit(10).collect(Collectors.toList());
 
@@ -96,7 +96,7 @@ public class IniciController {
             Parent root = loader.load();
             
             DetallController controller = loader.getController();
-            controller.cargarDatos(lista);
+            controller.carregarDades(lista);
 
             Stage stage = new Stage();
             stage.setTitle("Detall de: " + lista.getNombre());

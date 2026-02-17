@@ -62,11 +62,11 @@ public class AjudaController {
 				// Carregem les dades simples
 				resultat.put("usuaris", String.valueOf(UsuariServiceClient.getTotalUsuaris()));
 				resultat.put("supers", String.valueOf(SupermercatServiceClient.getAll().size()));
-				resultat.put("publi", String.valueOf(LlistaServiceClient.getPublicas().size()));
+				resultat.put("publi", String.valueOf(LlistaServiceClient.getPubliques().size()));
 				resultat.put("privi", String.valueOf(LlistaServiceClient.getTotalPrivades()));
 
 				// Carregem els productes una sola vegada i y mirem el tamany
-				List<ProductePreusDTO> productos = ProducteServiceClient.getProductos();
+				List<ProductePreusDTO> productos = ProducteServiceClient.getProductes();
 				resultat.put("nProd", String.valueOf(productos.size()));
 
 				// Obtenim la data i li donem format

@@ -13,63 +13,88 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Clase Service per gestionar productes amb la api del servidor
+ */
 public class ProducteServiceClient {
 
-    private static final ObjectMapper mapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule());
+	private static final ObjectMapper mapper = new ObjectMapper()
+			.registerModule(new JavaTimeModule());
 
-    // Obtenir tots els productes de la base de dades
-    public static List<ProductePreusDTO> getProductos() throws Exception {
-        String url = HttpClientProvider.getBaseUrl() + "/productos/con-precios";
-        
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .GET()
-            .build();
+	/**
+	 *  Obtenir tots els productes de la base de dades
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<ProductePreusDTO> getProductes() throws Exception {
+		String url = HttpClientProvider.getBaseUrl() + "/productos/con-precios";
 
-        HttpResponse<String> response = HttpClientProvider.getClient()
-            .send(request, HttpResponse.BodyHandlers.ofString());
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create(url))
+				.GET()
+				.build();
 
-        return mapper.readValue(response.body(), new TypeReference<List<ProductePreusDTO>>() {});
-    }
+		HttpResponse<String> response = HttpClientProvider.getClient()
+				.send(request, HttpResponse.BodyHandlers.ofString());
 
-    public static LocalDateTime ultimaDataProductes(List<ProductePreusDTO> productos) {
-        if (productos == null || productos.isEmpty()) return null;
-        return productos.stream()
-                .map(ProductePreusDTO::getLastUpdate)
-                .filter(Objects::nonNull)
-                .max(LocalDateTime::compareTo)
-                .orElse(null);
-    }
-    
-    
-    //  Obtenir els ids dels favorits de l'usuari
-    public static List<Long> getIdsFavoritos(Long userId) throws Exception {
-        String url = HttpClientProvider.getBaseUrl() + "/favoritos/ids/" + userId;
-        
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .GET()
-            .build();
+		return mapper.readValue(response.body(), new TypeReference<List<ProductePreusDTO>>() {});
+	}
 
-        HttpResponse<String> response = HttpClientProvider.getClient()
-            .send(request, HttpResponse.BodyHandlers.ofString());
+	/**
+	 * Metode per obtenir la data mes nova dels productes
+	 * Per fer servir com ultima actualització 
+	 * @param productos
+	 * @return
+	 */
+	public static LocalDateTime ultimaDataProductes(List<ProductePreusDTO> productos) {
+		if (productos == null || productos.isEmpty()) return null;
+		return productos.stream()
+				.map(ProductePreusDTO::getLastUpdate)
+				.filter(Objects::nonNull)
+				.max(LocalDateTime::compareTo)
+				.orElse(null);
+	}
 
-        return mapper.readValue(response.body(), new TypeReference<List<Long>>() {});
-    }
 
-    // afegir o eliminar favorit
-    public static boolean gestionarFavoritoAPI(Long userId, Long prodId, boolean esAñadir) throws Exception {
-        String url = HttpClientProvider.getBaseUrl() + "/favoritos/" + userId + "/" + prodId;
-        
-        HttpRequest.Builder builder = HttpRequest.newBuilder().uri(URI.create(url));
-        
-        if (esAñadir) builder.POST(HttpRequest.BodyPublishers.noBody());
-        else builder.DELETE();
+	/**
+	 * Metode per Obtenir els ids dels favorits de l'usuari
+	 * @param userId
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<Long> getIdsFavorits(Long userId) throws Exception {
+		String url = HttpClientProvider.getBaseUrl() + "/favoritos/ids/" + userId;
 
-        HttpResponse<String> response = HttpClientProvider.getClient()
-            .send(builder.build(), HttpResponse.BodyHandlers.ofString());
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create(url))
+				.GET()
+				.build();
 
-        return response.statusCode() == 200;
-    }
+		HttpResponse<String> response = HttpClientProvider.getClient()
+				.send(request, HttpResponse.BodyHandlers.ofString());
+
+		return mapper.readValue(response.body(), new TypeReference<List<Long>>() {});
+	}
+
+	/**
+	 * Metode per afegir o eliminar favorit
+	 * @param userId
+	 * @param prodId
+	 * @param esAfegir
+	 * @return
+	 * @throws Exception
+	 */
+	public static boolean gestionarFavoritAPI(Long userId, Long prodId, boolean esAfegir) throws Exception {
+		String url = HttpClientProvider.getBaseUrl() + "/favoritos/" + userId + "/" + prodId;
+
+		HttpRequest.Builder builder = HttpRequest.newBuilder().uri(URI.create(url));
+
+		if (esAfegir) builder.POST(HttpRequest.BodyPublishers.noBody());
+		else builder.DELETE();
+
+		HttpResponse<String> response = HttpClientProvider.getClient()
+				.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+
+		return response.statusCode() == 200;
+	}
 }

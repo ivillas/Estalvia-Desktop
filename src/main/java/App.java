@@ -12,7 +12,7 @@ public class App {
 
 	        try {
 	            List<ProductePreusDTO> productos =
-	                ProducteServiceClient.getProductos();
+	                ProducteServiceClient.getProductes();
 
 	            for (ProductePreusDTO p : productos) {
 	                System.out.println(p.marca + " - " + p.nombre);

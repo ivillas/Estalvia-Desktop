@@ -39,7 +39,7 @@ public class LlistesPubliquesController {
             @Override
             protected List<LlistaDTO> call() throws Exception {
                 // Esto se ejecuta fuera del hilo de la UI (sin bloquear la app)
-                return LlistaServiceClient.getPublicas(); 
+                return LlistaServiceClient.getPubliques(); 
             }
         };
 
@@ -96,7 +96,7 @@ public class LlistesPubliquesController {
             
             // Supongamos que creas un DetalleController
             DetallController controller = loader.getController();
-            controller.cargarDatos(lista);
+            controller.carregarDades(lista);
 
             Stage stage = new Stage();
             stage.setTitle("Detalle de " + lista.getNombre());

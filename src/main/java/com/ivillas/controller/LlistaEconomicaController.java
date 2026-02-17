@@ -86,8 +86,8 @@ public class LlistaEconomicaController {
             @Override protected Void call() throws Exception {
                 listaSupers = SupermercatServiceClient.getAll();
                 // Simulación: Asignar precios a los items si no los tienen
-                List<ProductePreusDTO> todos = ProducteServiceClient.getProductos();
-                for (ItemLlistaRequest item : SessionManager.getListaTemporal().getItems()) {
+                List<ProductePreusDTO> todos = ProducteServiceClient.getProductes();
+                for (ItemLlistaRequest item : SessionManager.getLlistaTemporal().getItems()) {
                     todos.stream().filter(p -> p.producteId.equals(item.getProductoId()))
                          .findFirst().ifPresent(p -> item.setPrecios(p.precios));
                 }
@@ -97,7 +97,7 @@ public class LlistaEconomicaController {
 
         task.setOnSucceeded(e -> {
             generarInterfazDinamica();
-            tblComparativa.getItems().setAll(SessionManager.getListaTemporal().getItems());
+            tblComparativa.getItems().setAll(SessionManager.getLlistaTemporal().getItems());
         });
         new Thread(task).start();
     }

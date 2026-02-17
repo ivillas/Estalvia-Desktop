@@ -139,7 +139,7 @@ public class ProductesController implements Initializable {
         List<ProductePreusDTO> listaFiltrada;
         if (ckbFavorit.isSelected()) {
             listaFiltrada = llistaProductes.stream()
-                    .filter(p -> SessionManager.esFavorito(p.getProducteId()))
+                    .filter(p -> SessionManager.esFavorit(p.getProducteId()))
                     .collect(Collectors.toList());
         } else {
             listaFiltrada = llistaProductes;
@@ -209,7 +209,7 @@ public class ProductesController implements Initializable {
                 // Lógica para el corazón de la tarjeta
                 if (!SessionManager.isLoggedIn()) {
                     controller.ocultarCorazon(); 
-                } else if (SessionManager.esFavorito(p.getProducteId())) {
+                } else if (SessionManager.esFavorit(p.getProducteId())) {
                     controller.marcarCorazonRojo(); // Deberás crear este método en el item controller
                 }
 
@@ -262,7 +262,7 @@ public class ProductesController implements Initializable {
                     setGraphic(null);
                 } else {
                     ProductePreusDTO p = getTableView().getItems().get(getIndex());
-                    if (SessionManager.esFavorito(p.getProducteId())) {
+                    if (SessionManager.esFavorit(p.getProducteId())) {
                         iconFavorit.setStyle("-fx-text-fill: #e74c3c; -fx-font-size: 20px;");
                     } else {
                         iconFavorit.setStyle("-fx-text-fill: #ccc; -fx-font-size: 20px;");
@@ -309,18 +309,18 @@ public class ProductesController implements Initializable {
 
         Long userId = SessionManager.getUsuario().getUserId();
         Long prodId = p.getProducteId();
-        boolean yaEsFavorit = SessionManager.esFavorito(prodId);
+        boolean yaEsFavorit = SessionManager.esFavorit(prodId);
 
         // fil secundari per no congelar l'app
         new Thread(() -> {
             try {
                 // true per afegir, false per treure
-                boolean exito = ProducteServiceClient.gestionarFavoritoAPI(userId, prodId, !yaEsFavorit);
+                boolean exito = ProducteServiceClient.gestionarFavoritAPI(userId, prodId, !yaEsFavorit);
                 
                 if (exito) {
                     // Actualizem la memoria del SessionManager
-                    if (yaEsFavorit) SessionManager.getIdsFavoritos().remove(prodId);
-                    else SessionManager.getIdsFavoritos().add(prodId);
+                    if (yaEsFavorit) SessionManager.getIdsFavorits().remove(prodId);
+                    else SessionManager.getIdsFavorits().add(prodId);
 
                     // Refresquem el color en el fil de JavaFX
                     Platform.runLater(() -> {
@@ -364,7 +364,7 @@ public class ProductesController implements Initializable {
 
         //  afegim directament a la llista del sessionmanager
         // Al cambiar de vista a CrearLlistaController, el initialize carregara aixo automaticament
-        SessionManager.getListaTemporal().getItems().add(nuevoItem);
+        SessionManager.getLlistaTemporal().getItems().add(nuevoItem);
 
         // Feedback en consola
         System.out.println("Afegit ItemLlistaRequest: " + nuevoItem.getProductoNombre());

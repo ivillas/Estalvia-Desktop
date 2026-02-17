@@ -47,18 +47,18 @@ public class CrearLlistaController {
     @FXML
     public void initialize() {
         // Carregar el que hi avia
-        itemsEnLlista.setAll(SessionManager.getListaTemporal().getItems());
-        txtNomLlista.setText(SessionManager.getListaTemporal().getNombre());
-        txtDescripcio.setText(SessionManager.getListaTemporal().getDescripcion());
+        itemsEnLlista.setAll(SessionManager.getLlistaTemporal().getItems());
+        txtNomLlista.setText(SessionManager.getLlistaTemporal().getNombre());
+        txtDescripcio.setText(SessionManager.getLlistaTemporal().getDescripcion());
     	    
         // per escoltar canvis, cada vegada que es borri o afegeix algo 
     	    itemsEnLlista.addListener((ListChangeListener<ItemLlistaRequest>) c -> {
-    	        SessionManager.getListaTemporal().setItems(new ArrayList<>(itemsEnLlista));
+    	        SessionManager.getLlistaTemporal().setItems(new ArrayList<>(itemsEnLlista));
     	    });
 
     	    // per els textes, si s'escriu algo i es cambie de vista que es guardi
-    	    txtNomLlista.textProperty().addListener((obs, oldV, newV) -> SessionManager.getListaTemporal().setNombre(newV));
-    	    txtDescripcio.textProperty().addListener((obs, oldV, newV) -> SessionManager.getListaTemporal().setDescripcion(newV));
+    	    txtNomLlista.textProperty().addListener((obs, oldV, newV) -> SessionManager.getLlistaTemporal().setNombre(newV));
+    	    txtDescripcio.textProperty().addListener((obs, oldV, newV) -> SessionManager.getLlistaTemporal().setDescripcion(newV));
 
     	    
     	    listaVisual.setItems(itemsEnLlista);
@@ -150,24 +150,24 @@ public class CrearLlistaController {
                     });
                     
                     // boto favorit (afegir/Treure)
-                    Button btnFavRow = new Button(SessionManager.esFavorito(item.getProductoId()) ? "❤" : "♡");
-                    btnFavRow.setStyle("-fx-text-fill: " + (SessionManager.esFavorito(item.getProductoId()) ? "red" : "gray") + "; -fx-background-color: transparent;");
+                    Button btnFavRow = new Button(SessionManager.esFavorit(item.getProductoId()) ? "❤" : "♡");
+                    btnFavRow.setStyle("-fx-text-fill: " + (SessionManager.esFavorit(item.getProductoId()) ? "red" : "gray") + "; -fx-background-color: transparent;");
 
                     btnFavRow.setOnAction(e -> {
                         Long userId = SessionManager.getUsuario().getUserId();
                         Long prodId = item.getProductoId();
-                        boolean esYaFav = SessionManager.esFavorito(prodId);
+                        boolean esYaFav = SessionManager.esFavorit(prodId);
 
                         new Thread(() -> {
                             try {
-                                if (ProducteServiceClient.gestionarFavoritoAPI(userId, prodId, !esYaFav)) {
-                                    if (esYaFav) SessionManager.getIdsFavoritos().remove(prodId);
-                                    else SessionManager.getIdsFavoritos().add(prodId);
+                                if (ProducteServiceClient.gestionarFavoritAPI(userId, prodId, !esYaFav)) {
+                                    if (esYaFav) SessionManager.getIdsFavorits().remove(prodId);
+                                    else SessionManager.getIdsFavorits().add(prodId);
                                     
                                     Platform.runLater(() -> {
                                         // Refrescar el ComboBox por si l'usuari está buscan favorits
                                         if (chbNomesFavorits.isSelected()) {
-                                            productesFiltrats.setPredicate(p -> SessionManager.esFavorito(p.getProducteId()));
+                                            productesFiltrats.setPredicate(p -> SessionManager.esFavorit(p.getProducteId()));
                                         }
                                         // Refrescar la propia llista per cambiar el cor de la fila
                                         listaVisual.refresh();
@@ -191,7 +191,7 @@ public class CrearLlistaController {
         chbNomesFavorits.selectedProperty().addListener((obs, oldV, newV) -> {
             if (newV) {
             	//Filtrem pr que nomes surton els favorits del SessionManager
-                productesFiltrats.setPredicate(p -> SessionManager.esFavorito(p.getProducteId()));
+                productesFiltrats.setPredicate(p -> SessionManager.esFavorit(p.getProducteId()));
             } else {
                 // Restaurem el buscador
                 productesFiltrats.setPredicate(p -> true);
@@ -205,9 +205,9 @@ public class CrearLlistaController {
      * Metode per sincronitzar la llista amb la que es guarda temporalment
      */
     private void sincronizarAmbSessionManager() {
-        SessionManager.getListaTemporal().setItems(new ArrayList<>(itemsEnLlista));
-        SessionManager.getListaTemporal().setNombre(txtNomLlista.getText());
-        SessionManager.getListaTemporal().setDescripcion(txtDescripcio.getText());
+        SessionManager.getLlistaTemporal().setItems(new ArrayList<>(itemsEnLlista));
+        SessionManager.getLlistaTemporal().setNombre(txtNomLlista.getText());
+        SessionManager.getLlistaTemporal().setDescripcion(txtDescripcio.getText());
     }
     
     /**
@@ -216,7 +216,7 @@ public class CrearLlistaController {
     private void carregarComboProductes() {
         try {
             // Usem el client de productes
-            List<ProductePreusDTO> base = ProducteServiceClient.getProductos();
+            List<ProductePreusDTO> base = ProducteServiceClient.getProductes();
             llistaMestraProductes.setAll(base);
             productesFiltrats = new FilteredList<>(llistaMestraProductes, p -> true);
 
@@ -260,9 +260,9 @@ public class CrearLlistaController {
                 itemsEnLlista.add(nuevoItem);
                 
                 // Sincronitzem amb SessionManager
-                SessionManager.getListaTemporal().setItems(new ArrayList<>(itemsEnLlista));
-                SessionManager.getListaTemporal().setNombre(txtNomLlista.getText());
-                SessionManager.getListaTemporal().setDescripcion(txtDescripcio.getText());
+                SessionManager.getLlistaTemporal().setItems(new ArrayList<>(itemsEnLlista));
+                SessionManager.getLlistaTemporal().setNombre(txtNomLlista.getText());
+                SessionManager.getLlistaTemporal().setDescripcion(txtDescripcio.getText());
                 
                 txtquantitat.clear();
                 cmbProductes.getSelectionModel().clearSelection();
@@ -336,20 +336,20 @@ public class CrearLlistaController {
 
         Long userId = SessionManager.getUsuario().getUserId();
         Long prodId = seleccionat.getProducteId();
-        boolean esYaFav = SessionManager.esFavorito(prodId);
+        boolean esYaFav = SessionManager.esFavorit(prodId);
 
         new Thread(() -> {
             try {
             	//Cridem a la API (true si no es favorit per afegirlo, o false si ja ho es)
-                boolean exit = ProducteServiceClient.gestionarFavoritoAPI(userId, prodId, !esYaFav);
+                boolean exit = ProducteServiceClient.gestionarFavoritAPI(userId, prodId, !esYaFav);
                 if (exit) {
-                    if (esYaFav) SessionManager.getIdsFavoritos().remove(prodId);
-                    else SessionManager.getIdsFavoritos().add(prodId);
+                    if (esYaFav) SessionManager.getIdsFavorits().remove(prodId);
+                    else SessionManager.getIdsFavorits().add(prodId);
 
                     Platform.runLater(() -> {
                         if (chbNomesFavorits.isSelected()) {
                             // AIXO FA QUE EL PRODUCTE DESAPAREGUI AL INSTANT
-                            productesFiltrats.setPredicate(p -> SessionManager.esFavorito(p.getProducteId()));
+                            productesFiltrats.setPredicate(p -> SessionManager.esFavorit(p.getProducteId()));
                         }
                         // aixo actualitze els cors de la llista de abaix
                         listaVisual.refresh(); 

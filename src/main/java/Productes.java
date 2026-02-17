@@ -49,7 +49,7 @@ public class Productes {
         new Thread(() -> {
             try {
                 // 1. Obtener datos del NAS
-                List<ProductePreusDTO> productos = ProducteServiceClient.getProductos();
+                List<ProductePreusDTO> productos = ProducteServiceClient.getProductes();
 
                 // 2. Identificar todos los supermercados únicos para crear las columnas
                 Set<String> nombresSupermercados = new TreeSet<>();

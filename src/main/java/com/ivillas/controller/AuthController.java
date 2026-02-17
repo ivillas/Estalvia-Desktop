@@ -47,7 +47,7 @@ public class AuthController {
 			return;
 
 		AuthServiceClient.login(txtUserLogin.getText(), txtPassLogin.getText(), usuari -> Platform.runLater(() -> {
-			SessionManager.setUsuario(usuari);
+			SessionManager.setUsuari(usuari);
 			if (mainController != null)
 				mainController.actualizarInterfazTrasLogin();
 			txtUserLogin.getScene().getWindow().hide();

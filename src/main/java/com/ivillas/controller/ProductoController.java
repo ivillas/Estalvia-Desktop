@@ -30,7 +30,7 @@ public class ProductoController {
         Task<List<ProductePreusDTO>> tarea = new Task<>() {
             @Override
             protected List<ProductePreusDTO> call() throws Exception {
-                return ProducteServiceClient.getProductos();
+                return ProducteServiceClient.getProductes();
             }
         };
 

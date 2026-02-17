@@ -12,81 +12,126 @@ import com.ivillas.service.ProducteServiceClient;
 
 import javafx.application.Platform;
 
+/**
+ * Clase que gestiona les dades de la app
+ */
 public class SessionManager {
-    private static UsuariDTO usuarioLogueado;
-    private static CrearLlistaRequest listaTemporal = new CrearLlistaRequest();
-    private static MainController mainController;
-    private static Set<Long> idsFavoritos = new HashSet<>();
-    
-    public static CrearLlistaRequest getListaTemporal() {
-        if (listaTemporal.getItems() == null) {
-            listaTemporal.setItems(new ArrayList<>());
-        }
-        return listaTemporal;
-    }
+	private static UsuariDTO usuariLoguejat;
+	private static CrearLlistaRequest llistaTemporal = new CrearLlistaRequest();
+	private static MainController mainController;
+	private static Set<Long> idsFavorits = new HashSet<>();
 
-    public static Set<Long> getIdsFavoritos() {
-        return idsFavoritos;
-    }
-    
-    public static void cargarFavoritos() {
-        if (isLoggedIn()) {
-            new Thread(() -> {
-                try {
-                    List<Long> ids = ProducteServiceClient.getIdsFavoritos(usuarioLogueado.getUserId());
-                    idsFavoritos.clear();
-                    idsFavoritos.addAll(ids);
-                    
-                    // ¡AQUÍ ESTÁ EL CAMBIO!
-                    Platform.runLater(() -> {
-                        // Si el MainController está cargado, intentamos refrescar la vista actual
-                        if (mainController != null) {
-                            mainController.refrescarVistaActualSiEsPerfil();
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }).start();
-        }
-    }
+	/**
+	 * Metode per obtenir la llista temporal que hi ha en la app
+	 * per crearLlista, comparar, afegir productes/llistes...
+	 * @return Llista
+	 */
+	public static CrearLlistaRequest getLlistaTemporal() {
+		if (llistaTemporal.getItems() == null) {
+			llistaTemporal.setItems(new ArrayList<>());
+		}
+		return llistaTemporal;
+	}
 
-    public static boolean esFavorito(Long productoId) {
-        return idsFavoritos.contains(productoId);
-    }
-    
-    public static void resetListaTemporal() {
-        listaTemporal = new CrearLlistaRequest();
-        listaTemporal.setItems(new ArrayList<>());
-    }
+	/**
+	 * Metode per obtenir els ids dels productes favorits de l'usuari
+	 * @return
+	 */
+	public static Set<Long> getIdsFavorits() {
+		return idsFavorits;
+	}
 
-    public static void setUsuario(UsuariDTO u) { 
-        usuarioLogueado = u; 
-        if (u != null) {
-            cargarFavoritos(); // <--- LLAMADA CRÍTICA AQUÍ
-        }
-    }
-    
-    public static UsuariDTO getUsuario() { return usuarioLogueado; }
-    
-    
-    public static boolean isLoggedIn() {
-        return usuarioLogueado != null;
-    }
-
-    public static void logout() {
-    	usuarioLogueado = null;
-    	 idsFavoritos.clear();
-    }
+	/**
+	 * Metode per carregar els ids dels productes favorits d'un usuari a la llista de ids
+	 * Primer llimpiarem la llista  
+	 */
+	public static void carregarFavorits() {
+		if (isLoggedIn()) {
+			new Thread(() -> {
+				try {
+					List<Long> ids = ProducteServiceClient.getIdsFavorits(usuariLoguejat.getUserId());
+					idsFavorits.clear();
+					idsFavorits.addAll(ids);
 
 
+					Platform.runLater(() -> {
+						// Si el MainController está carregat, intentem refrescar la vista actual
+						if (mainController != null) {
+							mainController.refrescarVistaActualSiEsPerfil();
+						}
+					});
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}).start();
+		}
+	}
+
+	/**
+	 * Metode per comprovar si un producte es favorit (si esta en la llista)
+	 * @param productoId
+	 * @return (true o false)
+	 */
+	public static boolean esFavorit(Long productoId) {
+		return idsFavorits.contains(productoId);
+	}
+
+	/**
+	 * Metode per resetejar la llista temporar de memoria
+	 */
+	public static void resetListaTemporal() {
+		llistaTemporal = new CrearLlistaRequest();
+		llistaTemporal.setItems(new ArrayList<>());
+	}
+
+	/**
+	 * Metode mer afegir l'usuari a l'objecte
+	 */
+	public static void setUsuari(UsuariDTO u) { 
+		usuariLoguejat = u; 
+		if (u != null) {
+			carregarFavorits(); 
+		}
+	}
+
+	/**
+	 * Metode per obtenir lusuari actual
+	 * @return usuari(objecte)
+	 */
+	public static UsuariDTO getUsuario() { return usuariLoguejat; }
+
+
+	/**
+	 * Metode per comprobar si esta logejat
+	 * @return (true o false)
+	 */
+	public static boolean isLoggedIn() {
+		return usuariLoguejat != null;
+	}
+
+	/**
+	 * Metode per buidar l'usuari y la llista de ids de productes favorits
+	 */
+	public static void logout() {
+		usuariLoguejat = null;
+		idsFavorits.clear();
+	}
+
+
+	/**
+	 * Metode mer demanat el MAinController
+	 * @return mainController
+	 */
 	public static MainController getMainController() {
 		return mainController;
 	}
-	
-    public static void setMainController(MainController controller) {
-        mainController = controller;
-    }
-    
-    
+
+	/**
+	 * Metode per afegiel Maincontroller
+	 * @param controller
+	 */
+	public static void setMainController(MainController controller) {
+		mainController = controller;
+	}
+
 }

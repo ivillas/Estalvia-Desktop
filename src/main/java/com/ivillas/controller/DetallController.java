@@ -30,31 +30,30 @@ import com.ivillas.service.LlistaServiceClient;
 
 
 public class DetallController {
-    @FXML private Label lblTitulo, lblAutor, lblDescripcion;
-    @FXML private Button btnCopiarDetalle1, btnEliminarLlista;
-    @FXML private TableView<ItemLlistaDTO> tablaProductos;
-    @FXML private TableColumn<ItemLlistaDTO, String> colNombre, colCantidad, colUnidad;
+    @FXML private Label lblTitol, lblAutor, lblDescripcio;
+    @FXML private Button btnCopiarDetall, btnEliminarLlista;
+    @FXML private TableView<ItemLlistaDTO> taulaProductes;
+    @FXML private TableColumn<ItemLlistaDTO, String> colNom, colQuantitat, colUnitat;
     
-    private LlistaDTO listaActual;
+    private LlistaDTO llistaActual;
     
     @FXML
-    public void cargarDatos(LlistaDTO lista) {
-        this.listaActual = lista;
-        lblTitulo.setText(lista.getNombre());
-        lblAutor.setText("Autor: " + lista.getNomAutor());
-        lblDescripcion.setText(lista.getDescripcion());
+    public void carregarDades(LlistaDTO llista) {
+        this.llistaActual = llista;
+        lblTitol.setText(llista.getNombre());
+        lblAutor.setText("Autor: " + llista.getNomAutor());
+        lblDescripcio.setText(llista.getDescripcion());
 
-        // Configuración de tabla...
-        colNombre.setCellValueFactory(new PropertyValueFactory<>("nombreProducto"));
-        colCantidad.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
-        colUnidad.setCellValueFactory(new PropertyValueFactory<>("unidad"));
-        tablaProductos.setItems(FXCollections.observableArrayList(lista.getItems()));
+        // Configuració de la taula...
+        colNom.setCellValueFactory(new PropertyValueFactory<>("nombreProducto"));
+        colQuantitat.setCellValueFactory(new PropertyValueFactory<>("cantidad"));
+        colUnitat.setCellValueFactory(new PropertyValueFactory<>("unidad"));
+        taulaProductes.setItems(FXCollections.observableArrayList(llista.getItems()));
 
-        // --- SEGURIDAD SIN CAMBIAR EL DTO ---
-        // Comparamos el nombre del autor (String) con el nombre del usuario logueado
-        if (SessionManager.isLoggedIn() && lista.getNomAutor() != null) {
+        // Comparem el nom del autor (String) amb el nom d'usuari logejat
+        if (SessionManager.isLoggedIn() && llista.getNomAutor() != null) {
             String nombreLogueado = SessionManager.getUsuario().getUsername();
-            boolean esAutor = lista.getNomAutor().equals(nombreLogueado);
+            boolean esAutor = llista.getNomAutor().equals(nombreLogueado);
             btnEliminarLlista.setVisible(esAutor);
         } else {
             btnEliminarLlista.setVisible(false);
@@ -64,38 +63,38 @@ public class DetallController {
 
     @FXML
     private void eliminarLlista() {
-        if (this.listaActual == null) return;
+        if (this.llistaActual == null) return;
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmar eliminació");
         alert.setHeaderText(null);
-        alert.setContentText("Vols eliminar la llista '" + listaActual.getNombre() + "'?");
+        alert.setContentText("Vols eliminar la llista '" + llistaActual.getNombre() + "'?");
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                Long llistaId = listaActual.getListaId(); 
+                Long llistaId = llistaActual.getListaId(); 
                 Long usuariId = SessionManager.getUsuario().getUserId();
 
-                // 1. Borrado físico en el servidor
+                // Borrat en el servidor
                 LlistaServiceClient.eliminarLlista(llistaId, usuariId);
 
-                // 2. Cerramos la ventana modal de detalle
-                cerrarVentana();
+                // tanquem la finestra del detall
+                tancarFinestra();
                 
-                // 3. Hilo con pequeño retardo para asegurar que el refresco vea el cambio
+                //fil de petit retard per asegurar que el refresc veigi el canvi
                 new Thread(() -> {
                     try { 
-                        Thread.sleep(300); // 300ms es el tiempo ideal para estabilidad
+                        Thread.sleep(300); // 300ms de retard
                     } catch (InterruptedException e) {}
                     
                     javafx.application.Platform.runLater(() -> {
                         if (SessionManager.getMainController() != null) {
-                            // Esto refresca los contadores de favoritos/stats si es necesario
+                            // aixo refresca els controldors de favoritos/stats si es necesari
                             if (SessionManager.isLoggedIn()) {
-                                SessionManager.cargarFavoritos(); 
+                                SessionManager.carregarFavorits(); 
                             }
-                            // Esto refresca la vista (Privadas, Públicas o Perfil)
+                            // Aixo refresca la vista (Privades, Públicas o Perfil)
                             SessionManager.getMainController().refrescarVistaActualSiEsPerfil();
                         }
                     });
@@ -114,14 +113,14 @@ public class DetallController {
     
     
     @FXML
-    private void copiarLista() {
+    private void copiarLlista() {
     
-    CrearLlistaRequest borrador = SessionManager.getListaTemporal();
+    CrearLlistaRequest borrador = SessionManager.getLlistaTemporal();
     if (SessionManager.getUsuario() == null) {
         MainController mc = SessionManager.getMainController();
         if (mc != null) {
             try {
-            	mostrarAlertaExito("Identificat","Has de iniciar sessió per afegir aquesta llista al teu compte.");
+            	mostrarAlertaExit("Identificat","Has de iniciar sessió per afegir aquesta llista al teu compte.");
 				mc.openLoginWindow();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
@@ -130,29 +129,29 @@ public class DetallController {
         }
         return;
     }
-    // Obtenemos todos los productos (con sus precios) para cruzar datos
+    //obtenim tots els productes (amb els preus) per creuar dades
     try {
-        List<ProductePreusDTO> maestra = ProducteServiceClient.getProductos();
+        List<ProductePreusDTO> mestra = ProducteServiceClient.getProductes();
 
-        for (ItemLlistaDTO item : listaActual.getItems()) {
-            ItemLlistaRequest nuevo = new ItemLlistaRequest();
-            nuevo.setProductoId(item.getProductoId());
-            nuevo.setProductoNombre(item.getNombreProducto());
-            nuevo.setCantidad(item.getCantidad() != null ? item.getCantidad() : java.math.BigDecimal.ONE);
-            nuevo.setUnidad(item.getUnidad());
+        for (ItemLlistaDTO item : llistaActual.getItems()) {
+            ItemLlistaRequest nou = new ItemLlistaRequest();
+            nou.setProductoId(item.getProductoId());
+            nou.setProductoNombre(item.getNombreProducto());
+            nou.setCantidad(item.getCantidad() != null ? item.getCantidad() : java.math.BigDecimal.ONE);
+            nou.setUnidad(item.getUnidad());
 
-            // BUSCAMOS LOS PRECIOS EN LA MAESTRA USANDO EL ID
-            maestra.stream()
+            // busquem preus en la mestra usant el ID
+            mestra.stream()
                 .filter(p -> p.getProducteId().equals(item.getProductoId()))
                 .findFirst()
-                .ifPresent(p -> nuevo.setPrecios(p.getPrecios()));
+                .ifPresent(p -> nou.setPrecios(p.getPrecios()));
 
-            borrador.getItems().add(nuevo);
+            borrador.getItems().add(nou);
         }
 
 
-        btnCopiarDetalle1.setText("Afegit!");
-        btnCopiarDetalle1.setDisable(true);
+        btnCopiarDetall.setText("Afegit!");
+        btnCopiarDetall.setDisable(true);
 
         
     } catch (Exception ex) {
@@ -162,11 +161,11 @@ public class DetallController {
     }
     
     
-    private void mostrarAlertaExito(String titulo, String msg) { crearAlerta(titulo, msg, AlertType.INFORMATION); }
+    private void mostrarAlertaExit(String titol, String msg) { crearAlerta(titol, msg, AlertType.INFORMATION); }
 
-    private void crearAlerta(String titulo, String msg, AlertType tipo) {
-        Alert alert = new Alert(tipo);
-        alert.setTitle(titulo);
+    private void crearAlerta(String titol, String msg, AlertType tipus) {
+        Alert alert = new Alert(tipus);
+        alert.setTitle(titol);
         alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.showAndWait();
@@ -176,7 +175,7 @@ public class DetallController {
     
     
     @FXML
-    private void cerrarVentana() {
-        ((Stage) lblTitulo.getScene().getWindow()).close();
+    private void tancarFinestra() {
+        ((Stage) lblTitol.getScene().getWindow()).close();
     }
 }

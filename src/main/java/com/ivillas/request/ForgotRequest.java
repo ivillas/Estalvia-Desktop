@@ -1,11 +1,17 @@
 package com.ivillas.request;
 
 
+/**
+ * Clase request de recuperar contrasenya
+ */
+
 public class ForgotRequest {
-    private String email;
+	private String email;
 
-    public ForgotRequest() {}
+	public ForgotRequest() {}
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+	// Getters & Setters
+
+	public String getEmail() { return email; }
+	public void setEmail(String email) { this.email = email; }
 }

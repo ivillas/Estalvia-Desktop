@@ -1,12 +1,17 @@
 package com.ivillas.request;
 
+/**
+ * Clase request del registre
+ */
 public class RegisterRequest {
     private String username;
     private String email;
     private String password;
 
     public RegisterRequest() {}
-
+    
+    //Getters & Setters
+    
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 

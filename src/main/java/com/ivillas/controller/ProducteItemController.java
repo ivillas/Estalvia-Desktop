@@ -37,7 +37,7 @@ public class ProducteItemController {
         }
 
         // Actualizar estado del corazón según el SessionManager
-        if (SessionManager.isLoggedIn() && SessionManager.esFavorito(p.getProducteId())) {
+        if (SessionManager.isLoggedIn() && SessionManager.esFavorit(p.getProducteId())) {
             marcarCorazonRojo();
         } else {
             resetCorazon();
@@ -51,13 +51,13 @@ public class ProducteItemController {
 
         Long userId = SessionManager.getUsuario().getUserId();
         Long prodId = producto.getProducteId();
-        boolean yaEsFav = SessionManager.esFavorito(prodId);
+        boolean yaEsFav = SessionManager.esFavorit(prodId);
 
         new Thread(() -> {
             try {
-                if (ProducteServiceClient.gestionarFavoritoAPI(userId, prodId, !yaEsFav)) {
-                    if (yaEsFav) SessionManager.getIdsFavoritos().remove(prodId);
-                    else SessionManager.getIdsFavoritos().add(prodId);
+                if (ProducteServiceClient.gestionarFavoritAPI(userId, prodId, !yaEsFav)) {
+                    if (yaEsFav) SessionManager.getIdsFavorits().remove(prodId);
+                    else SessionManager.getIdsFavorits().add(prodId);
                     
                     Platform.runLater(() -> {
                         if (!yaEsFav) marcarCorazonRojo();
@@ -78,7 +78,7 @@ public class ProducteItemController {
         nuevoItem.setPrecios(producto.getPrecios());
 
         // Añadir a la lista temporal del SessionManager
-        SessionManager.getListaTemporal().getItems().add(nuevoItem);
+        SessionManager.getLlistaTemporal().getItems().add(nuevoItem);
         System.out.println("Afegit a listaTemporal: " + producto.getNombre());
     }
 

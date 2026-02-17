@@ -38,7 +38,7 @@ public class UsuarioController {
             lblLlistesPubliques.setText(String.valueOf(user.getnLlistesPublices()));
             lblLlistesPrivades.setText(String.valueOf(user.getnLlistesPrivades()));
             if (SessionManager.isLoggedIn()) {
-                lblProductes.setText(String.valueOf(SessionManager.getIdsFavoritos().size()));
+                lblProductes.setText(String.valueOf(SessionManager.getIdsFavorits().size()));
             }
             
         }
@@ -85,13 +85,13 @@ public class UsuarioController {
             Long userId = SessionManager.getUsuario().getUserId();
             
             // Llamamos al cliente que conecta con el Backend
-            boolean ok = UsuariServiceClient.eliminarCuenta(userId, modo);
+            boolean ok = UsuariServiceClient.eliminarCompte(userId, modo);
 
             if (ok) {
                 mostrarAlerta("Compte eliminat", "El teu compte s'ha eliminat correctament. Fins la propera!");
                 
                 // Limpiamos sesión y volvemos al inicio (Login/Inici)
-                SessionManager.setUsuario(null);
+                SessionManager.setUsuari(null);
                 if (mainController != null) {
                     mainController.handleLogout(); 
                     mainController.openInici();

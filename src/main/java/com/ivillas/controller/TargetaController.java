@@ -45,7 +45,7 @@ public class TargetaController {
         
         btnAfegir.setOnAction(e -> {
         	
-            CrearLlistaRequest borrador = SessionManager.getListaTemporal();
+            CrearLlistaRequest borrador = SessionManager.getLlistaTemporal();
             if (SessionManager.getUsuario() == null) {
                 MainController mc = SessionManager.getMainController();
                 if (mc != null) {
@@ -61,7 +61,7 @@ public class TargetaController {
             }
             // Obtenemos todos los productos (con sus precios) para cruzar datos
             try {
-                List<ProductePreusDTO> maestra = ProducteServiceClient.getProductos();
+                List<ProductePreusDTO> maestra = ProducteServiceClient.getProductes();
 
                 for (ItemLlistaDTO item : listaActual.getItems()) {
                     ItemLlistaRequest nuevo = new ItemLlistaRequest();

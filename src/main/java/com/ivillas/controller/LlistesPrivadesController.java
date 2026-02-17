@@ -59,7 +59,7 @@ import javafx.stage.Stage;
 	            @Override
 	            protected List<LlistaDTO> call() throws Exception {
 	                // Forzamos la llamada al método que acepta el ID
-	                return LlistaServiceClient.getPorUsuario(userId); 
+	                return LlistaServiceClient.getPerUsuari(userId); 
 	            }
 	        };
 
@@ -136,7 +136,7 @@ import javafx.stage.Stage;
             
             // Supongamos que creas un DetalleController
             DetallController controller = loader.getController();
-            controller.cargarDatos(lista);
+            controller.carregarDades(lista);
 
             Stage stage = new Stage();
             stage.setTitle("Detalle de " + lista.getNombre());
