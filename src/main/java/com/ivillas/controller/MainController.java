@@ -19,7 +19,7 @@ import javafx.scene.control.TextField;
 
 import java.io.IOException;
 import java.net.URL;
-
+import com.ivillas.service.LlistaServiceClient;
 public class MainController {
 
     @FXML private Label txtTitol; // CAMBIADO: JFXLabel -> Label
@@ -246,7 +246,7 @@ public class MainController {
         btnCrearLlista.setManaged(false);
         btnSupers.setVisible(false);
         btnSupers.setManaged(false);
-
+        openInici();
     }
     
     @FXML
@@ -415,9 +415,7 @@ public class MainController {
     
     public void actualizarInterfazTrasLogin() {
         UsuariDTO user = SessionManager.getUsuario();
-       // if (user == null) return;
-
-        // DEBUG 1: ¿Realmente SessionManager tiene al usuario?
+        
         if (user == null) {
             System.out.println("ERROR: SessionManager devolvió NULL");
             return;
@@ -425,7 +423,7 @@ public class MainController {
             System.out.println("OK: Usuario recuperado: " + user.getUsername());
         }
         
-        // 1. Actualizar botones laterales (tu código actual)
+        // 1. Actualizar botones laterales (Tu lógica original intacta)
         btnUserSession.setText(user.getUsername());
         btnLogout.setVisible(true);
         btnLogout.setManaged(true);
@@ -433,40 +431,80 @@ public class MainController {
         btnCrearLlista.setManaged(true);
         btnLlistesPrivades.setVisible(true);
         btnLlistesPrivades.setManaged(true);
-        // ... activar el resto de botones ...
+        // (Añade aquí el resto de tus botones si los tienes)
 
-        // 2. Cargar la "página" de usuario desde el FXML
-        try {
-            txtTitol.setText("Perfil d'Usuari");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/perfilUsuari.fxml"));
-            BorderPane root = loader.load();
+        // 2. PEDIR DATOS FRESCOS (Refresco automático de contadores)
+        javafx.concurrent.Task<java.util.Map<String, Long>> task = new javafx.concurrent.Task<>() {
+            @Override
+            protected java.util.Map<String, Long> call() throws Exception {
+                // Llamamos a la API para obtener las estadísticas reales actuales
+                return LlistaServiceClient.getStats(user.getUserId());
+            }
+        };
 
-            // Obtener el controlador de forma segura
-            Object controller = loader.getController();
+        // Cuando la API responde con éxito:
+        task.setOnSucceeded(ev -> {
+            java.util.Map<String, Long> stats = task.getValue();
             
-            // CAMBIA 'UsuarioController' por el nombre EXACTO de tu clase (ej: UsuariController)
-            // Si aún no la tienes, comenta estas líneas para que no falle al compilar
-            if (controller instanceof UsuarioController) { 
-                UsuarioController uc = (UsuarioController) controller;
-                uc.setMainController(this);
-                uc.cargarDatos(user);
+            // Actualizamos los números en el objeto 'user' antes de pasarlo a la vista
+            if (stats != null) {
+                user.setnLlistesPublices(stats.get("publiques").intValue());
+                user.setnLlistesPrivades(stats.get("privades").intValue());
             }
 
-            root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
-            root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
-            mainDisplayArea.getChildren().setAll(root);
+            // 3. Cargar la "página" de usuario desde el FXML (Tu lógica original)
+            try {
+                txtTitol.setText("Perfil d'Usuari");
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/perfilUsuari.fxml"));
+                BorderPane root = loader.load();
 
-        } catch (IOException e) {
-            System.err.println("Error cargando usuario.fxml: " + e.getMessage());
-            e.printStackTrace();
-        }
+                Object controller = loader.getController();
+                
+                if (controller instanceof UsuarioController) { 
+                    UsuarioController uc = (UsuarioController) controller;
+                    uc.setMainController(this);
+                    // Ahora 'user' ya tiene los datos refrescados de la API
+                    uc.cargarDatos(user);
+                }
+
+                root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
+                root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
+                mainDisplayArea.getChildren().setAll(root);
+
+            } catch (IOException e) {
+                System.err.println("Error cargando perfilUsuari.fxml: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+
+        // Si falla la API, cargamos los datos que ya tenemos para no dejar la pantalla vacía
+        task.setOnFailed(ev -> {
+            System.err.println("No se han podido refrescar las stats, usando caché...");
+            // Reutilizamos la lógica de carga aquí o llamamos a un error
+        });
+
+        new Thread(task).start();
     }
-    
     public void refrescarVistaActualSiEsPerfil() {
-        // Si lo que hay ahora mismo en el área central es el perfil, volvemos a cargar los datos
-        // Esto se ejecutará en cuanto la API responda.
-        if ("Perfil d'Usuari".equals(txtTitol.getText())) {
-            actualizarInterfazTrasLogin(); // Esto recargará el perfil con los datos ya bajados de la API
+        String titol = txtTitol.getText();
+        
+        // 1. Si estamos en el Perfil
+        if ("Perfil d'Usuari".equals(titol)) {
+            actualizarInterfazTrasLogin(); 
+        } 
+        // 2. Si estamos en las listas privadas (Meves llistes)
+        else if ("Les meves llistes".equals(titol)) {
+            openLlistesPrivades(); 
+        }
+        // 3. Si estamos en las listas públicas de otros usuarios
+        else if ("Llistes creades pels usuaris".equals(titol)) {
+            openLlistesPubliques();
+        }
+        // 4. Si estamos en el Inicio (asumiendo que el título de openInici es algo como "Inici" o similar)
+        else {
+            // Por si acaso, si no detecta el título pero el borrado fue bien, 
+            // podrías llamar a openInici() como última opción
+            // openInici();
         }
     }
     

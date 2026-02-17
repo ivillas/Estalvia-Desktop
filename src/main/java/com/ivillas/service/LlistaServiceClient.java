@@ -127,4 +127,21 @@ public class LlistaServiceClient {
             throw new RuntimeException("Error en servidor: " + response.statusCode());
         }
     }
+    
+ // 4. Eliminar una lista específica
+    public static void eliminarLlista(Long llistaId, Long usuariId) throws Exception {
+        // La URL debe incluir el ID de la lista y el usuariId como Query Parameter
+    	String url = HttpClientProvider.getBaseUrl() + "/listas/" + llistaId + "/" + usuariId;
+        System.out.println("URL FINAL: " + url);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .DELETE() // Usamos el método DELETE
+                .build();
+
+        HttpResponse<String> response = HttpClientProvider.getClient()
+                .send(request, HttpResponse.BodyHandlers.ofString());
+
+        // Reutilizamos tu método de validación para lanzar excepción si falla (ej: 403 Forbidden)
+        validarRespuesta(response);
+    }
 }
