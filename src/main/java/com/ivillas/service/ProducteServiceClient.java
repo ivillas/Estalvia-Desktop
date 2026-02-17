@@ -18,7 +18,7 @@ public class ProducteServiceClient {
     private static final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule());
 
-    // Obtener todos los productos (Usa la URL base del provider)
+    // Obtenir tots els productes de la base de dades
     public static List<ProductePreusDTO> getProductos() throws Exception {
         String url = HttpClientProvider.getBaseUrl() + "/productos/con-precios";
         
@@ -43,7 +43,7 @@ public class ProducteServiceClient {
     }
     
     
-    // NUEVO: Obtener solo los IDs favoritos del usuario
+    //  Obtenir els ids dels favorits de l'usuari
     public static List<Long> getIdsFavoritos(Long userId) throws Exception {
         String url = HttpClientProvider.getBaseUrl() + "/favoritos/ids/" + userId;
         
@@ -58,7 +58,7 @@ public class ProducteServiceClient {
         return mapper.readValue(response.body(), new TypeReference<List<Long>>() {});
     }
 
-    // NUEVO: Añadir o Quitar favorito (Acción POST/DELETE)
+    // afegir o eliminar favorit
     public static boolean gestionarFavoritoAPI(Long userId, Long prodId, boolean esAñadir) throws Exception {
         String url = HttpClientProvider.getBaseUrl() + "/favoritos/" + userId + "/" + prodId;
         

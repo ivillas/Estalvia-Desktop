@@ -3,30 +3,34 @@ package com.ivillas.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+/**
+ * Clase DTO de Usuari
+ */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UsuariDTO {
-    private Long userId;
-    private String username;
-    private String email;
-    private String dataCreacio; 
-    private int nLlistesPrivades;
-    private int nLlistesPublices;
+	private Long userId;
+	private String username;
+	private String email;
+	private String dataCreacio; 
+	private int nLlistesPrivades;
+	private int nLlistesPublices;
 
-    public UsuariDTO() {}
+	public UsuariDTO() {}
 
-    // Getters y Setters (TODOS sin la palabra static)
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+	// Getters y Setters
 
-    public String getUsername() { return username; } // Quitamos static
-    public void setUsername(String username) { this.username = username; }
+	public Long getUserId() { return userId; }
+	public void setUserId(Long userId) { this.userId = userId; }
 
-    public String getEmail() { return email; } // Quitamos static
-    public void setEmail(String email) { this.email = email; }
+	public String getUsername() { return username; } // Quitamos static
+	public void setUsername(String username) { this.username = username; }
 
-    public String getDataCreacio() { return dataCreacio; } // Quitamos static
-    public void setDataCreacio(String dataCreacio) { this.dataCreacio = dataCreacio; }
+	public String getEmail() { return email; } // Quitamos static
+	public void setEmail(String email) { this.email = email; }
+
+	public String getDataCreacio() { return dataCreacio; } // Quitamos static
+	public void setDataCreacio(String dataCreacio) { this.dataCreacio = dataCreacio; }
 
 	public int getnLlistesPrivades() {
 		return nLlistesPrivades;
@@ -43,8 +47,8 @@ public class UsuariDTO {
 	public void setnLlistesPublices(int nLlistesPublices) {
 		this.nLlistesPublices = nLlistesPublices;
 	}
-    
-    
-    
-    
+
+
+
+
 }

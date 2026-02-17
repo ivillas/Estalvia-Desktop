@@ -3,17 +3,23 @@ package com.ivillas.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Clase DTO de Llista
+ */
+
 public class LlistaDTO {
 
-    private Long listaId;
-    private String nombre;
-    private String descripcion;
-    private String visibilitat;
-    private LocalDateTime dataCreacio;
-    private List<ItemLlistaDTO> items;
-    private String nomAutor;
-    
-    
+	private Long listaId;
+	private String nombre;
+	private String descripcion;
+	private String visibilitat;
+	private LocalDateTime dataCreacio;
+	private List<ItemLlistaDTO> items;
+	private String nomAutor;
+
+
+	// Getters & Setters
+
 	public Long getListaId() {
 		return listaId;
 	}
@@ -57,10 +63,7 @@ public class LlistaDTO {
 		this.nomAutor = nomAutor;
 	}
 
-	
 
-    // getters & setters
-    
-    
-    
+
+
 }

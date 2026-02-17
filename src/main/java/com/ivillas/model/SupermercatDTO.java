@@ -1,56 +1,57 @@
 package com.ivillas.model;
 
+
+/**
+ * Clase DTO de Supermercats 
+ */
+
 public class SupermercatDTO {
-   private Long supermercatId;
-   private String nom;
-   private String web;
-   private boolean actiu;
+	private Long supermercatId;
+	private String nom;
+	private String web;
+	private boolean actiu;
 
-   public SupermercatDTO() {
-   }
-   
-   
-   public SupermercatDTO(Long supermercatId, String nom, String web, boolean actiu) {
-      this.supermercatId = supermercatId;
-      this.nom = nom;
-      this.web = web;
-      this.actiu = actiu;
-   }
+	public SupermercatDTO() {
+	}
 
-   public Long getSupermercatId() {
-	return supermercatId;
-   }
+	// Getters & Setters 
+	public SupermercatDTO(Long supermercatId, String nom, String web, boolean actiu) {
+		this.supermercatId = supermercatId;
+		this.nom = nom;
+		this.web = web;
+		this.actiu = actiu;
+	}
 
-   public void setSupermercatId(Long supermercatId) {
-	this.supermercatId = supermercatId;
-   }
+	public Long getSupermercatId() {
+		return supermercatId;
+	}
 
-   public String getNom() {
-	return nom;
-   }
+	public void setSupermercatId(Long supermercatId) {
+		this.supermercatId = supermercatId;
+	}
 
-   public void setNom(String nom) {
-	this.nom = nom;
-   }
+	public String getNom() {
+		return nom;
+	}
 
-   public String getWeb() {
-	return web;
-   }
+	public void setNom(String nom) {
+		this.nom = nom;
+	}
 
-   public void setWeb(String web) {
-	this.web = web;
-   }
+	public String getWeb() {
+		return web;
+	}
 
-   public boolean isActiu() {
-	return actiu;
-   }
+	public void setWeb(String web) {
+		this.web = web;
+	}
 
-   public void setActiu(boolean actiu) {
-	this.actiu = actiu;
-   }
+	public boolean isActiu() {
+		return actiu;
+	}
 
-   
-   
-   
-   
+	public void setActiu(boolean actiu) {
+		this.actiu = actiu;
+	}
+
 }

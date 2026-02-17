@@ -9,10 +9,14 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import java.io.IOException;
 
+/**
+ * Calse main per l'execució de l'aplicació
+ */
+
 public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        // Tu código de carga de FXML
+        // codi de carrega del FXML
         Parent root = FXMLLoader.load(getClass().getResource("/vista.fxml"));
         Scene scene = new Scene(root);
         stage.setScene(scene);
@@ -22,7 +26,6 @@ public class App extends Application {
         stage.getIcons().add(icon); 
         stage.show();
         
-
         
 
     }

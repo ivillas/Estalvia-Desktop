@@ -2,18 +2,23 @@ package com.ivillas.model;
 
 import java.math.BigDecimal;
 
+/**
+ * Clase DTO de ItemLlista
+ */
+
 public class ItemLlistaDTO {
 
-    private Long itemId;
-    private Long productoId;
-    private String nombreProducto;
-    private BigDecimal cantidad;
-    private String unidad;
-    private boolean marcada;
-    private Long supermercadoPreferidoId;
-	
-    
-    public Long getItemId() {
+	private Long itemId;
+	private Long productoId;
+	private String nombreProducto;
+	private BigDecimal cantidad;
+	private String unidad;
+	private boolean marcada;
+	private Long supermercadoPreferidoId;
+
+	// getters & setters
+
+	public Long getItemId() {
 		return itemId;
 	}
 	public void setItemId(Long itemId) {
@@ -56,7 +61,4 @@ public class ItemLlistaDTO {
 		this.supermercadoPreferidoId = supermercadoPreferidoId;
 	}
 
-    // getters & setters
-    
-    
 }

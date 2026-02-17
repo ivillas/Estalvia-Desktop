@@ -3,19 +3,25 @@ package com.ivillas.model;
 import java.math.BigDecimal;
 import java.util.Map;
 
+/**
+ * Clase DTO de Productes amb els preus
+ */
+
 public class ProductePreusDTO {
 
-    public Long producteId;
-    public String marca;
-    public String nombre;
-    public String unidad;
-    public String pack;
-    private String descripcio;
-    private String imatge;
-    private String envase;
-    private java.time.LocalDateTime lastUpdate;
-    public Map<String, BigDecimal> precios;
-        
+	public Long producteId;
+	public String marca;
+	public String nombre;
+	public String unidad;
+	public String pack;
+	private String descripcio;
+	private String imatge;
+	private String envase;
+	private java.time.LocalDateTime lastUpdate;
+	public Map<String, BigDecimal> precios;
+
+	// Getters & Setters
+
 	public Long getProducteId() {
 		return producteId;
 	}
@@ -52,10 +58,10 @@ public class ProductePreusDTO {
 	public void setPrecios(Map<String, BigDecimal> precios) {
 		this.precios = precios;
 	}
-    
+
 	@Override
 	public String toString() {
-	    return nombre; // O el nombre del campo donde guardas el nombre del producto
+		return nombre; 
 	}
 	public String getDescripcio() {
 		return descripcio;
@@ -81,5 +87,5 @@ public class ProductePreusDTO {
 	public void setLastUpdate(java.time.LocalDateTime lastUpdate) {
 		this.lastUpdate = lastUpdate;
 	}
-        
+
 }
