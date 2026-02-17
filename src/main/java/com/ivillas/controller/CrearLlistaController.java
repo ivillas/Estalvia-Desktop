@@ -23,73 +23,80 @@ import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Clase Controller de la vista crear Llista
+ */
 public class CrearLlistaController {
 
-    // 1. IDs del FXML
-    @FXML private TextField txtNomLlista, txtCantidad, txtBuscador;
+    // IDs del FXML
+    @FXML private TextField txtNomLlista, txtquantitat, txtBuscador;
     @FXML private JFXTextArea txtDescripcio;
     @FXML private JFXComboBox<ProductePreusDTO> cmbProductes;
     @FXML private JFXListView<ItemLlistaRequest> listaVisual; // CORREGIDO: Tipo ItemLlistaRequest
     @FXML private JFXCheckBox chbNomesFavorits;
     @FXML private JFXButton btnAfegirFavorit;
-    // 2. Listas de datos
-    private ObservableList<ProductePreusDTO> listaMaestraProductes = FXCollections.observableArrayList();
-    private FilteredList<ProductePreusDTO> productosFiltrados;
-    private ObservableList<ItemLlistaRequest> itemsEnLista = FXCollections.observableArrayList();
+    // Llistes de dades
+    private ObservableList<ProductePreusDTO> llistaMestraProductes = FXCollections.observableArrayList();
+    private FilteredList<ProductePreusDTO> productesFiltrats;
+    private ObservableList<ItemLlistaRequest> itemsEnLlista = FXCollections.observableArrayList();
 
+    /**
+     * Metode dínicialització de la vista
+     */
     @FXML
     public void initialize() {
-        // 1. Cargar lo que ya había
-        itemsEnLista.setAll(SessionManager.getListaTemporal().getItems());
+        // Carregar el que hi avia
+        itemsEnLlista.setAll(SessionManager.getListaTemporal().getItems());
         txtNomLlista.setText(SessionManager.getListaTemporal().getNombre());
         txtDescripcio.setText(SessionManager.getListaTemporal().getDescripcion());
     	    
-    	    // 2. ESCUCHAR CAMBIOS: Cada vez que se borre o añada algo, se guarda en el Manager
-    	    itemsEnLista.addListener((ListChangeListener<ItemLlistaRequest>) c -> {
-    	        SessionManager.getListaTemporal().setItems(new ArrayList<>(itemsEnLista));
+        // per escoltar canvis, cada vegada que es borri o afegeix algo 
+    	    itemsEnLlista.addListener((ListChangeListener<ItemLlistaRequest>) c -> {
+    	        SessionManager.getListaTemporal().setItems(new ArrayList<>(itemsEnLlista));
     	    });
 
-    	    // 3. ESCUCHAR TEXTOS: Si el usuario escribe y cambia de vista, que se guarde
+    	    // per els textes, si s'escriu algo i es cambie de vista que es guardi
     	    txtNomLlista.textProperty().addListener((obs, oldV, newV) -> SessionManager.getListaTemporal().setNombre(newV));
     	    txtDescripcio.textProperty().addListener((obs, oldV, newV) -> SessionManager.getListaTemporal().setDescripcion(newV));
 
     	    
-    	    listaVisual.setItems(itemsEnLista);
+    	    listaVisual.setItems(itemsEnLlista);
     	
-        cargarComboProductes();
+        carregarComboProductes();
         
-        listaVisual.setItems(itemsEnLista);
+        listaVisual.setItems(itemsEnLlista);
         
-     // 1. CONFIGURAR EL COMBO (Solo para elegir el producto)
+     // CONFIGURAR EL COMBO (nomes per elejir producte)
         cmbProductes.setCellFactory(lv -> new ListCell<ProductePreusDTO>() {
             @Override
             protected void updateItem(ProductePreusDTO item, boolean empty) {
                 super.updateItem(item, empty);
-                // Aquí NO hay cantidad. Solo el nombre.
+                // aqui nomes el nom(sense quantitat.
                 setText(empty || item == null ? null : item.getNombre());
             }
         });
         cmbProductes.setButtonCell(cmbProductes.getCellFactory().call(null));
-        // SOLUCIÓN AL TYPE MISMATCH: Quitamos el genérico de la izquierda en la lambda
-     // 2. CONFIGURAR LA LISTA VISUAL (Donde ya están añadidos los productos)
+        
+     // configuració de la vista visual
         listaVisual.setCellFactory(lv -> new JFXListCell<ItemLlistaRequest>() {
             @Override
             protected void updateItem(ItemLlistaRequest item, boolean empty) {
-            	// Dentro del updateItem de la listaVisual
+            	// Dintre del updateItem de la llistaVisual
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setGraphic(null);
                     setText(null);
                 } else {
-                    VBox contenedorFila = new VBox(5);
+                    VBox contenidorFila = new VBox(5);
                     HBox filaSuperior = new HBox(15);
                     filaSuperior.setAlignment(Pos.CENTER_LEFT);
-                    HBox filaPrecios = new HBox(10); // <--- AQUÍ SE METERÁN LOS PRECIOS
+                    HBox filaPreuss = new HBox(10); // aqui posarem els preus
 
                     if (item.getCantidad() == null) item.setCantidad(java.math.BigDecimal.ONE);
   
-                 // .stripTrailingZeros() quita los ceros sobrantes (2.000 -> 2)
-                 // .toPlainString() evita que use notación científica en números muy grandes
+                 // .stripTrailingZeros() treu els 0 que sobren (2.000 -> 2)
+                 // .toPlainString() evita la notació científica en números molt grans
                  String cantidadLimpia = item.getCantidad().stripTrailingZeros().toPlainString();
 
                  
@@ -101,44 +108,48 @@ public class CrearLlistaController {
                     lblCantVal.setPrefWidth(40);
                     lblCantVal.setAlignment(Pos.CENTER);
 
-                    // --- LÓGICA DE PRECIOS (ESTO ES LO QUE FALTABA) ---
+                    // --- LÓGICA DE PREUS ---
                     if (item.getPrecios() != null) {
-                        item.getPrecios().forEach((superNombre, precio) -> {
-                            // Solo si el súper está activo en Configuración
-                            if (SupermercatServiceClient.getLocalStatus(superNombre)) {
-                                Label lblPrecio = new Label(superNombre + ": " + precio + "€");
+                        item.getPrecios().forEach((superNom, preu) -> {
+                            // Sol si el supermerct esta actiu en la configuració
+                            if (SupermercatServiceClient.getLocalStatus(superNom)) {
+                                Label lblPrecio = new Label(superNom + ": " + preu + "€");
                                 lblPrecio.setStyle("-fx-font-size: 10px; -fx-text-fill: #555; " +
                                                    "-fx-background-color: #eee; -fx-padding: 2 5; " +
                                                    "-fx-background-radius: 5;");
-                                filaPrecios.getChildren().add(lblPrecio);
+                                filaPreuss.getChildren().add(lblPrecio);
                             }
                         });
                     }
 
-                    // --- BOTONES (Copia estos tal cual los tenías) ---
-                    Button btnMas = new Button("+");
-                    btnMas.setOnAction(e -> {
+                    // --- BOTONS ---
+                    // boto afegir unitat
+                    Button btnMes = new Button("+");
+                    btnMes.setOnAction(e -> {
                         item.setCantidad(item.getCantidad().add(java.math.BigDecimal.ONE));
                         lblCantVal.setText(item.getCantidad().toString());
-                        sincronizarConSessionManager();
+                        sincronizarAmbSessionManager();
                     });
 
-                    Button btnMenos = new Button("-");
-                    btnMenos.setOnAction(e -> {
+                    //boto treure unitat
+                    Button btnMenys = new Button("-");
+                    btnMenys.setOnAction(e -> {
                         if (item.getCantidad().compareTo(java.math.BigDecimal.ONE) > 0) {
                             item.setCantidad(item.getCantidad().subtract(java.math.BigDecimal.ONE));
                             lblCantVal.setText(item.getCantidad().toString());
-                            sincronizarConSessionManager();
+                            sincronizarAmbSessionManager();
                         }
                     });
 
+                    //boto eliminar producte
                     Button btnDelete = new Button("🗑");
                     btnDelete.setStyle("-fx-text-fill: red;");
                     btnDelete.setOnAction(e -> {
-                        itemsEnLista.remove(item);
-                        sincronizarConSessionManager();
+                        itemsEnLlista.remove(item);
+                        sincronizarAmbSessionManager();
                     });
                     
+                    // boto favorit (afegir/Treure)
                     Button btnFavRow = new Button(SessionManager.esFavorito(item.getProductoId()) ? "❤" : "♡");
                     btnFavRow.setStyle("-fx-text-fill: " + (SessionManager.esFavorito(item.getProductoId()) ? "red" : "gray") + "; -fx-background-color: transparent;");
 
@@ -154,11 +165,11 @@ public class CrearLlistaController {
                                     else SessionManager.getIdsFavoritos().add(prodId);
                                     
                                     Platform.runLater(() -> {
-                                        // Refrescar el ComboBox por si el usuario está buscando favoritos
+                                        // Refrescar el ComboBox por si l'usuari está buscan favorits
                                         if (chbNomesFavorits.isSelected()) {
-                                            productosFiltrados.setPredicate(p -> SessionManager.esFavorito(p.getProducteId()));
+                                            productesFiltrats.setPredicate(p -> SessionManager.esFavorito(p.getProducteId()));
                                         }
-                                        // Refrescar la propia lista para cambiar el corazón de la fila
+                                        // Refrescar la propia llista per cambiar el cor de la fila
                                         listaVisual.refresh();
                                     });
                                 }
@@ -166,12 +177,12 @@ public class CrearLlistaController {
                         }).start();
                     });
 
-                    filaSuperior.getChildren().addAll(lblNom, btnMenos, lblCantVal, btnMas, btnFavRow, btnDelete);
+                    filaSuperior.getChildren().addAll(lblNom, btnMenys, lblCantVal, btnMes, btnFavRow, btnDelete);
                     
-                    // Metemos la fila de botones y la fila de precios en el contenedor vertical
-                    contenedorFila.getChildren().addAll(filaSuperior, filaPrecios);
+                    //Posem la fila de botons y la fila de preus en el contenidor vertical
+                    contenidorFila.getChildren().addAll(filaSuperior, filaPreuss);
                     
-                    setGraphic(contenedorFila);
+                    setGraphic(contenidorFila);
                     setText(null);
                 }
             }
@@ -179,72 +190,81 @@ public class CrearLlistaController {
         
         chbNomesFavorits.selectedProperty().addListener((obs, oldV, newV) -> {
             if (newV) {
-                // Filtramos para que solo salgan los favoritos del SessionManager
-                productosFiltrados.setPredicate(p -> SessionManager.esFavorito(p.getProducteId()));
+            	//Filtrem pr que nomes surton els favorits del SessionManager
+                productesFiltrats.setPredicate(p -> SessionManager.esFavorito(p.getProducteId()));
             } else {
-                // Restauramos el predicado normal (o el del buscador si hay algo escrito)
-                productosFiltrados.setPredicate(p -> true);
+                // Restaurem el buscador
+                productesFiltrats.setPredicate(p -> true);
             }
         });
         
     }
 
-    private void sincronizarConSessionManager() {
-        SessionManager.getListaTemporal().setItems(new ArrayList<>(itemsEnLista));
+    
+    /**
+     * Metode per sincronitzar la llista amb la que es guarda temporalment
+     */
+    private void sincronizarAmbSessionManager() {
+        SessionManager.getListaTemporal().setItems(new ArrayList<>(itemsEnLlista));
         SessionManager.getListaTemporal().setNombre(txtNomLlista.getText());
         SessionManager.getListaTemporal().setDescripcion(txtDescripcio.getText());
     }
     
-    private void cargarComboProductes() {
+    /**
+     * Metode per carregar els productes al combo
+     */
+    private void carregarComboProductes() {
         try {
-            // Usamos tu cliente de productos
+            // Usem el client de productes
             List<ProductePreusDTO> base = ProducteServiceClient.getProductos();
-            listaMaestraProductes.setAll(base);
-            productosFiltrados = new FilteredList<>(listaMaestraProductes, p -> true);
+            llistaMestraProductes.setAll(base);
+            productesFiltrats = new FilteredList<>(llistaMestraProductes, p -> true);
 
             txtBuscador.textProperty().addListener((obs, oldV, newV) -> {
-                productosFiltrados.setPredicate(p -> {
+                productesFiltrats.setPredicate(p -> {
                     if (newV == null || newV.isEmpty()) return true;
                     return p.getNombre().toLowerCase().contains(newV.toLowerCase());
                 });
                 
-                // TRUCO: Si hay resultados, selecciona el primero y abre el combo
-                if (!productosFiltrados.isEmpty()) {
-                    cmbProductes.show(); 
-                    // Opcional: cmbProductes.getSelectionModel().selectFirst(); 
+                // Si hi ha resulktats selecciona primer y mostra el combo
+                if (!productesFiltrats.isEmpty()) {
+                    cmbProductes.show();  
                 }
             });
 
-            cmbProductes.setItems(productosFiltrados);
+            cmbProductes.setItems(productesFiltrats);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Metode per afegir un producte a la llista
+     */
     @FXML
     private void afegirProducteALlista() {
-        ProductePreusDTO seleccionado = cmbProductes.getSelectionModel().getSelectedItem();
-        String cantStr = txtCantidad.getText();
+        ProductePreusDTO seleccionat = cmbProductes.getSelectionModel().getSelectedItem();
+        String cantStr = txtquantitat.getText();
 
-        // Validamos que haya selección y cantidad
-        if (seleccionado != null && !cantStr.isEmpty()) {
+        // Validem que hi ha selecció i quantitat
+        if (seleccionat != null && !cantStr.isEmpty()) {
             try {
                 ItemLlistaRequest nuevoItem = new ItemLlistaRequest();
-                nuevoItem.setProductoId(seleccionado.getProducteId());
-                nuevoItem.setProductoNombre(seleccionado.getNombre());
+                nuevoItem.setProductoId(seleccionat.getProducteId());
+                nuevoItem.setProductoNombre(seleccionat.getNombre());
                 nuevoItem.setCantidad(new java.math.BigDecimal(cantStr.trim()));
-                nuevoItem.setUnidad(seleccionado.getUnidad());
-                nuevoItem.setPrecios(seleccionado.getPrecios()); // Cargamos los precios
+                nuevoItem.setUnidad(seleccionat.getUnidad());
+                nuevoItem.setPrecios(seleccionat.getPrecios());// carregem els preus
 
-                // Añadir a la lista visual
-                itemsEnLista.add(nuevoItem);
+                // Afegim a la vista (visual)
+                itemsEnLlista.add(nuevoItem);
                 
-                // Sincronizar con SessionManager
-                SessionManager.getListaTemporal().setItems(new ArrayList<>(itemsEnLista));
+                // Sincronitzem amb SessionManager
+                SessionManager.getListaTemporal().setItems(new ArrayList<>(itemsEnLlista));
                 SessionManager.getListaTemporal().setNombre(txtNomLlista.getText());
                 SessionManager.getListaTemporal().setDescripcion(txtDescripcio.getText());
                 
-                txtCantidad.clear();
+                txtquantitat.clear();
                 cmbProductes.getSelectionModel().clearSelection();
             } catch (NumberFormatException e) {
                 mostrarAlerta("Error", "La quantitat ha de ser un número.");
@@ -254,16 +274,34 @@ public class CrearLlistaController {
         }
     }
 
+    /**
+     * Metode per borrar tots els productes
+     */
     @FXML
-    private void borrarTodos() {
-        itemsEnLista.clear();
+    private void borrarTots() {
+        itemsEnLlista.clear();
     }
 
-    @FXML private void guardarLlistaPrivada() { enviarLlistaAlServidor("PRIVADA"); }
-    @FXML private void publicarLlista() { enviarLlistaAlServidor("PUBLICA"); }
+    /**
+     * Metode que crida al de enviar llista al servidor com a PRIVADA
+     */
+    @FXML private void guardarLlistaPrivada() { 
+    	enviarLlistaAlServidor("PRIVADA"); 
+    	}
+    
+    /**
+     * Metode que crida al de enviar llista al servidor com a PUBLICA
+     */
+    @FXML private void publicarLlista() { 
+    	enviarLlistaAlServidor("PUBLICA"); }
+    
 
-    private void enviarLlistaAlServidor(String visibilidad) {
-        if (itemsEnLista.isEmpty()) {
+    /**
+     * Metode que envia al servidor una llista
+     * @param visibilitat (publica o privada)
+     */
+    private void enviarLlistaAlServidor(String visibilitat) {
+        if (itemsEnLlista.isEmpty()) {
             mostrarAlerta("Error", "La llista està buida.");
             return;
         }
@@ -273,12 +311,12 @@ public class CrearLlistaController {
             req.setUsuariId(SessionManager.getUsuario().getUserId());
             req.setNombre(txtNomLlista.getText());
             req.setDescripcion(txtDescripcio.getText());
-            req.setVisibilidad(visibilidad);
-            req.setItems(itemsEnLista); // Enviamos los items acumulados
+            req.setVisibilidad(visibilitat);
+            req.setItems(itemsEnLlista); //enviem els items acumulats
 
             LlistaServiceClient.crearLlista(req);
-            mostrarAlerta("Èxit", "Llista guardada com a " + visibilidad);
-            borrarTodos();
+            mostrarAlerta("Èxit", "Llista guardada com a " + visibilitat);
+            borrarTots();
             txtNomLlista.clear();
             txtDescripcio.clear();
         } catch (Exception e) {
@@ -287,29 +325,33 @@ public class CrearLlistaController {
         }
     }
     
+    /**
+     * MEtode per els favorits al combo
+     */
+    
     @FXML
-    private void toggleFavoritoEnCombo() {
-        ProductePreusDTO seleccionado = cmbProductes.getSelectionModel().getSelectedItem();
-        if (seleccionado == null || !SessionManager.isLoggedIn()) return;
+    private void toggleFavoritEnCombo() {
+        ProductePreusDTO seleccionat = cmbProductes.getSelectionModel().getSelectedItem();
+        if (seleccionat == null || !SessionManager.isLoggedIn()) return;
 
         Long userId = SessionManager.getUsuario().getUserId();
-        Long prodId = seleccionado.getProducteId();
+        Long prodId = seleccionat.getProducteId();
         boolean esYaFav = SessionManager.esFavorito(prodId);
 
         new Thread(() -> {
             try {
-                // Llamamos a la API (true si no es fav para añadirlo, false si ya lo es)
-                boolean exito = ProducteServiceClient.gestionarFavoritoAPI(userId, prodId, !esYaFav);
-                if (exito) {
+            	//Cridem a la API (true si no es favorit per afegirlo, o false si ja ho es)
+                boolean exit = ProducteServiceClient.gestionarFavoritoAPI(userId, prodId, !esYaFav);
+                if (exit) {
                     if (esYaFav) SessionManager.getIdsFavoritos().remove(prodId);
                     else SessionManager.getIdsFavoritos().add(prodId);
 
                     Platform.runLater(() -> {
                         if (chbNomesFavorits.isSelected()) {
-                            // Esto hace que el producto desaparezca del ComboBox al instante
-                            productosFiltrados.setPredicate(p -> SessionManager.esFavorito(p.getProducteId()));
+                            // AIXO FA QUE EL PRODUCTE DESAPAREGUI AL INSTANT
+                            productesFiltrats.setPredicate(p -> SessionManager.esFavorito(p.getProducteId()));
                         }
-                        // Esto actualiza los corazones de la lista visual de abajo
+                        // aixo actualitze els cors de la llista de abaix
                         listaVisual.refresh(); 
                     });
                 }
@@ -317,45 +359,22 @@ public class CrearLlistaController {
         }).start();
     }
     
+    /**
+     * Metode que obre la vista del comprovador (per gestionar l'estalvi)
+     * @param event
+     */
     @FXML
     private void enviarComprovador(ActionEvent event) {
-        // Usamos la instancia del MainController para cambiar la vista
+        // Usem la instancia per camviar a la vista eco
         MainController.getInstance().openLlistaEco();
     }
     
-    @FXML
-    private void toggleFavoritoSeleccionado() {
-        ProductePreusDTO seleccionado = cmbProductes.getSelectionModel().getSelectedItem();
-        if (seleccionado == null || !SessionManager.isLoggedIn()) return;
-
-        Long userId = SessionManager.getUsuario().getUserId();
-        Long prodId = seleccionado.getProducteId();
-        boolean esYaFavorito = SessionManager.esFavorito(prodId);
-
-        new Thread(() -> {
-            try {
-                // Llamamos al Service que actualizamos antes
-                boolean exito = ProducteServiceClient.gestionarFavoritoAPI(userId, prodId, !esYaFavorito);
-                if (exito) {
-                    if (esYaFavorito) SessionManager.getIdsFavoritos().remove(prodId);
-                    else SessionManager.getIdsFavoritos().add(prodId);
-                    
-                    // Si tienes el checkbox de "Només Favorits" activo, refrescamos el filtro
-                    Platform.runLater(() -> {
-                        if (chbNomesFavorits.isSelected()) {
-                            productosFiltrados.setPredicate(p -> SessionManager.esFavorito(p.getProducteId()));
-                        }
-                    });
-                }
-            } catch (Exception e) { e.printStackTrace(); }
-        }).start();
-    }
     
-    private void mostrarAlerta(String titulo, String mensaje) {
+    private void mostrarAlerta(String titol, String missatge) {
         Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle(titulo);
+        alert.setTitle(titol);
         alert.setHeaderText(null);
-        alert.setContentText(mensaje);
+        alert.setContentText(missatge);
         alert.showAndWait();
     }
 }

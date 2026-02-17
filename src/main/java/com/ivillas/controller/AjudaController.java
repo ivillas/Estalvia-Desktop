@@ -1,7 +1,7 @@
 package com.ivillas.controller;
 
 /**
- * Clase controlador d ela vista ajuda
+ * Clase controlador de la vista ajuda
  * @author ivilla
  * @Version 1.0
  */
@@ -47,7 +47,7 @@ public class AjudaController {
 	@FXML
 	private JFXButton btnUpdate;
 
-	/*
+	/**
 	 * Metode que carrega al iniciar on posem les dades a les labels
 	 */
 
@@ -82,7 +82,7 @@ public class AjudaController {
 			}
 		};
 
-		// Cuando el hilo termina, asignamos todos los textos a la vez
+		// Quan el fil acaba signem tots els textes
 		task.setOnSucceeded(e -> {
 			Map<String, String> res = task.getValue();
 			lblNusuaris.setText(res.get("usuaris"));
@@ -114,7 +114,7 @@ public class AjudaController {
 		}
 	}
 
-	/*
+	/**
 	 * Metode que buscara actualitzacions
 	 */
 
@@ -123,10 +123,21 @@ public class AjudaController {
 		mostrarAlertaExit("Actualització", "No s'han trobat actualitzacions, ja tens la versió mes recent.");
 	}
 
+	/**
+	 * Metode per mostrar una alerta
+	 * @param titol
+	 * @param msg
+	 */
 	private void mostrarAlertaExit(String titol, String msg) {
 		crearAlerta(titol, msg, AlertType.INFORMATION);
 	}
 
+	/**
+	 * Metode per crear l'alerta
+	 * @param titol
+	 * @param msg
+	 * @param tipus
+	 */
 	private void crearAlerta(String titol, String msg, AlertType tipus) {
 		Alert alert = new Alert(tipus);
 		alert.setTitle(titol);

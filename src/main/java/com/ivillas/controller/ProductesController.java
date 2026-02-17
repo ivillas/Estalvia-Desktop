@@ -59,9 +59,9 @@ public class ProductesController implements Initializable {
     
     private List<ProductePreusDTO> llistaProductes = new ArrayList<>();
     private final ObjectMapper objectMapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule()); // Para el LocalDateTime
+            .registerModule(new JavaTimeModule()); 
     
-    // Añade este método para que el MainController pueda "registrarse"
+    
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
     }   
@@ -71,35 +71,41 @@ public class ProductesController implements Initializable {
         configurarTabla();
         configurarCheckboxes();
         
-        // Si no está logeado, ocultamos la opción de favoritos
+        // si no esta logejat ocultem el check de favorits
         if (!SessionManager.isLoggedIn()) {
             ckbFavorit.setVisible(false);
-            colAccions.setVisible(false); // Oculta la columna de los corazones en la tabla
+            colAccions.setVisible(false); 
         }        
         carregarDades();
     }
         
     
 
+    /**
+     * Metode per configurar el checkbox de la vista
+     */
+    
     private void configurarCheckboxes() {
-        // Exclusividad entre Tarjetas y Lista
+        // Per tarjetes o llista
         chbTarget.selectedProperty().addListener((obs, oldV, newV) -> {
             if (newV) { chbLlista.setSelected(false); renderitzarUI(); }
         });
         chbLlista.selectedProperty().addListener((obs, oldV, newV) -> {
             if (newV) { chbTarget.setSelected(false); renderitzarUI(); }
         });
-        // Filtro favoritos
+        // filtre favorits
         ckbFavorit.selectedProperty().addListener((obs, oldV, newV) -> renderitzarUI());
         
-        chbTarget.setSelected(true); // Estado inicial
+        chbTarget.setSelected(true); //estat inicial
     }
 
+    /**
+     * MEtode per carregar les dades (productes)
+     */
     private void carregarDades() {
         Task<List<ProductePreusDTO>> task = new Task<>() {
             @Override
             protected List<ProductePreusDTO> call() throws Exception {
-                // Usamos tu HttpClientProvider para obtener la URL y el Cliente
                 String url = HttpClientProvider.getBaseUrl() + "/productos/con-precios";
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(url))
@@ -116,7 +122,7 @@ public class ProductesController implements Initializable {
 
         task.setOnSucceeded(e -> {
             this.llistaProductes = task.getValue();
-            lblTotalProductes.setText("Total: " + llistaProductes.size() + " productes"); // <--- Añadir esto
+            lblTotalProductes.setText("Total: " + llistaProductes.size() + " productes"); 
             renderitzarUI();
         });
         
@@ -124,8 +130,12 @@ public class ProductesController implements Initializable {
         new Thread(task).start();
     }
 
+    /**
+     * Metode per rederitzar la IU cad check
+     */
+    
     private void renderitzarUI() {
-        // Filtramos la lista según el checkbox de favoritos
+        // Filtrem segons el chek de favorits
         List<ProductePreusDTO> listaFiltrada;
         if (ckbFavorit.isSelected()) {
             listaFiltrada = llistaProductes.stream()
@@ -146,12 +156,17 @@ public class ProductesController implements Initializable {
         }
     }
     
-    private void abrirDetallePopup(ProductePreusDTO p) {
+    /**
+     * Metode per obrir el detall del producte
+     * @param p
+     */
+    
+    private void obrirDetallPopup(ProductePreusDTO p) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Especificacions: " + p.getNombre());
         alert.setHeaderText(p.getNombre().toUpperCase());
 
-        // Construcción del contenido siguiendo tu lógica de filtros
+        // construccio del contingut segons la logica del filtre
         StringBuilder sb = new StringBuilder();
         sb.append("Marca: ").append(p.getMarca() != null ? p.getMarca() : "N/A").append("\n");
         sb.append("Envàs: ").append(p.getEnvase() != null ? p.getEnvase() : "N/A").append("\n");
@@ -162,7 +177,7 @@ public class ProductesController implements Initializable {
 
         if (p.getPrecios() != null && !p.getPrecios().isEmpty()) {
             p.getPrecios().forEach((superNombre, precio) -> {
-                // Usamos tu lógica de configuración para filtrar
+                // usem la logica per filtrar
                 if (SupermercatServiceClient.getLocalStatus(superNombre)) {
                     sb.append(String.format(" • %-15s : %s €\n", superNombre.toUpperCase(), precio));
                 }
@@ -171,11 +186,11 @@ public class ProductesController implements Initializable {
             sb.append("No hi ha preus disponibles actualment.");
         }
 
-        // Aplicar un estilo básico para que no se vea el Alert de Windows nativo tan seco
+        // apliquem estil per que no e vegi sec
         alert.getDialogPane().setPrefWidth(450);
         alert.setContentText(sb.toString());
         
-        // Si quieres que se abra al clicar en la tabla o en la tarjeta, llama a este método
+        // metode per obrir els detalls en els clicks
         alert.showAndWait();
     }
     
@@ -230,7 +245,7 @@ public class ProductesController implements Initializable {
             return new SimpleStringProperty("Sense preu");
         });
 
-        // 3. COLUMNA ACCIONS (CORAZÓN FAVORITOS)
+        // columnes  accions favorits
         colAccions.setCellFactory(param -> new TableCell<>() {
             private final Label iconFavorit = new Label("❤");
             {
@@ -258,7 +273,7 @@ public class ProductesController implements Initializable {
             }
         });
 
-        // 4. COLUMNA ANYADIR (BOTÓN MÁS)
+        // boto mes (afegir
         colAnyadir.setCellFactory(param -> new TableCell<>() {
             private final Button btnPlus = new Button("＋");
             {
@@ -266,7 +281,7 @@ public class ProductesController implements Initializable {
                 btnPlus.setCursor(Cursor.HAND);
                 btnPlus.setOnAction(event -> {
                     ProductePreusDTO p = getTableView().getItems().get(getIndex());
-                    if (p != null) afegirALlista(p); // Usamos tu método que ya funciona
+                    if (p != null) afegirALlista(p);
                 });
             }
             @Override
@@ -294,31 +309,31 @@ public class ProductesController implements Initializable {
 
         Long userId = SessionManager.getUsuario().getUserId();
         Long prodId = p.getProducteId();
-        boolean yaEsFavorito = SessionManager.esFavorito(prodId);
+        boolean yaEsFavorit = SessionManager.esFavorito(prodId);
 
-        // Hilo secundario para no congelar la UI
+        // fil secundari per no congelar l'app
         new Thread(() -> {
             try {
-                // true para añadir, false para quitar
-                boolean exito = ProducteServiceClient.gestionarFavoritoAPI(userId, prodId, !yaEsFavorito);
+                // true per afegir, false per treure
+                boolean exito = ProducteServiceClient.gestionarFavoritoAPI(userId, prodId, !yaEsFavorit);
                 
                 if (exito) {
-                    // Actualizamos la memoria del SessionManager
-                    if (yaEsFavorito) SessionManager.getIdsFavoritos().remove(prodId);
+                    // Actualizem la memoria del SessionManager
+                    if (yaEsFavorit) SessionManager.getIdsFavoritos().remove(prodId);
                     else SessionManager.getIdsFavoritos().add(prodId);
 
-                    // Refrescamos color en el hilo de JavaFX
+                    // Refresquem el color en el fil de JavaFX
                     Platform.runLater(() -> {
-                        // Si estamos filtrando por favoritos, debemos refrescar la UI
+                        // si estem filtran per favorits, hem de refrescar la UI
                         if (ckbFavorit.isSelected()) {
-                            renderitzarUI(); // Esto volverá a filtrar y el producto desaparecerá
+                            renderitzarUI(); // aqui desapareixera el producte
                         } else {
-                            // Si no estamos filtrando, solo cambiamos el color del corazón
-                            if (yaEsFavorito) icon.setStyle("-fx-text-fill: #ccc;");
+                            // si no filtrem nome cambiem el producte
+                            if (yaEsFavorit) icon.setStyle("-fx-text-fill: #ccc;");
                             else icon.setStyle("-fx-text-fill: #e74c3c;");
                         }
                         
-                        // Actualizar contador del perfil si es necesario
+                        // actualitcem el controlador si es necesari
                         if (SessionManager.getMainController() != null) {
                             SessionManager.getMainController().refrescarVistaActualSiEsPerfil();
                         }
@@ -332,27 +347,26 @@ public class ProductesController implements Initializable {
 
     private void afegirALlista(ProductePreusDTO p) {
         if (!SessionManager.isLoggedIn()) {
-            // Alerta simple para no fallar
+            // Alerta per iniciar sessio
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setContentText("Has de iniciar sessió.");
             alert.showAndWait();
             return;
         }
 
-        // 1. Creamos el objeto que YA usas en tu CrearLlistaController
         ItemLlistaRequest nuevoItem = new ItemLlistaRequest();
         nuevoItem.setProductoId(p.getProducteId());
         nuevoItem.setProductoNombre(p.getNombre());
         nuevoItem.setCantidad(java.math.BigDecimal.ONE);
         
-        // 2. Pasamos los precios para que se vean en la lista visual (como tienes en tu cellFactory)
+        // Pasem els preus per que es vegin a la llista
         nuevoItem.setPrecios(p.getPrecios());
 
-        // 3. Lo añadimos directamente a la lista del SessionManager
-        // Al cambiar de vista a CrearLlistaController, el initialize cargará esto automáticamente
+        //  afegim directament a la llista del sessionmanager
+        // Al cambiar de vista a CrearLlistaController, el initialize carregara aixo automaticament
         SessionManager.getListaTemporal().getItems().add(nuevoItem);
 
-        // 4. Feedback en consola
+        // Feedback en consola
         System.out.println("Afegit ItemLlistaRequest: " + nuevoItem.getProductoNombre());
     }
 }

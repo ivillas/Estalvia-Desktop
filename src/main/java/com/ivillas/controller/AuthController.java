@@ -10,6 +10,12 @@ import com.ivillas.utils.SessionManager;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
+/**
+ * Clase controlador de la vista de inici de sessió
+ * @author ivilla
+ * @Version 1.0
+ */
+
 public class AuthController {
 
 	private MainController mainController;
@@ -23,7 +29,7 @@ public class AuthController {
 	private javafx.scene.control.Button btnEntrar;
 
 	
-	/*
+	/**
 	 * Metode inicialitzacions
 	 */
 	@FXML
@@ -31,7 +37,7 @@ public class AuthController {
 		btnEntrar.setDefaultButton(true); // per poder accedir al boto amb enter desde el teclat
 	}
 
-	/*
+	/**
 	 * Metode per identificarse
 	 */
 	
@@ -48,7 +54,7 @@ public class AuthController {
 		}), error -> Platform.runLater(() -> mostrarAlerta("Error", error)));
 	}
 
-	/*
+	/**
 	 * Metode per registrarse
 	 */
 		
@@ -64,7 +70,7 @@ public class AuthController {
 				}), error -> Platform.runLater(() -> mostrarAlerta("Error", error)));
 	}
 	
-	/*
+	/**
 	 * Metode per recuperar la contrasenya
 	 */
 
@@ -121,7 +127,7 @@ public class AuthController {
 		return false;
 	}
 
-	/*
+	/**
 	 * Metode per mostrar alertes de error
 	 */
 	
@@ -129,7 +135,7 @@ public class AuthController {
 		crearAlerta(titol, msg, AlertType.ERROR);
 	}
 
-	/*
+	/**
 	 * Metode per mostrar alertes d'informació
 	 */
 
@@ -137,7 +143,7 @@ public class AuthController {
 		crearAlerta(titol, msg, AlertType.INFORMATION);
 	}
 	
-	/*
+	/**
 	 * Metode que crea les alertes
 	 */
 	private void crearAlerta(String titol, String msg, AlertType tipus) {

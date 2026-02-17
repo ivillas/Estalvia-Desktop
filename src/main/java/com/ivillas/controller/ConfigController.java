@@ -26,7 +26,7 @@ public class ConfigController {
 	    @FXML private Label lblPortProxi;
         @FXML private JFXButton btnCancelarConfig;
 
-	    // Checkboxes de Supermercados
+	    // Checkboxes de Supermercats
         
 	    @FXML private JFXCheckBox cxbMercadona; // Mercadona
 	    @FXML private JFXCheckBox cxbCarrefour; // Carrefour
@@ -41,26 +41,27 @@ public class ConfigController {
 	    @FXML
 	    public void initialize() {
 
-	        // 1. Recuperar valores actuales del Provider
+	        // Recuperar els valors actuals del servidor
 	        boolean actiu = HttpClientProvider.isUseProxy();	        
 	        cxbProxi.setSelected(actiu);
 	        txtIpProxi.setText(HttpClientProvider.getProxyHost());
 	        
-	        // Si el puerto es 0, lo ponemos vacío, si no, lo convertimos a String
+	        // si el port es 0 el posem buit si no el pasem a string
 	        int puerto = HttpClientProvider.getProxyPort();
 	        txtPortProxi.setText(puerto == 0 ? "" : String.valueOf(puerto));
 
-	        // 2. Aplicar visibilidad según el estado recuperado
-	        actualizarEstadoProxy(actiu);
+	        //  aplicar la visibilitat segons el check
+	        actualizarEstatProxy(actiu);
 	        
-	        // ... resto de tu inicialización de supermercados ...
-	        // 1. Ponemos los supers seleccionados por defecto
-	        cargarEstadoSupermercados();
+	        //Per carregar els supermercats
+	        carregarEstatSupermercats();
 	    }
 	    
 
-	    
-	    private void cargarEstadoSupermercados() {
+	    /**
+	     * 
+	     */
+	    private void carregarEstatSupermercats() {
 	        Task<List<SupermercatDTO>> task = new Task<>() {
 	            @Override protected List<SupermercatDTO> call() throws Exception {
 	                return SupermercatServiceClient.getAll();
@@ -75,19 +76,19 @@ public class ConfigController {
 	        
 	        task.setOnSucceeded(e -> {
 	            List<SupermercatDTO> resultado = task.getValue();
-	            // ESTO ES LO QUE FALTA: Obligar a la UI a actualizarse
+	            //Per obligar a actualitzarse la iu
 	            Platform.runLater(() -> {
 	                for (SupermercatDTO s : resultado) {
 	                    String nom = s.getNom().toLowerCase().replace(" ", "").trim();
-	                    boolean estado = s.isActiu();
+	                    boolean estat = s.isActiu();
 	                    
-	                    System.out.println("UI: Marcando " + nom + " como " + estado);
+	                    System.out.println("UI: Marcando " + nom + " como " + estat);
 
-	                    if (nom.contains("mercadona")) cxbMercadona.setSelected(estado);
-	                    else if (nom.contains("alcampo"))   cxbAlcampo.setSelected(estado);
-	                    else if (nom.contains("carrefour")) cxbCarrefour.setSelected(estado);
-	                    else if (nom.contains("consum"))    cxbConsum.setSelected(estado);
-	                    else if (nom.contains("plusfresc")) cxbPlus.setSelected(estado);
+	                    if (nom.contains("mercadona")) cxbMercadona.setSelected(estat);
+	                    else if (nom.contains("alcampo"))   cxbAlcampo.setSelected(estat);
+	                    else if (nom.contains("carrefour")) cxbCarrefour.setSelected(estat);
+	                    else if (nom.contains("consum"))    cxbConsum.setSelected(estat);
+	                    else if (nom.contains("plusfresc")) cxbPlus.setSelected(estat);
 	                }
 	            });
 	        });
@@ -95,49 +96,66 @@ public class ConfigController {
 	        new Thread(task).start();
 	    }
 	    
+	    /**
+	     * Metode per l'accio del proxi (actualitzar depen si es chec¡keja o no)
+	     */
 	    @FXML
 	    private void handleProxyAction() {
-	        actualizarEstadoProxy(cxbProxi.isSelected());
+	        actualizarEstatProxy(cxbProxi.isSelected());
 	    }
 	    
 	    public void setMainController(MainController mainController) {
 	        this.mainController = mainController;
 	    }
 
+	    /**
+	     * Metode per anar a la pantalla inicial
+	     */
 	    @FXML
 	    private void openInici() {
 	        if (mainController != null) {
-	            mainController.openInici(); // Llama al método del padre
+	            mainController.openInici();
 	        }
 	    }
 	    
+	    
+	    /**
+	     * Metode per obtenir l'estat a l'accio del checkbox
+	     * @param event
+	     */
 	    @FXML
 	    private void handleProxyAction(ActionEvent event) {
-	        // Obtenemos el estado directamente del checkbox
-	        actualizarEstadoProxy(cxbProxi.isSelected());
+	        actualizarEstatProxy(cxbProxi.isSelected());
 	    }
 	    
-	    private void actualizarEstadoProxy(boolean seleccionado) {
+	    /**
+	     * Metode per actualitzar segons el check ver enseñar o ocultar le sopcions del proxi
+	     * @param seleccionat
+	     */
+	    private void actualizarEstatProxy(boolean seleccionat) {
 	    	
-	        lblIpProxi.setVisible(seleccionado);
-	        lblIpProxi.setManaged(seleccionado);
+	        lblIpProxi.setVisible(seleccionat);
+	        lblIpProxi.setManaged(seleccionat);
 	        
-	        txtIpProxi.setVisible(seleccionado);
-	        txtIpProxi.setManaged(seleccionado);
+	        txtIpProxi.setVisible(seleccionat);
+	        txtIpProxi.setManaged(seleccionat);
 	        
-	        lblPortProxi.setVisible(seleccionado);
-	        lblPortProxi.setManaged(seleccionado);
+	        lblPortProxi.setVisible(seleccionat);
+	        lblPortProxi.setManaged(seleccionat);
 	        
-	        txtPortProxi.setVisible(seleccionado);
-	        txtPortProxi.setManaged(seleccionado);
+	        txtPortProxi.setVisible(seleccionat);
+	        txtPortProxi.setManaged(seleccionat);
 	    }
 	    
+	    /**
+	     * Metode per guardar la configuració
+	     */
 	    @FXML
 	    private void handleGuardarConfig() {
 	        try {
 	            boolean usarProxy = cxbProxi.isSelected();
 	            String host = txtIpProxi.getText();
-	            int puerto = 0;
+	            int port = 0;
 
 	            if (usarProxy) {
 	                String portText = txtPortProxi.getText();
@@ -145,18 +163,18 @@ public class ConfigController {
 	                    mostrarAlertaExit("Configuració", "El port es obligatori si es fa anar proxi.");
 	                    return; 
 	                }
-	                puerto = Integer.parseInt(portText.trim());
+	                port = Integer.parseInt(portText.trim());
 	            }
 
-	            // Llamamos al provider para aplicar los cambios
-	            HttpClientProvider.configureProxy(usarProxy, host, puerto);
+	            
+	            HttpClientProvider.configureProxy(usarProxy, host, port);
 	          
 	        } catch (NumberFormatException e) {
 	        	mostrarAlertaExit("Configuració", "El port ha de ser un numero valid.");
 
 	        }
 	        
-	        // 2. Guardar supermercados
+	        // guardar els supermercats
 	        SupermercatServiceClient.saveStatus("alcampo", cxbAlcampo.isSelected());
 	        SupermercatServiceClient.saveStatus("mercadona", cxbMercadona.isSelected());
 	        SupermercatServiceClient.saveStatus("carrefour", cxbCarrefour.isSelected());
@@ -165,13 +183,19 @@ public class ConfigController {
 
 	        mostrarAlertaExit("Configuració", "Preferències guardades.");
 	        
-	        // SOLO AL FINAL DE TODO cerramos o navegamos
+	        // al final cridem al metode per anar al inici
 	        openInici(); 
 	        
 	    }
 
+		/**
+		 * Metode per mostrar alertes d'informació
+		 */
 	    private void mostrarAlertaExit(String titol, String msg) { crearAlerta(titol, msg, AlertType.INFORMATION); }
-
+	    
+		/**
+		 * Metode que crea les alertes
+		 */
 	    private void crearAlerta(String titol, String msg, AlertType tipo) {
 	        Alert alert = new Alert(tipo);
 	        alert.setTitle(titol);
