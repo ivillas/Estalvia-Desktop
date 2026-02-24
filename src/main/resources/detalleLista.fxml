@@ -16,20 +16,20 @@
         <HBox alignment="CENTER_LEFT" spacing="15">
             <children>
                 <VBox HBox.hgrow="ALWAYS">
-                    <Label fx:id="lblTitulo" style="-fx-font-weight: bold; -fx-font-size: 24; -fx-text-fill: #2C3E50;" text="Nombre de la Lista" />
+                    <Label fx:id="lblTitol" style="-fx-font-weight: bold; -fx-font-size: 24; -fx-text-fill: #2C3E50;" text="Nombre de la Lista" />
                     <Label fx:id="lblAutor" style="-fx-text-fill: #7F8C8D;" text="Creado por: Usuario" />
                 </VBox>
-                <Button onAction="#cerrarVentana" style="-fx-background-color: #E74C3C; -fx-text-fill: white;" text="Cerrar" />
+                <Button onAction="#tancarFinestra" style="-fx-background-color: #E74C3C; -fx-text-fill: white;" text="Cerrar" />
             </children>
         </HBox>
 
-        <Label fx:id="lblDescripcion" style="-fx-font-size: 14;" text="Descripción detallada aquí..." wrapText="true" />
+        <Label fx:id="lblDescripcio" style="-fx-font-size: 14;" text="Descripción detallada aquí..." wrapText="true" />
 
-        <TableView fx:id="tablaProductos" style="-fx-background-radius: 10;" VBox.vgrow="ALWAYS">
+        <TableView fx:id="taulaProductes" style="-fx-background-radius: 10;" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="colNombre" prefWidth="300.0" text="Producte" />
-                <TableColumn fx:id="colCantidad" prefWidth="100.0" text="Quantitat" />
-                <TableColumn fx:id="colUnidad" prefWidth="120.0" text="Unitat" />
+                <TableColumn fx:id="colNom" prefWidth="300.0" text="Producte" />
+                <TableColumn fx:id="colQuantitat" prefWidth="100.0" text="Quantitat" />
+                <TableColumn fx:id="colUnitat" prefWidth="120.0" text="Unitat" />
             </columns>
         </TableView>
 
@@ -38,7 +38,7 @@
             <HBox.margin>
                <Insets right="120.0" />
             </HBox.margin></Button>
-         <Button fx:id="btnCopiarDetalle1" onAction="#copiarLista" style="-fx-background-color: #79EDED; -fx-font-weight: bold; -fx-padding: 10 20;" text="Afegir tota la llista a la meva compra" />
+         <Button fx:id="btnCopiarDetall" onAction="#copiarLlista" style="-fx-background-color: #79EDED; -fx-font-weight: bold; -fx-padding: 10 20;" text="Afegir tota la llista a la meva compra" />
         </HBox>
     </children>
 </VBox>

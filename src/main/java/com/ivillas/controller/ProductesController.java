@@ -56,7 +56,7 @@ public class ProductesController implements Initializable {
     private MainController mainController;
     @FXML private TableColumn<ProductePreusDTO, Void> colAccions;
     @FXML private TableColumn<ProductePreusDTO, Void> colAnyadir;
-    
+    private List<ProductePreusDTO> listaFiltrada;
     private List<ProductePreusDTO> llistaProductes = new ArrayList<>();
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule()); 
@@ -68,7 +68,7 @@ public class ProductesController implements Initializable {
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        configurarTabla();
+        configurarTaula();
         configurarCheckboxes();
         
         // si no esta logejat ocultem el check de favorits
@@ -122,6 +122,10 @@ public class ProductesController implements Initializable {
 
         task.setOnSucceeded(e -> {
             this.llistaProductes = task.getValue();
+            if(ckbFavorit.isSelected()) {
+            	System.out.println("Aqui 1");
+            	lblTotalProductes.setText("Total: " + listaFiltrada.size() + " productes");
+            }
             lblTotalProductes.setText("Total: " + llistaProductes.size() + " productes"); 
             renderitzarUI();
         });
@@ -136,15 +140,16 @@ public class ProductesController implements Initializable {
     
     private void renderitzarUI() {
         // Filtrem segons el chek de favorits
-        List<ProductePreusDTO> listaFiltrada;
+        
         if (ckbFavorit.isSelected()) {
             listaFiltrada = llistaProductes.stream()
                     .filter(p -> SessionManager.esFavorit(p.getProducteId()))
                     .collect(Collectors.toList());
+           
         } else {
             listaFiltrada = llistaProductes;
         }
-
+        lblTotalProductes.setText("Total: " + listaFiltrada.size() + " productes");
         if (chbLlista.isSelected()) {
             scrollTargetes.setVisible(false);
             tablaProductes.setVisible(true);
@@ -152,7 +157,7 @@ public class ProductesController implements Initializable {
         } else {
             tablaProductes.setVisible(false);
             scrollTargetes.setVisible(true);
-            cargarTarjetasDinamicasFiltradas(listaFiltrada);
+            CarregarTargetesDinamiques(listaFiltrada);
         }
     }
     
@@ -194,7 +199,7 @@ public class ProductesController implements Initializable {
         alert.showAndWait();
     }
     
-    private void cargarTarjetasDinamicasFiltradas(List<ProductePreusDTO> lista) {
+    private void CarregarTargetesDinamiques(List<ProductePreusDTO> lista) {
         containerProductes.getChildren().clear();
         int limite = Math.min(lista.size(), 100); 
 
@@ -208,9 +213,9 @@ public class ProductesController implements Initializable {
                 
                 // Lógica para el corazón de la tarjeta
                 if (!SessionManager.isLoggedIn()) {
-                    controller.ocultarCorazon(); 
+                    controller.ocultarCor(); 
                 } else if (SessionManager.esFavorit(p.getProducteId())) {
-                    controller.marcarCorazonRojo(); // Deberás crear este método en el item controller
+                    controller.marcarCorVermell(); // Deberás crear este método en el item controller
                 }
 
                 containerProductes.getChildren().add(card);
@@ -223,7 +228,7 @@ public class ProductesController implements Initializable {
     
         
     
-    private void configurarTabla() {
+    private void configurarTaula() {
         // 1. Columnas básicas
         colNom.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colMarca.setCellValueFactory(new PropertyValueFactory<>("marca"));
@@ -252,7 +257,7 @@ public class ProductesController implements Initializable {
                 iconFavorit.setCursor(Cursor.HAND);
                 iconFavorit.setOnMouseClicked(event -> {
                     ProductePreusDTO p = getTableView().getItems().get(getIndex());
-                    if (p != null) gestionarFavorito(p, iconFavorit);
+                    if (p != null) gestionarFavorit(p, iconFavorit);
                 });
             }
             @Override
@@ -298,7 +303,7 @@ public class ProductesController implements Initializable {
     }
 
     
-    private void gestionarFavorito(ProductePreusDTO p, Label icon) {
+    private void gestionarFavorit(ProductePreusDTO p, Label icon) {
         if (!SessionManager.isLoggedIn()) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Sessió necessària");

@@ -26,7 +26,7 @@ public class ProducteItemController {
         this.producto = p;
         lblNom.setText(p.getNombre());
         
-        // Buscamos el precio más barato en lugar del primero
+        // Busquem el preu mes barat
         if (p.getPrecios() != null && !p.getPrecios().isEmpty()) {
             BigDecimal minPrecio = Collections.min(p.getPrecios().values());
             lblPreu.setText(minPrecio.toString() + " €");
@@ -36,17 +36,17 @@ public class ProducteItemController {
             imgProducte.setImage(new Image(p.getImatge(), true));
         }
 
-        // Actualizar estado del corazón según el SessionManager
+        // Actualizar l'estat del cor segons el SessionManager
         if (SessionManager.isLoggedIn() && SessionManager.esFavorit(p.getProducteId())) {
-            marcarCorazonRojo();
+            marcarCorVermell();
         } else {
-            resetCorazon();
+            resetCor();
         }
     }
 
     @FXML
     private void toggleFavorito(MouseEvent event) {
-        event.consume(); // Evita que se abra el detalle al clicar el corazón
+        event.consume(); // Evita que s'obri el detall al polsar el cor
         if (!SessionManager.isLoggedIn()) return;
 
         Long userId = SessionManager.getUsuario().getUserId();
@@ -60,8 +60,8 @@ public class ProducteItemController {
                     else SessionManager.getIdsFavorits().add(prodId);
                     
                     Platform.runLater(() -> {
-                        if (!yaEsFav) marcarCorazonRojo();
-                        else resetCorazon();
+                        if (!yaEsFav) marcarCorVermell();
+                        else resetCor();
                     });
                 }
             } catch (Exception e) { e.printStackTrace(); }
@@ -70,39 +70,39 @@ public class ProducteItemController {
 
     @FXML
     private void afegirALlista() {
-        // Usamos tu ItemLlistaRequest real
+        // Usem ItemLlistaRequest real
         ItemLlistaRequest nuevoItem = new ItemLlistaRequest();
         nuevoItem.setProductoId(producto.getProducteId());
         nuevoItem.setProductoNombre(producto.getNombre());
         nuevoItem.setCantidad(BigDecimal.ONE);
         nuevoItem.setPrecios(producto.getPrecios());
 
-        // Añadir a la lista temporal del SessionManager
+        // Afegim a la llista temporal del SessionManager
         SessionManager.getLlistaTemporal().getItems().add(nuevoItem);
         System.out.println("Afegit a listaTemporal: " + producto.getNombre());
     }
 
-    public void ocultarCorazon() {
+    public void ocultarCor() {
         if (btnFavorit != null) {
             btnFavorit.setVisible(false);
             btnFavorit.setManaged(false);
         }
     }
 
-    public void marcarCorazonRojo() {
+    public void marcarCorVermell() {
         if (btnFavorit != null) {
             btnFavorit.setStyle("-fx-text-fill: #e74c3c; -fx-font-size: 20px;");
         }
     }
 
-    private void resetCorazon() {
+    private void resetCor() {
         if (btnFavorit != null) {
             btnFavorit.setStyle("-fx-text-fill: #ccc; -fx-font-size: 20px;");
         }
     }
 
     @FXML
-    private void abrirDetalle() {
+    private void obrirDetall() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Detalls del Producte");
         alert.setHeaderText(producto.getNombre() + " (" + (producto.getMarca() != null ? producto.getMarca() : "") + ")");

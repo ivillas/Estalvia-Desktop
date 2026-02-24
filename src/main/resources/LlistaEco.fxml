@@ -15,7 +15,7 @@
                <font><Font name="System Bold" size="20.0" /></font>
             </Label>
 
-            <!-- ESTE ES EL QUE FALTABA: hbCheckboxes -->
+            <!-- hbCheckboxes -->
             <HBox fx:id="hbCheckboxes" layoutX="40.0" layoutY="60.0" prefHeight="45.0" prefWidth="820.0" spacing="15.0" alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 10;" />
 
             <SplitPane fx:id="splitPanePrincipal" dividerPositions="0.6" layoutX="40.0" layoutY="115.0" prefHeight="480.0" prefWidth="820.0" orientation="VERTICAL" style="-fx-background-radius: 10;">
@@ -48,7 +48,7 @@
                </items>
             </SplitPane>
 
-            <!-- Botones de Acción -->
+             <!-- Botons d'acció -->
             <JFXButton layoutX="40.0" layoutY="615.0" onAction="#volverAtras" prefHeight="34.0" prefWidth="120.0" style="-fx-background-color: white;" text="Tornar" />
             <JFXButton layoutX="175.0" layoutY="615.0" onAction="#guardarArchivo" prefHeight="34.0" prefWidth="120.0" style="-fx-background-color: white;" text="Guardar .lst" />
             <JFXButton layoutX="310.0" layoutY="615.0" onAction="#enviarEmail" prefHeight="34.0" prefWidth="120.0" style="-fx-background-color: white;" text="Enviar" />

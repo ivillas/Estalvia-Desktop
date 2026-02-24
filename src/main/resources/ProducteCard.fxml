@@ -4,12 +4,11 @@
 <?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox fx:id="rootPane" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5); -fx-cursor: hand;" xmlns="http://javafx.com" xmlns:fx="http://javafx.com" fx:controller="com.ivillas.controller.ProducteItemController" onMouseClicked="#abrirDetalle">
+<VBox fx:id="rootPane" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5); -fx-cursor: hand;" xmlns="http://javafx.com" xmlns:fx="http://javafx.com" fx:controller="com.ivillas.controller.ProducteItemController" onMouseClicked="#obrirDetall">
    <padding>
       <Insets bottom="15.0" left="15.0" right="15.0" top="10.0" />
    </padding>
    <children>
-      <!-- Fila superior: Solo el corazón alineado a la derecha -->
       <HBox alignment="TOP_RIGHT">
          <children>
             <Label fx:id="btnFavorit" onMouseClicked="#toggleFavorito" style="-fx-font-size: 22; -fx-text-fill: #bdc3c7;" text="❤" />
