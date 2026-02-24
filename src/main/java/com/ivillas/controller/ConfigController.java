@@ -99,6 +99,7 @@ public class ConfigController {
 	    /**
 	     * Metode per l'accio del proxi (actualitzar depen si es chec¡keja o no)
 	     */
+	    
 	    @FXML
 	    private void handleProxyAction() {
 	        actualizarEstatProxy(cxbProxi.isSelected());
@@ -182,7 +183,18 @@ public class ConfigController {
 	        SupermercatServiceClient.saveStatus("plusfresc", cxbPlus.isSelected());
 
 	        mostrarAlertaExit("Configuració", "Preferències guardades.");
+	        List<SupermercatDTO> llistaImp = null;
+	        try {
+				llistaImp = SupermercatServiceClient.getAll();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        for(SupermercatDTO i: llistaImp) {
+	        	System.out.println(i.getNom() + " estat: " + i.isActiu());	        	
+	        }
 	        
+	        System.out.println();
 	        // al final cridem al metode per anar al inici
 	        openInici(); 
 	        

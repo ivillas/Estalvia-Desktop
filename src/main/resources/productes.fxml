@@ -45,13 +45,13 @@
       </ScrollPane>
 
       <!-- VISTA TAuLA -->
-      <TableView fx:id="tablaProductes" visible="false">
+      <TableView fx:id="taulaProductes" visible="false">
          <columns>
             <TableColumn fx:id="colNom" prefWidth="350.0" text="Producte" />
             <TableColumn fx:id="colMarca" prefWidth="150.0" text="Marca" />
             <TableColumn fx:id="colPreu" prefWidth="120.0" text="Preu Mínim" />
             <TableColumn fx:id="colAccions" prefWidth="60.0" text="" />
-            <TableColumn fx:id="colAnyadir" prefWidth="60.0" text="" />
+            <TableColumn fx:id="colAfegir" prefWidth="60.0" text="" />
          </columns>
       </TableView>
    </StackPane>

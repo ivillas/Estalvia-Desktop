@@ -32,7 +32,7 @@ public class AuthServiceClient {
 
 		enviarPeticio("/login", dades, responseBody -> {
 			try {
-				//Parsear l'usuario
+				//parsear l'usuario
 				UsuariDTO usuari = objectMapper.readValue(responseBody, UsuariDTO.class);
 
 				// Demanar les estadistiques

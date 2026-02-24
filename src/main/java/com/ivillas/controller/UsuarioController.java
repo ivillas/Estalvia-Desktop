@@ -32,43 +32,41 @@ public class UsuarioController {
     public void cargarDatos(UsuariDTO user) {
     	
         if (user != null) {
-            lblUsuari.setText(user.getUsername()); // Usar la instancia 'user'
+            lblUsuari.setText(user.getUsername());
             lblEmail.setText(user.getEmail());
             lblData.setText(user.getDataCreacio());  
             lblLlistesPubliques.setText(String.valueOf(user.getnLlistesPublices()));
             lblLlistesPrivades.setText(String.valueOf(user.getnLlistesPrivades()));
             if (SessionManager.isLoggedIn()) {
                 lblProductes.setText(String.valueOf(SessionManager.getIdsFavorits().size()));
-            }
-            
+            }            
         }
     }
 
     @FXML
     private void openInici() {
         if (mainController != null) {
-            mainController.openInici(); // Llama al método del padre
+            mainController.openInici(); 
         }
     }
     
     
     @FXML
     private void baixaUser() {
-        // 1. Crear la alerta usando la clase estándar de JavaFX
+        // Crear la alerta 
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("Donar-se de baixa");
         alert.setHeaderText("Estàs a punt d'eliminar el teu compte.");
         alert.setContentText("Tria com vols gestionar les teves llistes:");
 
-        // CORRECCIÓN: Asegúrate de importar javafx.scene.control.ButtonType
         ButtonType btnSoloPrivadas = new ButtonType("Només privades");
         ButtonType btnTodo = new ButtonType("Tot (Llistes i compte)");
-        // Para el botón de cancelar, usamos el tipo predefinido
+
         ButtonType btnCancelar = new ButtonType("Cancel·lar", ButtonBar.ButtonData.CANCEL_CLOSE);
 
         alert.getButtonTypes().setAll(btnSoloPrivadas, btnTodo, btnCancelar);
 
-        // 2. Procesar la respuesta
+        // enviar la resposta
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent()) {
             if (result.get() == btnSoloPrivadas) {
@@ -81,16 +79,16 @@ public class UsuarioController {
 
     private void ejecutarBorrado(String modo) {
         try {
-            // Obtenemos el ID del usuario actual de la sesión
+            // obtenim el Id del usuari actual
             Long userId = SessionManager.getUsuario().getUserId();
             
-            // Llamamos al cliente que conecta con el Backend
+            // cridem al clien que conecta amb el backend
             boolean ok = UsuariServiceClient.eliminarCompte(userId, modo);
 
             if (ok) {
                 mostrarAlerta("Compte eliminat", "El teu compte s'ha eliminat correctament. Fins la propera!");
                 
-                // Limpiamos sesión y volvemos al inicio (Login/Inici)
+                // llimpiem la secio i tornem al inici
                 SessionManager.setUsuari(null);
                 if (mainController != null) {
                     mainController.handleLogout(); 
@@ -104,11 +102,11 @@ public class UsuarioController {
             mostrarAlerta("Error de connexió", "No s'ha pogut contactar amb el servidor.");
         }
     }
-    private void mostrarAlerta(String titulo, String mensaje) {
+    private void mostrarAlerta(String titol, String missatge) {
         Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle(titulo);
+        alert.setTitle(titol);
         alert.setHeaderText(null);
-        alert.setContentText(mensaje);
+        alert.setContentText(missatge);
         alert.showAndWait();
     }
 

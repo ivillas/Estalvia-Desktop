@@ -12,6 +12,7 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ivillas.model.ProductePreusDTO;
+import com.ivillas.model.SupermercatDTO;
 import com.ivillas.network.HttpClientProvider;
 import com.ivillas.request.ItemLlistaRequest;
 import com.ivillas.service.ProducteServiceClient;
@@ -49,14 +51,14 @@ public class ProductesController implements Initializable {
 	@FXML private Button btnFavorit;
     @FXML private FlowPane containerProductes;
     @FXML private JFXCheckBox chbTarget, chbLlista, ckbFavorit;
-    @FXML private TableView<ProductePreusDTO> tablaProductes;
+    @FXML private TableView<ProductePreusDTO> taulaProductes;
     @FXML private TableColumn<ProductePreusDTO, String> colNom, colMarca;
     @FXML private TableColumn<ProductePreusDTO, String> colPreu;
     @FXML private ScrollPane scrollTargetes;
     private MainController mainController;
     @FXML private TableColumn<ProductePreusDTO, Void> colAccions;
-    @FXML private TableColumn<ProductePreusDTO, Void> colAnyadir;
-    private List<ProductePreusDTO> listaFiltrada;
+    @FXML private TableColumn<ProductePreusDTO, Void> colAfegir;
+    private List<ProductePreusDTO> llistaFiltrada;
     private List<ProductePreusDTO> llistaProductes = new ArrayList<>();
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule()); 
@@ -77,8 +79,7 @@ public class ProductesController implements Initializable {
             colAccions.setVisible(false); 
         }        
         carregarDades();
-    }
-        
+    }       
     
 
     /**
@@ -102,37 +103,74 @@ public class ProductesController implements Initializable {
     /**
      * MEtode per carregar les dades (productes)
      */
+   
+    
+    
     private void carregarDades() {
         Task<List<ProductePreusDTO>> task = new Task<>() {
             @Override
             protected List<ProductePreusDTO> call() throws Exception {
-                String url = HttpClientProvider.getBaseUrl() + "/productos/con-precios";
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(url))
-                        .GET()
-                        .build();
-
-                HttpResponse<String> response = HttpClientProvider.getClient()
-                        .send(request, HttpResponse.BodyHandlers.ofString());
-
-                return objectMapper.readValue(response.body(), 
-                        new TypeReference<List<ProductePreusDTO>>() {});
+                return ProducteServiceClient.getProductes(); 
             }
         };
+        
+        List<String> supersActius;
+		try {
+			supersActius = SupermercatServiceClient.supersActius();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		/*
+        try {
+			for(SupermercatDTO l: SupermercatServiceClient.getAll()) {
+				if(l.isActiu()) {
+					supersActius.add(l.getNom());
+				}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		*/
+        List<ProductePreusDTO> llistaNeta, LlistaSupers;
+        llistaNeta = task.getValue();
+        for (ProductePreusDTO i : llistaNeta) {
+        	Map<String, BigDecimal> map = i.precios;
+        	for( Map.Entry<String, BigDecimal> p : map.entrySet()) {
+        		if(supersActius.contains(p.getKey())) {
+        			llistaNeta.add(i);
+        			break;
+        		}
+        	}
+        }
+        
 
         task.setOnSucceeded(e -> {
-            this.llistaProductes = task.getValue();
-            if(ckbFavorit.isSelected()) {
-            	System.out.println("Aqui 1");
-            	lblTotalProductes.setText("Total: " + listaFiltrada.size() + " productes");
+           // this.llistaProductes = task.getValue();
+            this.llistaProductes = llistaNeta;
+            // verifiquem que no sigui null
+            if (llistaProductes != null) {
+                lblTotalProductes.setText("Total: " + llistaProductes.size() + " productes");
+                renderitzarUI();
             }
-            lblTotalProductes.setText("Total: " + llistaProductes.size() + " productes"); 
-            renderitzarUI();
         });
         
-        task.setOnFailed(e -> task.getException().printStackTrace());
-        new Thread(task).start();
+        task.setOnFailed(e -> {
+            Throwable exception = task.getException();
+            exception.printStackTrace();
+        });
+
+        Thread thread = new Thread(task);
+        thread.setDaemon(true); // El hilo se cerrará si cierras la app
+        thread.start();
     }
+    
+    
+    
+    
 
     /**
      * Metode per rederitzar la IU cad check
@@ -142,22 +180,22 @@ public class ProductesController implements Initializable {
         // Filtrem segons el chek de favorits
         
         if (ckbFavorit.isSelected()) {
-            listaFiltrada = llistaProductes.stream()
+            llistaFiltrada = llistaProductes.stream()
                     .filter(p -> SessionManager.esFavorit(p.getProducteId()))
                     .collect(Collectors.toList());
            
         } else {
-            listaFiltrada = llistaProductes;
+            llistaFiltrada = llistaProductes;
         }
-        lblTotalProductes.setText("Total: " + listaFiltrada.size() + " productes");
+        lblTotalProductes.setText("Total: " + llistaFiltrada.size() + " productes");
         if (chbLlista.isSelected()) {
             scrollTargetes.setVisible(false);
-            tablaProductes.setVisible(true);
-            tablaProductes.setItems(FXCollections.observableArrayList(listaFiltrada));
+            taulaProductes.setVisible(true);
+            taulaProductes.setItems(FXCollections.observableArrayList(llistaFiltrada));
         } else {
-            tablaProductes.setVisible(false);
+            taulaProductes.setVisible(false);
             scrollTargetes.setVisible(true);
-            CarregarTargetesDinamiques(listaFiltrada);
+            CarregarTargetesDinamiques(llistaFiltrada);
         }
     }
     
@@ -211,11 +249,11 @@ public class ProductesController implements Initializable {
                 ProducteItemController controller = loader.getController();
                 controller.setData(p);
                 
-                // Lógica para el corazón de la tarjeta
+                // logica per el cor de la targeta
                 if (!SessionManager.isLoggedIn()) {
                     controller.ocultarCor(); 
                 } else if (SessionManager.esFavorit(p.getProducteId())) {
-                    controller.marcarCorVermell(); // Deberás crear este método en el item controller
+                    controller.marcarCorVermell(); 
                 }
 
                 containerProductes.getChildren().add(card);
@@ -223,28 +261,25 @@ public class ProductesController implements Initializable {
                 e.printStackTrace();
             }
         }
-    }
-    
-    
-        
+    }        
     
     private void configurarTaula() {
-        // 1. Columnas básicas
+        // Columnes basiques
         colNom.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colMarca.setCellValueFactory(new PropertyValueFactory<>("marca"));
         
-        // 2. Columna Precio + Supermercado
+        // Columna preu + supermercat
         colPreu.setCellValueFactory(cellData -> {
             ProductePreusDTO p = cellData.getValue();
-            Map<String, BigDecimal> precios = p.getPrecios();
-            if (precios != null && !precios.isEmpty()) {
-                Map.Entry<String, BigDecimal> minEntry = precios.entrySet().stream()
+            Map<String, BigDecimal> preus = p.getPrecios();
+            if (preus != null && !preus.isEmpty()) {
+                Map.Entry<String, BigDecimal> minEntry = preus.entrySet().stream()
                     .filter(e -> e.getValue() != null)
                     .min(Map.Entry.comparingByValue())
                     .orElse(null);
                 if (minEntry != null) {
-                    String texto = String.format("%.2f € (%s)", minEntry.getValue(), minEntry.getKey().toUpperCase());
-                    return new SimpleStringProperty(texto);
+                    String text = String.format("%.2f € (%s)", minEntry.getValue(), minEntry.getKey().toUpperCase());
+                    return new SimpleStringProperty(text);
                 }
             }
             return new SimpleStringProperty("Sense preu");
@@ -277,9 +312,11 @@ public class ProductesController implements Initializable {
                 }
             }
         });
+        
+        
 
-        // boto mes (afegir
-        colAnyadir.setCellFactory(param -> new TableCell<>() {
+        // boto mes (afegir)
+        colAfegir.setCellFactory(param -> new TableCell<>() {
             private final Button btnPlus = new Button("＋");
             {
                 btnPlus.setStyle("-fx-background-color: #79EDED; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;");
@@ -300,8 +337,14 @@ public class ProductesController implements Initializable {
                 }
             }
         });
+        
+        taulaProductes.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && taulaProductes.getSelectionModel().getSelectedItem() != null) {
+                ProductePreusDTO seleccionat = taulaProductes.getSelectionModel().getSelectedItem();
+                obrirDetallPopup(seleccionat);
+            }
+        });
     }
-
     
     private void gestionarFavorit(ProductePreusDTO p, Label icon) {
         if (!SessionManager.isLoggedIn()) {
@@ -359,19 +402,19 @@ public class ProductesController implements Initializable {
             return;
         }
 
-        ItemLlistaRequest nuevoItem = new ItemLlistaRequest();
-        nuevoItem.setProductoId(p.getProducteId());
-        nuevoItem.setProductoNombre(p.getNombre());
-        nuevoItem.setCantidad(java.math.BigDecimal.ONE);
+        ItemLlistaRequest nouItem = new ItemLlistaRequest();
+        nouItem.setProductoId(p.getProducteId());
+        nouItem.setProductoNombre(p.getNombre());
+        nouItem.setCantidad(java.math.BigDecimal.ONE);
         
         // Pasem els preus per que es vegin a la llista
-        nuevoItem.setPrecios(p.getPrecios());
+        nouItem.setPrecios(p.getPrecios());
 
         //  afegim directament a la llista del sessionmanager
         // Al cambiar de vista a CrearLlistaController, el initialize carregara aixo automaticament
-        SessionManager.getLlistaTemporal().getItems().add(nuevoItem);
+        SessionManager.getLlistaTemporal().getItems().add(nouItem);
 
         // Feedback en consola
-        System.out.println("Afegit ItemLlistaRequest: " + nuevoItem.getProductoNombre());
+        System.out.println("Afegit ItemLlistaRequest: " + nouItem.getProductoNombre());
     }
 }

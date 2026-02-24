@@ -53,7 +53,8 @@ public class AuthController {
 			txtUserLogin.getScene().getWindow().hide();
 		}), error -> Platform.runLater(() -> mostrarAlerta("Error", error)));
 	}
-
+	
+	
 	/**
 	 * Metode per registrarse
 	 */
