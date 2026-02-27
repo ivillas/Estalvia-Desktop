@@ -1,6 +1,7 @@
 package com.ivillas.controller;
 
 import com.ivillas.model.ProductePreusDTO;
+import com.ivillas.model.SupermercatDTO;
 import com.ivillas.request.CrearLlistaRequest;
 import com.ivillas.request.ItemLlistaRequest;
 import com.ivillas.service.LlistaServiceClient;
@@ -13,6 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -20,8 +22,12 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -33,14 +39,18 @@ public class CrearLlistaController {
     @FXML private TextField txtNomLlista, txtquantitat, txtBuscador;
     @FXML private JFXTextArea txtDescripcio;
     @FXML private JFXComboBox<ProductePreusDTO> cmbProductes;
-    @FXML private JFXListView<ItemLlistaRequest> listaVisual; // CORREGIDO: Tipo ItemLlistaRequest
+    @FXML private JFXListView<ItemLlistaRequest> listaVisual;
     @FXML private JFXCheckBox chbNomesFavorits;
     @FXML private JFXButton btnAfegirFavorit;
     // Llistes de dades
     private ObservableList<ProductePreusDTO> llistaMestraProductes = FXCollections.observableArrayList();
     private FilteredList<ProductePreusDTO> productesFiltrats;
     private ObservableList<ItemLlistaRequest> itemsEnLlista = FXCollections.observableArrayList();
-
+    //variables
+    
+    
+    
+    
     /**
      * Metode dínicialització de la vista
      */
@@ -48,6 +58,9 @@ public class CrearLlistaController {
     public void initialize() {
         // Carregar el que hi avia
         itemsEnLlista.setAll(SessionManager.getLlistaTemporal().getItems());
+        
+
+        
         txtNomLlista.setText(SessionManager.getLlistaTemporal().getNombre());
         txtDescripcio.setText(SessionManager.getLlistaTemporal().getDescripcion());
     	    
@@ -110,16 +123,31 @@ public class CrearLlistaController {
 
                     // --- LÓGICA DE PREUS ---
                     if (item.getPrecios() != null) {
-                        item.getPrecios().forEach((superNom, preu) -> {
-                            // Sol si el supermerct esta actiu en la configuració
+                        // variable pr saver si hem escrit algun preu
+                        boolean algunPreuEscrit = false;
+
+                        // recorrem per escriure els preus i marquem true si aixi es
+                        for (Map.Entry<String, BigDecimal> entry : item.getPrecios().entrySet()) {
+                            String superNom = entry.getKey();
+                            BigDecimal preu = entry.getValue();
+
                             if (SupermercatServiceClient.getLocalStatus(superNom)) {
                                 Label lblPrecio = new Label(superNom + ": " + preu + "€");
                                 lblPrecio.setStyle("-fx-font-size: 10px; -fx-text-fill: #555; " +
                                                    "-fx-background-color: #eee; -fx-padding: 2 5; " +
                                                    "-fx-background-radius: 5;");
                                 filaPreuss.getChildren().add(lblPrecio);
+                                algunPreuEscrit = true; // marquem true per no escriure l'avis
                             }
-                        });
+                        }
+
+                        // si no hem posat cap preu escriurem el missatge
+                        if (!algunPreuEscrit) {
+                            Label lblAvis = new Label("Avis: No disponible en els supermercats seleccionats");
+                            lblAvis.setStyle("-fx-font-size: 15px; -fx-text-fill: #d9534f; " + 
+                                               "-fx-font-style: italic; -fx-padding: 2 5;");
+                            filaPreuss.getChildren().add(lblAvis);
+                        }
                     }
 
                     // --- BOTONS ---
@@ -190,7 +218,7 @@ public class CrearLlistaController {
         
         chbNomesFavorits.selectedProperty().addListener((obs, oldV, newV) -> {
             if (newV) {
-            	//Filtrem pr que nomes surton els favorits del SessionManager
+            	//Filtrem per que nomes surton els favorits del SessionManager
                 productesFiltrats.setPredicate(p -> SessionManager.esFavorit(p.getProducteId()));
             } else {
                 // Restaurem el buscador
@@ -213,30 +241,60 @@ public class CrearLlistaController {
     /**
      * Metode per carregar els productes al combo
      */
+    
     private void carregarComboProductes() {
-        try {
-            // Usem el client de productes
-            List<ProductePreusDTO> base = ProducteServiceClient.getProductes();
-            llistaMestraProductes.setAll(base);
-            productesFiltrats = new FilteredList<>(llistaMestraProductes, p -> true);
+        // usem una task per no congelar la app al obrir el comboBox
+        Task<List<ProductePreusDTO>> task = new Task<>() {
+            @Override
+            protected List<ProductePreusDTO> call() throws Exception {
+                // cerregem les dades
+                List<ProductePreusDTO> tots = ProducteServiceClient.getProductes();
+                List<SupermercatDTO> totsSupers = SupermercatServiceClient.getAll();
+                
+                // obtenim els noms dels supers actius
+                List<String> activos = totsSupers.stream()
+                    .filter(SupermercatDTO::isActiu)
+                    .map(SupermercatDTO::getNom)
+                    .collect(Collectors.toList());
 
+                // filtrem la llista base, nomes productes amb preus dels supers seleccionats
+                return tots.stream()
+                    .filter(p -> p.precios.keySet().stream().anyMatch(activos::contains))
+                    .collect(Collectors.toList());
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            // iniciem la llista amb els filtres aplicats
+            llistaMestraProductes.setAll(task.getValue());
+            productesFiltrats = new FilteredList<>(llistaMestraProductes, p -> true);
+            
+            // configurem el buscador, filtre sobre filtre
             txtBuscador.textProperty().addListener((obs, oldV, newV) -> {
                 productesFiltrats.setPredicate(p -> {
+                    // si el buscador esta en blanc mostrem tots els dels super elejits
                     if (newV == null || newV.isEmpty()) return true;
+                    
+                    // si escribim anem filtran
                     return p.getNombre().toLowerCase().contains(newV.toLowerCase());
                 });
                 
-                // Si hi ha resulktats selecciona primer y mostra el combo
-                if (!productesFiltrats.isEmpty()) {
-                    cmbProductes.show();  
+                if (!productesFiltrats.isEmpty() && txtBuscador.isFocused()) {
+                    cmbProductes.show();
                 }
             });
 
             cmbProductes.setItems(productesFiltrats);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
+
+        task.setOnFailed(e -> task.getException().printStackTrace());
+
+        Thread t = new Thread(task);
+        t.setDaemon(true);
+        t.start();
     }
+    
+   
 
     /**
      * Metode per afegir un producte a la llista
@@ -245,19 +303,26 @@ public class CrearLlistaController {
     private void afegirProducteALlista() {
         ProductePreusDTO seleccionat = cmbProductes.getSelectionModel().getSelectedItem();
         String cantStr = txtquantitat.getText();
-
+        Map<String, BigDecimal> misatgePreus = Map.of("Avis, No disponible en els supermercats seleccionats2", BigDecimal.ZERO);
         // Validem que hi ha selecció i quantitat
         if (seleccionat != null && !cantStr.isEmpty()) {
             try {
-                ItemLlistaRequest nuevoItem = new ItemLlistaRequest();
-                nuevoItem.setProductoId(seleccionat.getProducteId());
-                nuevoItem.setProductoNombre(seleccionat.getNombre());
-                nuevoItem.setCantidad(new java.math.BigDecimal(cantStr.trim()));
-                nuevoItem.setUnidad(seleccionat.getUnidad());
-                nuevoItem.setPrecios(seleccionat.getPrecios());// carregem els preus
-
+            	
+                ItemLlistaRequest nouItem = new ItemLlistaRequest();
+                System.out.println(seleccionat);
+                nouItem.setProductoId(seleccionat.getProducteId());
+                nouItem.setProductoNombre(seleccionat.getNombre());
+                nouItem.setCantidad(new java.math.BigDecimal(cantStr.trim()));
+                nouItem.setUnidad(seleccionat.getUnidad());
+                
+                if(seleccionat.getPrecios().isEmpty()) {
+                	nouItem.setPrecios(misatgePreus);
+                }else {
+                nouItem.setPrecios(seleccionat.getPrecios());// carregem els preus
+                }
+                
                 // Afegim a la vista (visual)
-                itemsEnLlista.add(nuevoItem);
+                itemsEnLlista.add(nouItem);
                 
                 // Sincronitzem amb SessionManager
                 SessionManager.getLlistaTemporal().setItems(new ArrayList<>(itemsEnLlista));
@@ -294,6 +359,15 @@ public class CrearLlistaController {
      */
     @FXML private void publicarLlista() { 
     	enviarLlistaAlServidor("PUBLICA"); }
+    
+    
+    private boolean noPreus() {
+    	
+    	for( ItemLlistaRequest i : itemsEnLlista) {
+    		if(i.getPrecios().isEmpty()) return true;
+    	}    	
+    	return false;
+    }
     
 
     /**
@@ -365,6 +439,11 @@ public class CrearLlistaController {
      */
     @FXML
     private void enviarComprovador(ActionEvent event) {
+    	System.out.println("entrant al comparador");
+    	if(noPreus()) {
+    		mostrarAlerta("Atenció", "Hi ha productes que no tenen preus, primer s'han d'eliminar");
+    	return;
+    	}
         // Usem la instancia per camviar a la vista eco
         MainController.getInstance().openLlistaEco();
     }

@@ -49,22 +49,6 @@ public class SupermercatServiceClient {
 
 		return lista;
 	}
-	
-	public static List<String> supersActius() throws Exception {
-		 List<String> supersActius = null;
-	        try {
-				for(SupermercatDTO l: getAll()) {
-					if(l.isActiu()) {
-						supersActius.add(l.getNom());
-					}
-				}
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		return supersActius;
-	}
 
 	/**
 	 * Metode Per guardar(Desde ConfigController) ---

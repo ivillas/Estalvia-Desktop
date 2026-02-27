@@ -110,19 +110,75 @@ public class ProductesController implements Initializable {
         Task<List<ProductePreusDTO>> task = new Task<>() {
             @Override
             protected List<ProductePreusDTO> call() throws Exception {
+                // obtenim els productes
+                List<ProductePreusDTO> totsProductes = ProducteServiceClient.getProductes();
+                
+               //obtenim els supers actius
+                List<String> supersActiusNoms = new ArrayList<>();
+                
+                
+               
+                
+                try {
+
+                    List<SupermercatDTO> totsSupers = SupermercatServiceClient.getAll();
+                    for (SupermercatDTO s : totsSupers) {
+                        if (s.isActiu() ) {
+                            supersActiusNoms.add(s.getNom());
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error obtenint supermercats: " + e.getMessage());
+                }
+
+                // nomes els productes amb un supermercat com a minim a la llista s'afegeigen
+                return totsProductes.stream()
+                    .filter(prod -> prod.precios.keySet().stream()
+                        .anyMatch(supersActiusNoms::contains))
+                    .collect(Collectors.toList());
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            // asignem la llista filtrada que ve del fil
+            this.llistaProductes = task.getValue();
+            
+            if (llistaProductes != null) {
+                // actualitzem el total de productes a la label
+                lblTotalProductes.setText("Total: " + llistaProductes.size() + " productes");
+                // cridems a renderizarUIper aplicar el filtre
+                renderitzarUI();
+            }
+        });
+
+        task.setOnFailed(e -> {
+            task.getException().printStackTrace();
+        });
+
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    /*
+    
+    private void carregarDades() {
+        Task<List<ProductePreusDTO>> task = new Task<>() {
+            @Override
+            protected List<ProductePreusDTO> call() throws Exception {
                 return ProducteServiceClient.getProductes(); 
             }
         };
         
-        List<String> supersActius;
+        List<String> supersActius = null;
 		try {
-			supersActius = SupermercatServiceClient.supersActius();
+		supersActius = SupermercatServiceClient.supersActius();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		/*
+
         try {
 			for(SupermercatDTO l: SupermercatServiceClient.getAll()) {
 				if(l.isActiu()) {
@@ -134,7 +190,8 @@ public class ProductesController implements Initializable {
 			e.printStackTrace();
 		}
 		
-		*/
+        
+
         List<ProductePreusDTO> llistaNeta, LlistaSupers;
         llistaNeta = task.getValue();
         for (ProductePreusDTO i : llistaNeta) {
@@ -147,6 +204,9 @@ public class ProductesController implements Initializable {
         	}
         }
         
+        System.out.println("Supers: " + supersActius);
+        System.out.println(llistaNeta);
+
 
         task.setOnSucceeded(e -> {
            // this.llistaProductes = task.getValue();
@@ -169,7 +229,7 @@ public class ProductesController implements Initializable {
     }
     
     
-    
+    */
     
 
     /**

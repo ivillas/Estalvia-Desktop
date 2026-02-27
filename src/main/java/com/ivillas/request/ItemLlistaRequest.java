@@ -26,6 +26,7 @@ public class ItemLlistaRequest {
 	public String getProductoNombre() { return productoNombre; }
 	public void setProductoNombre(String productoNombre) { this.productoNombre = productoNombre; }
 	public Map<String, BigDecimal> getPrecios() { return precios; }
+	
 	public void setPrecios(Map<String, BigDecimal> map) { this.precios = map; }
 
 }
