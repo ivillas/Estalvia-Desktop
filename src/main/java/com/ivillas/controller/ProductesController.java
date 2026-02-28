@@ -62,7 +62,7 @@ public class ProductesController implements Initializable {
     private List<ProductePreusDTO> llistaProductes = new ArrayList<>();
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule()); 
-    
+    private String filtreBusqueda = "";
     
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
@@ -78,6 +78,15 @@ public class ProductesController implements Initializable {
             ckbFavorit.setVisible(false);
             colAccions.setVisible(false); 
         }        
+        
+        // LEER BÚSQUEDA
+        String query = SessionManager.getultimaBusqueda();
+        if (query != null && !query.isEmpty()) {
+            // Guardamos la query en una variable para usarla en renderitzarUI
+            this.filtreBusqueda = query; 
+            SessionManager.setultimaBusqueda(null); 
+        }
+        
         carregarDades();
     }       
     
@@ -237,6 +246,44 @@ public class ProductesController implements Initializable {
      */
     
     private void renderitzarUI() {
+        // 1. Filtramos por favoritos
+        List<ProductePreusDTO> temporal;
+        if (ckbFavorit.isSelected()) {
+            temporal = llistaProductes.stream()
+                    .filter(p -> SessionManager.esFavorit(p.getProducteId()))
+                    .collect(Collectors.toList());
+        } else {
+            temporal = llistaProductes;
+        }
+
+        // 2. Filtramos por el texto de búsqueda (NUEVO)
+        if (filtreBusqueda != null && !filtreBusqueda.isEmpty()) {
+            String q = filtreBusqueda.toLowerCase();
+            temporal = temporal.stream()
+                    .filter(p -> p.getNombre().toLowerCase().contains(q) || 
+                                 (p.getMarca() != null && p.getMarca().toLowerCase().contains(q)))
+                    .collect(Collectors.toList());
+        }
+
+        // 3. Asignamos a la lista final
+        this.llistaFiltrada = temporal;
+
+        // 4. El resto de tu código igual...
+        lblTotalProductes.setText("Total: " + llistaFiltrada.size() + " productes");
+        if (chbLlista.isSelected()) {
+            scrollTargetes.setVisible(false);
+            taulaProductes.setVisible(true);
+            taulaProductes.setItems(FXCollections.observableArrayList(llistaFiltrada));
+        } else {
+            taulaProductes.setVisible(false);
+            scrollTargetes.setVisible(true);
+            CarregarTargetesDinamiques(llistaFiltrada);
+        }
+    }
+    
+    
+    /*
+    private void renderitzarUI() {
         // Filtrem segons el chek de favorits
         
         if (ckbFavorit.isSelected()) {
@@ -258,6 +305,8 @@ public class ProductesController implements Initializable {
             CarregarTargetesDinamiques(llistaFiltrada);
         }
     }
+    */
+    
     
     /**
      * Metode per obrir el detall del producte

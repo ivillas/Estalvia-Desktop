@@ -91,7 +91,7 @@ public class CrearLlistaController {
         });
         cmbProductes.setButtonCell(cmbProductes.getCellFactory().call(null));
         
-     // configuració de la vista visual
+     // configuració de la lista visual
         listaVisual.setCellFactory(lv -> new JFXListCell<ItemLlistaRequest>() {
             @Override
             protected void updateItem(ItemLlistaRequest item, boolean empty) {
@@ -362,11 +362,36 @@ public class CrearLlistaController {
     
     
     private boolean noPreus() {
-    	
-    	for( ItemLlistaRequest i : itemsEnLlista) {
-    		if(i.getPrecios().isEmpty()) return true;
-    	}    	
-    	return false;
+        // si la llista esta buida mostrem missatge i retornem
+        if (itemsEnLlista.isEmpty()) {
+        	mostrarAlerta("Atenció", "La llista està buida.");
+        	return true; 
+        }
+
+        for (ItemLlistaRequest item : itemsEnLlista) {
+            Map<String, BigDecimal> preus = item.getPrecios();
+            
+            // els preus son nuls o estan buits
+            if (preus == null || preus.isEmpty()) {
+                return true; 
+            }
+
+            // Comprovem si almenys te un preu actiu
+            boolean TeAlmenysUnPreu = false;
+            for (String superNom : preus.keySet()) {
+                if (SupermercatServiceClient.getLocalStatus(superNom)) {
+                    TeAlmenysUnPreu = true;
+                    break; //amb un  ni ha prou, sortim del bucle
+                }
+            }
+
+            // si despues de revisar no te caop actiu retornem true per mostrar el missatge
+            if (!TeAlmenysUnPreu) {
+                return true;
+            }
+        }
+        
+        return false; // si tots els productes tenen almenys un preu valid arribem aqui i retornem false
     }
     
 
@@ -441,7 +466,7 @@ public class CrearLlistaController {
     private void enviarComprovador(ActionEvent event) {
     	System.out.println("entrant al comparador");
     	if(noPreus()) {
-    		mostrarAlerta("Atenció", "Hi ha productes que no tenen preus, primer s'han d'eliminar");
+    		mostrarAlerta("Atenció", "Hi ha productes que no tenen preus, primer s'han d'eliminar o has d'elegir mes supermercats");
     	return;
     	}
         // Usem la instancia per camviar a la vista eco

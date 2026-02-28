@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.ivillas.model.LlistaDTO;
 import com.ivillas.service.LlistaServiceClient;
+import com.ivillas.utils.SessionManager;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -29,9 +30,53 @@ public class LlistesPubliquesController {
     // 3. ESTE ES EL MÉTODO: Se ejecuta al cargar la pantalla
     @FXML
     public void initialize() {
-        cargarListasPubliques();
+    	
+        String query = SessionManager.getultimaBusqueda();
+        
+        if (query != null && !query.isEmpty()) {
+            System.out.println("Buscant llista: " + query);
+            
+            // Aquí crides al teu mètode de càrrega passant-li el filtre
+            cargarListasPubliquesFiltradas(query); 
+            
+            SessionManager.setultimaBusqueda(null); 
+        } else {
+            cargarListasPubliques();
+        }
+
     }
    
+    
+    public void cargarListasPubliquesFiltradas(String query) {
+        Task<List<LlistaDTO>> task = new Task<>() {
+            @Override
+            protected List<LlistaDTO> call() throws Exception {
+                // Reutilizamos la misma llamada a la API que ya tienes
+                return LlistaServiceClient.getPubliques(); 
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            List<LlistaDTO> todas = task.getValue();
+            
+            // Filtramos la lista para quedarnos solo con lo que el usuario buscó
+            List<LlistaDTO> filtradas = todas.stream()
+                .filter(l -> l.getNombre().toLowerCase().contains(query.toLowerCase()))
+                .toList();
+
+            // IMPORTANTE: Aquí llamamos a TU método llenarInterfaz que ya funciona
+            llenarInterfaz(filtradas); 
+        });
+
+        task.setOnFailed(e -> {
+            System.err.println("Error en la cerca: " + task.getException().getMessage());
+        });
+
+        Thread th = new Thread(task);
+        th.setDaemon(true); 
+        th.start();
+    }
+    
     
     public void cargarListasPubliques() {
         // 1. Crear una tarea en segundo plano

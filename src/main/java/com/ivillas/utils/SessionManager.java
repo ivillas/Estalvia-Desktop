@@ -20,6 +20,21 @@ public class SessionManager {
 	private static CrearLlistaRequest llistaTemporal = new CrearLlistaRequest();
 	private static MainController mainController;
 	private static Set<Long> idsFavorits = new HashSet<>();
+	
+	private static String ultimaBusqueda;
+
+	public static void setultimaBusqueda(String q) { 
+		
+		ultimaBusqueda = q; 
+		
+	}
+	
+	
+	public static String getultimaBusqueda() { 
+		
+		return ultimaBusqueda; 
+		
+	}
 
 	/**
 	 * Metode per obtenir la llista temporal que hi ha en la app

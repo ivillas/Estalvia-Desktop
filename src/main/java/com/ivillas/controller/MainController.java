@@ -11,18 +11,21 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import com.ivillas.model.UsuariDTO;
 import com.ivillas.utils.SessionManager;
 import com.jfoenix.controls.JFXButton;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.control.MenuItem;
 
 import java.io.IOException;
 import java.net.URL;
 import com.ivillas.service.LlistaServiceClient;
 public class MainController {
 
-    @FXML private Label txtTitol; // CAMBIADO: JFXLabel -> Label
+    @FXML private Label txtTitol;
     @FXML private JFXButton btnUserSession;
     @FXML private JFXButton btnLogout;
     @FXML private JFXButton btnProductes;
@@ -30,9 +33,12 @@ public class MainController {
     @FXML private JFXButton btnLlistesPubliques;
     @FXML private JFXButton btnCrearLlista;
     @FXML private JFXButton btnSupers;
-    @FXML private TextField txtBuscador;
+    @FXML private JFXButton btnOpcions;
+    @FXML private TextField txtBuscar;
+    
     @FXML private StackPane mainDisplayArea;
     private static MainController instance;
+    private String modeBusqueda = "PRODUCTES";
     
     
     public MainController() {
@@ -48,27 +54,70 @@ public class MainController {
     	openInici();
     	SessionManager.setMainController(this);
 
-    }
+    	// 1. Configurar Menú de Opciones (los tres puntitos)
+        ContextMenu menuBusqueda = new ContextMenu();
+        MenuItem itemProd = new MenuItem("Buscar Productes");
+        MenuItem itemLlistes = new MenuItem("Buscar Llistes Públiques");
 
+        itemProd.setOnAction(e -> {
+            modeBusqueda = "PRODUCTES";
+            txtBuscar.setPromptText("Buscar productes...");
+        });
+        itemLlistes.setOnAction(e -> {
+            modeBusqueda = "LLISTES";
+            txtBuscar.setPromptText("Buscar llistes...");
+        });
+        menuBusqueda.getItems().addAll(itemProd, itemLlistes);
+
+        btnOpcions.setOnMouseClicked(event -> {
+            menuBusqueda.show(btnOpcions, event.getScreenX(), event.getScreenY());
+        });
+
+        // 2. Evento ENTER en el buscador
+        txtBuscar.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                ejecutarBusqueda(txtBuscar.getText());
+            }
+        });
+    }
+    
+    
+    private void ejecutarBusqueda(String query) {
+        if (query == null || query.trim().isEmpty()) return;
+
+        // Guardamos la consulta en el SessionManager para que la vista destino la lea
+        SessionManager.setultimaBusqueda(query);
+
+        if ("PRODUCTES".equals(modeBusqueda)) {
+            openProductes(); // Tu método existente que carga Productes.fxml
+        } else {
+            openLlistesPubliques(); // Tu método existente
+        }
+    }
+    
+    
+    
+    
+    
     @FXML
     private void openConfig() {
         try {
             txtTitol.setText("Configura les teves preferencies de la app");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/configuracio.fxml"));
             
-            // Cargamos el nodo raíz
+            // cargem l'arrel1 (que és un BorderPane)
             BorderPane root = loader.load();
 
-            // --- ESTA ES LA CONEXIÓN QUE TE FALTA PARA QUE EL BOTÓN 'SORTIR' FUNCIONE ---
+               // per que funciono el botó sortir de la configuració, necessitem passar-li el MainController a ConfigController
             ConfigController configCtrl = loader.getController();
             configCtrl.setMainController(this); 
             // --------------------------------------------------------------------------
 
-            // 1. FORZAR CRECIMIENTO
+            // per forçar el creixement del BorderPane 
             root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             root.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
 
-            // 2. SOLUCIONAR EL PROBLEMA DEL <TOP> (Mover contenido al centro)
+            // per solucionar el problema del  contingut dins
             if (root.getTop() != null) {
                 Node contenido = root.getTop();
                 root.setTop(null);    
