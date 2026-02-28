@@ -63,6 +63,7 @@ public class ProductesController implements Initializable {
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule()); 
     private String filtreBusqueda = "";
+    private static ProductesController instance;
     
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
@@ -70,8 +71,14 @@ public class ProductesController implements Initializable {
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        instance = this; 
         configurarTaula();
         configurarCheckboxes();
+
+        // Avisamos al MainController de que cambie el modo
+        if (SessionManager.getMainController() != null) {
+            SessionManager.getMainController().actualizarModeBusqueda("PRODUCTES");
+        }
         
         // si no esta logejat ocultem el check de favorits
         if (!SessionManager.isLoggedIn()) {
@@ -502,6 +509,20 @@ public class ProductesController implements Initializable {
         }).start();
     }
 
+    public static ProductesController getInstance() { 
+    	return instance; 
+    }
+    
+ // Método para filtrar sin recargar de la base de datos
+    public void filtrarDesdeFora(String text) {
+        this.filtreBusqueda = text; // Actualizamos la variable que usamos en el paso anterior
+        renderitzarUI(); // Re-dibujamos la interfaz con el nuevo filtro
+    }
+    
+    
+    
+    
+    
     private void afegirALlista(ProductePreusDTO p) {
         if (!SessionManager.isLoggedIn()) {
             // Alerta per iniciar sessio

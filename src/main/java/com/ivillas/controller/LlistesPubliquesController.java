@@ -1,6 +1,7 @@
 package com.ivillas.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ivillas.model.LlistaDTO;
@@ -22,7 +23,11 @@ public class LlistesPubliquesController {
 
     @FXML private FlowPane contenedorTarjetas;
     private MainController mainController;
+    private static LlistesPubliquesController instance;
 
+    private List<LlistaDTO> todasLasListasCache = new ArrayList<>();
+    
+    
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
     }
@@ -30,6 +35,11 @@ public class LlistesPubliquesController {
     // 3. ESTE ES EL MÉTODO: Se ejecuta al cargar la pantalla
     @FXML
     public void initialize() {
+    	instance = this;
+        // Avisamos al MainController
+        if (SessionManager.getMainController() != null) {
+            SessionManager.getMainController().actualizarModeBusqueda("LLISTES");
+        }
     	
         String query = SessionManager.getultimaBusqueda();
         
@@ -46,6 +56,9 @@ public class LlistesPubliquesController {
 
     }
    
+    public static LlistesPubliquesController getInstance() { 
+    	return instance; 
+    }
     
     public void cargarListasPubliquesFiltradas(String query) {
         Task<List<LlistaDTO>> task = new Task<>() {
@@ -58,13 +71,12 @@ public class LlistesPubliquesController {
 
         task.setOnSucceeded(e -> {
             List<LlistaDTO> todas = task.getValue();
-            
-            // Filtramos la lista para quedarnos solo con lo que el usuario buscó
+            this.todasLasListasCache = todas; // <-- IMPORTANTE: GUARDAR AQUÍ TAMBIÉN
+
             List<LlistaDTO> filtradas = todas.stream()
                 .filter(l -> l.getNombre().toLowerCase().contains(query.toLowerCase()))
                 .toList();
 
-            // IMPORTANTE: Aquí llamamos a TU método llenarInterfaz que ya funciona
             llenarInterfaz(filtradas); 
         });
 
@@ -87,11 +99,12 @@ public class LlistesPubliquesController {
                 return LlistaServiceClient.getPubliques(); 
             }
         };
-
-        // 2. Qué hacer cuando la tarea termine con éxito
+        
+        // UN SOLO setOnSucceeded para todo
         task.setOnSucceeded(e -> {
             List<LlistaDTO> publicas = task.getValue();
-            llenarInterfaz(publicas); // Pintamos los datos
+            this.todasLasListasCache = publicas; // <-- GUARDAMOS EN CACHÉ
+            llenarInterfaz(publicas);           // <-- PINTAMOS
         });
 
         // 3. Qué hacer si falla (error de red)
@@ -105,6 +118,19 @@ public class LlistesPubliquesController {
         Thread th = new Thread(task);
         th.setDaemon(true); 
         th.start();
+    }
+    
+ // Método para el filtrado en caliente
+    public void filtrarDesdeFora(String text) {
+        if (text == null || text.isEmpty()) {
+            llenarInterfaz(todasLasListasCache);
+        } else {
+            String q = text.toLowerCase();
+            List<LlistaDTO> filtradas = todasLasListasCache.stream()
+                .filter(l -> l.getNombre().toLowerCase().contains(q))
+                .toList();
+            llenarInterfaz(filtradas);
+        }
     }
 
     private void llenarInterfaz(List<LlistaDTO> publicas) {

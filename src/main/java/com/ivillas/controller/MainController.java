@@ -79,6 +79,25 @@ public class MainController {
                 ejecutarBusqueda(txtBuscar.getText());
             }
         });
+        
+        // 3. BUSCADOR EN CALIENTE (Añadir esto al final)
+        txtBuscar.textProperty().addListener((obs, oldText, newText) -> {
+            // Guardamos siempre en el SessionManager por si el usuario cambia de vista
+            SessionManager.setultimaBusqueda(newText);
+
+            // Si ya estamos en la vista de Productos, filtramos la tabla/tarjetas al instante
+            if ("PRODUCTES".equals(modeBusqueda)) {
+                if (ProductesController.getInstance() != null) {
+                    ProductesController.getInstance().filtrarDesdeFora(newText);
+                }
+            } 
+            // Si estamos en Listas, filtramos el FlowPane al instante
+            else if ("LLISTES".equals(modeBusqueda)) {
+                if (LlistesPubliquesController.getInstance() != null) {
+                    LlistesPubliquesController.getInstance().filtrarDesdeFora(newText);
+                }
+            }
+        });
     }
     
     
@@ -556,5 +575,16 @@ public class MainController {
             // openInici();
         }
     }
+    
+    
+    public void actualizarModeBusqueda(String mode) {
+        this.modeBusqueda = mode; // "PRODUCTES" o "LLISTES"
+        if ("PRODUCTES".equals(mode)) {
+            txtBuscar.setPromptText("Buscar productes...");
+        } else {
+            txtBuscar.setPromptText("Buscar llistes...");
+        }
+    }
+    
     
 }
