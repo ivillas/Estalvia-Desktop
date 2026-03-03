@@ -21,6 +21,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+/**
+ * Clase que mostra la vista inicial de l'aplicació
+ * es pot cridar per mortrar la vista
+ */
 public class IniciController {
 
     @FXML private HBox hbUltimesLlistes;
@@ -28,10 +32,14 @@ public class IniciController {
 
     @FXML
     public void initialize() {
-        cargarDashboard();
+        carregarInici();
     }
 
-    private void cargarDashboard() {
+    /**
+     * Metode per carregar la finestra central que conte les llistes y els productes
+     */
+    
+    private void carregarInici() {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
@@ -47,8 +55,8 @@ public class IniciController {
 
                 // Renderizar en UI
                 Platform.runLater(() -> {
-                    renderizarListas(topListas);
-                    renderizarProductos(topProds);
+                    recarregarLlistes(topListas);
+                    carregarProductes(topProds);
                 });
                 return null;
             }
@@ -56,31 +64,35 @@ public class IniciController {
         new Thread(task).start();
     }
 
-    private void renderizarListas(List<LlistaDTO> listas) {
-        // Asegúrate de que hbUltimasListas es el ID correcto en el FXML
+    /**^
+     * Metode que carrega les llistes 
+     * @param llistes
+     */
+    private void recarregarLlistes(List<LlistaDTO> llistes) {
+        // ID del HBox per les llistes en el FXML
     	hbUltimesLlistes.getChildren().clear();
 
-        for (LlistaDTO dto : listas) {
+        for (LlistaDTO dto : llistes) {
             try {
-                // Cargamos tu FXML de tarjeta personalizada
+                // carrgem el FXML de la tarjeta personalitzada
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/targetaLista.fxml"));
-                VBox tarjeta = loader.load();
+                VBox targeta = loader.load();
                 
-                // Forzamos un ancho mínimo para que el ScrollPane funcione bien
-                tarjeta.setMinWidth(250); 
+                // Forcem un minim d'ample
+                targeta.setMinWidth(250); 
 
-                // Pasamos los datos al controlador de la tarjeta
+                // pasem les dades al controlador de la targeta
                 TargetaController controller = loader.getController();
                 controller.setData(dto);
                 
-                // Añadimos el evento de doble clic para abrir el detalle
-                tarjeta.setOnMouseClicked(event -> {
+                // Afegim l'event del doble click per obrir la targeta
+                targeta.setOnMouseClicked(event -> {
                     if (event.getClickCount() == 2) {
-                        abrirDetalleLista(dto); // Llamamos a tu método de popup
+                        obrirDetallLlista(dto); // cridem per obrir el detall
                     }
                 });
 
-                hbUltimesLlistes.getChildren().add(tarjeta);
+                hbUltimesLlistes.getChildren().add(targeta);
 
             } catch (Exception e) {
                 System.err.println("Error carregant targeta de llista a l'Inici");
@@ -89,17 +101,19 @@ public class IniciController {
         }
     }
 
-    // Método para abrir el popup (copia el que ya tienes o llámalo desde aquí)
-    private void abrirDetalleLista(LlistaDTO lista) {
+    /**
+     * Metode per obrir el popup de detall de llista
+     */
+    private void obrirDetallLlista(LlistaDTO llista) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/detalleLista.fxml"));
             Parent root = loader.load();
             
             DetallController controller = loader.getController();
-            controller.carregarDades(lista);
+            controller.carregarDades(llista);
 
             Stage stage = new Stage();
-            stage.setTitle("Detall de: " + lista.getNombre());
+            stage.setTitle("Detall de: " + llista.getNombre());
             stage.setScene(new Scene(root));
             stage.initModality(Modality.APPLICATION_MODAL); 
             stage.show();
@@ -108,15 +122,16 @@ public class IniciController {
         }
     }
 
-    private void renderizarProductos(List<ProductePreusDTO> prods) {
+    private void carregarProductes(List<ProductePreusDTO> prods) {
+    	// ID del HBox per als productes en el FXML
         hbUltimsProductes.getChildren().clear();
         for (ProductePreusDTO p : prods) {
             try {
-                // Reutilizamos tu Card de producto existente
+                // reutilitcem la card del producte existent
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/ProducteCard.fxml"));
                 Node card = loader.load();
                 
-                // Si el Card es muy grande, podemos re-ajustar su tamaño aquí
+                // si es molt gran reajustem aqui
                 card.setScaleX(0.9); card.setScaleY(0.9);
                 
                 ProducteItemController controller = loader.getController();
@@ -129,6 +144,4 @@ public class IniciController {
         }
     }
 
-    @FXML private void irACrearLlista() { MainController.getInstance().openCrearLlista(); }
-    @FXML private void irAComparador() { MainController.getInstance().openLlistaEco(); }
 }

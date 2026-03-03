@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import com.ivillas.model.ProductePreusDTO;
 import com.ivillas.model.SupermercatDTO;
 import com.ivillas.request.ItemLlistaRequest;
@@ -46,6 +45,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+
+/**
+ * Clase controladora de la llista economica
+ */
 
 public class LlistaEconomicaController {
 

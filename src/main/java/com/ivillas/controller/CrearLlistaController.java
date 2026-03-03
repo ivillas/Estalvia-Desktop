@@ -46,12 +46,9 @@ public class CrearLlistaController {
     private ObservableList<ProductePreusDTO> llistaMestraProductes = FXCollections.observableArrayList();
     private FilteredList<ProductePreusDTO> productesFiltrats;
     private ObservableList<ItemLlistaRequest> itemsEnLlista = FXCollections.observableArrayList();
-    //variables
+    //variables   
     
-    
-    
-    
-    /**
+     /**
      * Metode dínicialització de la vista
      */
     @FXML
@@ -360,6 +357,11 @@ public class CrearLlistaController {
     @FXML private void publicarLlista() { 
     	enviarLlistaAlServidor("PUBLICA"); }
     
+    /**
+     * Metode que comproba si tots els productes tenen almenys un preu
+     * en angun dels supermercats seleccionats 
+     * @return
+     */
     
     private boolean noPreus() {
         // si la llista esta buida mostrem missatge i retornem
@@ -464,15 +466,20 @@ public class CrearLlistaController {
      */
     @FXML
     private void enviarComprovador(ActionEvent event) {
-    	System.out.println("entrant al comparador");
+    	//Comprovació dels preus dels productes
     	if(noPreus()) {
     		mostrarAlerta("Atenció", "Hi ha productes que no tenen preus, primer s'han d'eliminar o has d'elegir mes supermercats");
     	return;
     	}
         // Usem la instancia per camviar a la vista eco
         MainController.getInstance().openLlistaEco();
-    }
-    
+    }    
+
+    /**
+     * Metode per mostrar una alerta
+     * @param titol
+     * @param missatge
+     */
     
     private void mostrarAlerta(String titol, String missatge) {
         Alert alert = new Alert(AlertType.INFORMATION);

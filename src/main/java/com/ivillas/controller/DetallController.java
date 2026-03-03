@@ -28,6 +28,9 @@ import javafx.scene.control.ButtonType;
 import com.ivillas.utils.SessionManager;
 import com.ivillas.service.LlistaServiceClient; 
 
+/**
+ * Clase controlador del detall d'una llista
+ */
 
 public class DetallController {
     @FXML private Label lblTitol, lblAutor, lblDescripcio;
@@ -37,6 +40,11 @@ public class DetallController {
     
     private LlistaDTO llistaActual;
     
+    
+    /**
+     * Carrega les dades de la llista que se li pasa
+     * @param llista
+     */
     @FXML
     public void carregarDades(LlistaDTO llista) {
         this.llistaActual = llista;
@@ -61,6 +69,10 @@ public class DetallController {
     }
     
 
+    /**
+     * Metode per eliminar la llista, nomes la pot eliminar l'usuari que la crear
+     * ha de ser el que esta en la sessió
+     */
     @FXML
     private void eliminarLlista() {
         if (this.llistaActual == null) return;
@@ -108,10 +120,11 @@ public class DetallController {
     }
     
     
-    
-    
-    
-    
+    /**
+     * Metode que copia tots els productes de una llista a la de la sessió
+     * els afegeix
+     */
+     
     @FXML
     private void copiarLlista() {
     
@@ -160,6 +173,9 @@ public class DetallController {
     
     }
     
+    /**
+     * Metode per mortar alertes
+     */
     
     private void mostrarAlertaExit(String titol, String msg) { crearAlerta(titol, msg, AlertType.INFORMATION); }
 
@@ -171,9 +187,10 @@ public class DetallController {
         alert.showAndWait();
     }
     
-
-    
-    
+    /**
+     * Metode que tancat la finestra(vista)
+     */
+        
     @FXML
     private void tancarFinestra() {
         ((Stage) lblTitol.getScene().getWindow()).close();
