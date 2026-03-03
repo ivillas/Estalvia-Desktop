@@ -54,7 +54,7 @@ public class MainController {
     	openInici();
     	SessionManager.setMainController(this);
 
-    	// 1. Configurar Menú de Opciones (los tres puntitos)
+    	// Configurar menu d'opcions del buscador 
         ContextMenu menuBusqueda = new ContextMenu();
         MenuItem itemProd = new MenuItem("Buscar Productes");
         MenuItem itemLlistes = new MenuItem("Buscar Llistes Públiques");
@@ -73,25 +73,25 @@ public class MainController {
             menuBusqueda.show(btnOpcions, event.getScreenX(), event.getScreenY());
         });
 
-        // 2. Evento ENTER en el buscador
+        // event del ENTER per el buscador
         txtBuscar.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 ejecutarBusqueda(txtBuscar.getText());
             }
         });
         
-        // 3. BUSCADOR EN CALIENTE (Añadir esto al final)
+        // buscador en calent
         txtBuscar.textProperty().addListener((obs, oldText, newText) -> {
-            // Guardamos siempre en el SessionManager por si el usuario cambia de vista
+            // guardem en el sessionmanager per si l'usuari cambia de vista
             SessionManager.setultimaBusqueda(newText);
 
-            // Si ya estamos en la vista de Productos, filtramos la tabla/tarjetas al instante
+            // si ja estem en la vista de prodcutes filtrem la taula/targetes al instant
             if ("PRODUCTES".equals(modeBusqueda)) {
                 if (ProductesController.getInstance() != null) {
                     ProductesController.getInstance().filtrarDesdeFora(newText);
                 }
             } 
-            // Si estamos en Listas, filtramos el FlowPane al instante
+            // si estem en llistess, filtrem el FlowPane al instant
             else if ("LLISTES".equals(modeBusqueda)) {
                 if (LlistesPubliquesController.getInstance() != null) {
                     LlistesPubliquesController.getInstance().filtrarDesdeFora(newText);
@@ -101,23 +101,28 @@ public class MainController {
     }
     
     
+    /**
+     * Metode per al buscador general de la app
+     * @param query
+     */
     private void ejecutarBusqueda(String query) {
         if (query == null || query.trim().isEmpty()) return;
 
-        // Guardamos la consulta en el SessionManager para que la vista destino la lea
+        // guardem la consulta en el sessionmanager perque la seguent vista la llegeixo
         SessionManager.setultimaBusqueda(query);
 
         if ("PRODUCTES".equals(modeBusqueda)) {
-            openProductes(); // Tu método existente que carga Productes.fxml
+            openProductes(); // cridem a la vista - obrirProductes
         } else {
-            openLlistesPubliques(); // Tu método existente
+            openLlistesPubliques(); // cridem a la vista --  obrirLlistes
         }
     }
     
     
     
-    
-    
+    /**
+     * Metode que crida a la vista de configuracio
+     */
     @FXML
     private void openConfig() {
         try {
@@ -149,7 +154,7 @@ public class MainController {
                 }
             }
 
-            // 3. BINDING TOTAL
+            // BINDING TOTAL
             root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
             root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
 
@@ -162,27 +167,28 @@ public class MainController {
     	
 
         
-    	
+    /**
+     * Metode que crida a la vista d'inici
+     */	
     @FXML
     public void  openInici() {
     	try {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/inici.fxml"));
-     // Cargamos el nodo raíz (que es un BorderPane)
+        //carregem el node rel (que es un BorderPane)
         BorderPane root = loader.load();
 
-        // 1. FORZAR CRECIMIENTO: El BorderPane viene con tamaños máximos del FXML. Los reseteamos.
+        // Forcem el creixement: El BorderPane ve amb mides maximes del FXML. Els resetegem.
         root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         root.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
         
-        // 2. SOLUCIONAR EL PROBLEMA DEL <TOP>: 
-        // Tu FXML tiene el AnchorPane dentro de <top>. El <top> NUNCA se expande verticalmente.
-        // Extraemos el contenido y lo ponemos en el centro para que JavaFX lo obligue a estirarse.
+        
+        // extraurem el contingut i el posem al centre per que JavaFX l'obligo a estirarse.
         if (root.getTop() != null) {
             Node contenido = root.getTop();
-            root.setTop(null);    // Quitamos del top
-            root.setCenter(contenido); // Lo ponemos en el centro (el centro sí se expande)
+            root.setTop(null);    // treiem el top
+            root.setCenter(contenido); // el posem al centre que si que s'expandeix
             
-            // Si el contenido es un AnchorPane (como en tu FXML), quitamos sus límites también
+            // treiem els limits
             if (contenido instanceof Region) {
                 Region pane = (Region) contenido;
                 pane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -190,7 +196,7 @@ public class MainController {
             }
         }
 
-        // 3. BINDING TOTAL: Ajuste al contenedor padre
+        // ajustem el contenidor pare
         root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
         root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
        
@@ -200,19 +206,21 @@ public class MainController {
 			e.printStackTrace();
 		}
     }
+    
+    /**
+     * Metode que crida a la vista llista economica
+     */
 
     @FXML
     public void openLlistaEco() {
         try {
             txtTitol.setText("Comparativa i Estalvi Optimitzat");
-            // Asegúrate de que la ruta sea correcta según tu estructura de carpetas
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/LlistaEco.fxml"));
             BorderPane root = loader.load();
 
             root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             root.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
 
-            // Aplicamos tu lógica de mover el contenido del top al center si es necesario
             if (root.getCenter() == null && root.getTop() != null) {
                 Node contenido = root.getTop();
                 root.setTop(null);
@@ -235,27 +243,27 @@ public class MainController {
         }
     }
     
-    
+    /**
+     * Metode que crida a la vista Crear llista
+     */
     @FXML void openCrearLlista() {
         try {
         	txtTitol.setText("Crea la teva llista de la compra");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/CrearLlista.fxml"));
-            // Cargamos el nodo raíz (que es un BorderPane)
+            //carregem el node rel (que es un BorderPane)
             BorderPane root = loader.load();
 
-            // 1. FORZAR CRECIMIENTO: El BorderPane viene con tamaños máximos del FXML. Los reseteamos.
+         // Forcem el creixement: El BorderPane ve amb mides maximes del FXML. Els resetegem.
             root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             root.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
 
-            // 2. SOLUCIONAR EL PROBLEMA DEL <TOP>: 
-            // Tu FXML tiene el AnchorPane dentro de <top>. El <top> NUNCA se expande verticalmente.
-            // Extraemos el contenido y lo ponemos en el centro para que JavaFX lo obligue a estirarse.
+         // extraurem el contingut i el posem al centre per que JavaFX l'obligo a estirarse.
             if (root.getTop() != null) {
                 Node contenido = root.getTop();
                 root.setTop(null);    // Quitamos del top
                 root.setCenter(contenido); // Lo ponemos en el centro (el centro sí se expande)
                 
-                // Si el contenido es un AnchorPane (como en tu FXML), quitamos sus límites también
+                // treiem els limits
                 if (contenido instanceof Region) {
                     Region pane = (Region) contenido;
                     pane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -263,7 +271,7 @@ public class MainController {
                 }
             }
 
-            // 3. BINDING TOTAL: Ajuste al contenedor padre
+         // ajustem el contenidor pare
             root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
             root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
 
@@ -274,27 +282,30 @@ public class MainController {
         }
     }
     
+    /**
+     * Metode que crida a la vista login d'usuari
+     */
     @FXML
     public void openLoginWindow() throws IOException {
-        // Si ya hay sesión, no abrimos el login, vamos al perfil
+        // Si ja hi ha una sessio no obrim el login, nem al perfil
         if (SessionManager.isLoggedIn()) {
             actualizarInterfazTrasLogin();
             return;
         }
 
-        // Si no hay sesión, abrimos la ventana modal de siempre
+        // Si no hi ha sessio obrim la finestra de login
         URL fxmlLocation = getClass().getResource("/login.fxml");
         if (fxmlLocation == null) throw new IOException("¡Error! No es troba login.fxml");
 
-        // 2. USAR EL CARGADOR DE FORMA NO ESTÁTICA
+        // carregador de vista
         FXMLLoader loader = new FXMLLoader(fxmlLocation);
-        Parent root = loader.load(); // Aquí se carga la vista
+        Parent root = loader.load();
 
-        // 3. LA MAGIA: Obtener el controlador del login y pasarle ESTE MainController (this)
+        // obtenim el controlador del login i i passem al mainControler (this)
         AuthController authController = loader.getController();
         authController.setMainController(this); 
 
-        // 4. Configurar y mostrar la ventana
+        // configura i mostra la finestra
         Stage stage = new Stage();
         stage.setScene(new Scene(root));
         stage.setTitle("Acces al compte");
@@ -302,6 +313,9 @@ public class MainController {
         stage.show();
     }
     
+    /**
+     * Metode que tanca la sesio de l'usuari
+     */
     @FXML
     public void handleLogout() {
         SessionManager.logout();
@@ -317,50 +331,18 @@ public class MainController {
         openInici();
     }
     
+    /**
+     * Metode que tanca la app 
+     */
     @FXML
     private void handleExit() {
         Platform.exit();
         System.exit(0);
     }
     
-    @FXML
-    private void openProducts() {
-        try {
-        	txtTitol.setText("Els teus productes favorits");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/productes.fxml"));
-            // Cargamos el nodo raíz (que es un BorderPane)
-            BorderPane root = loader.load();
-
-            // 1. FORZAR CRECIMIENTO: El BorderPane viene con tamaños máximos del FXML. Los reseteamos.
-            root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-            root.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-
-            // 2. SOLUCIONAR EL PROBLEMA DEL <TOP>: 
-            // Tu FXML tiene el AnchorPane dentro de <top>. El <top> NUNCA se expande verticalmente.
-            // Extraemos el contenido y lo ponemos en el centro para que JavaFX lo obligue a estirarse.
-            if (root.getTop() != null) {
-                Node contenido = root.getTop();
-                root.setTop(null);    // Quitamos del top
-                root.setCenter(contenido); // Lo ponemos en el centro (el centro sí se expande)
-                
-                // Si el contenido es un AnchorPane (como en tu FXML), quitamos sus límites también
-                if (contenido instanceof Region) {
-                    Region pane = (Region) contenido;
-                    pane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-                    pane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-                }
-            }
-
-            // 3. BINDING TOTAL: Ajuste al contenedor padre
-            root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
-            root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
-
-            mainDisplayArea.getChildren().setAll(root);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    /**
+     * Metode que crida a la vista de llistes privades 
+     */
     
     @FXML
     private void openLlistesPrivades() {
@@ -370,15 +352,15 @@ public class MainController {
             
             BorderPane root = loader.load();
 
-            // Conexión con el controlador
+            // Conexió amb el controlador
             LlistesPrivadesController llistapCtrl = loader.getController();
             llistapCtrl.setMainController(this); 
 
-            // Vincular al área principal para que se estire
+            // Vinculem per que s'estiro
             root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
             root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
 
-            // Inyectar en la vista
+            // injectem la vista
             mainDisplayArea.getChildren().setAll(root);
 
         } catch (IOException e) {
@@ -387,6 +369,9 @@ public class MainController {
         }
     }
     
+    /**
+     * Metode que crida a la vista de llistes publiques 
+     */
     @FXML
     private void openLlistesPubliques() {
         try {
@@ -395,15 +380,15 @@ public class MainController {
             
             BorderPane root = loader.load();
 
-            // Conexión con el controlador
+            // Conexió amb el controlador
             LlistesPubliquesController llistapCtrl = loader.getController();
             llistapCtrl.setMainController(this); 
 
-            // Vincular al área principal para que se estire
+            // Vinculem per que s'estiro
             root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
             root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
 
-            // Inyectar en la vista
+            // injectem la vista
             mainDisplayArea.getChildren().setAll(root);
 
         } catch (IOException e) {
@@ -412,7 +397,9 @@ public class MainController {
         }
     }
     
-    
+    /**
+     * Metode que crida a la vista productes  
+     */
     @FXML
     private void openProductes() {
         try {
@@ -421,15 +408,15 @@ public class MainController {
             
             BorderPane root = loader.load();
 
-            // Conexión con el controlador
+            // Conexió amb el controlador
             ProductesController productsCtrl = loader.getController();
             productsCtrl.setMainController(this); 
 
-            // Vincular al área principal para que se estire
+            // Vinculem per que s'estiro
             root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
             root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
 
-            // Inyectar en la vista
+            // injectem la vista
             mainDisplayArea.getChildren().setAll(root);
 
         } catch (IOException e) {
@@ -438,25 +425,25 @@ public class MainController {
         }
     }
     
+    /**
+     * Metode que crida a la vista d'ajuda e informació  
+     */
     @FXML
     private void openAjuda() {
         try {
             txtTitol.setText("Ajuda i informació de la app");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ajuda.fxml"));
            
-            // Cargamos el nodo raíz
+            //carregem el node rel (que es un BorderPane)
             BorderPane root = loader.load();
-
-            // --- ESTA ES LA CONEXIÓN QUE TE FALTA PARA QUE EL BOTÓN 'SORTIR' FUNCIONE ---
+            
             AjudaController ajudaCtrl = loader.getController();
             ajudaCtrl.setMainController(this); 
-            // --------------------------------------------------------------------------
-
-            // 1. FORZAR CRECIMIENTO
+          
+            //forcem el creixement
             root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             root.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
 
-            // 2. SOLUCIONAR EL PROBLEMA DEL <TOP> (Mover contenido al centro)
             if (root.getTop() != null) {
                 Node contenido = root.getTop();
                 root.setTop(null);    
@@ -469,7 +456,6 @@ public class MainController {
                 }
             }
 
-            // 3. BINDING TOTAL
             root.prefWidthProperty().bind(mainDisplayArea.widthProperty());
             root.prefHeightProperty().bind(mainDisplayArea.heightProperty());
 
@@ -480,7 +466,10 @@ public class MainController {
         }
     }
     
-    
+    /**
+     * Metode per actualitzar la interface al fer login
+     * cambiant labels, mostrant botons...
+     */
     public void actualizarInterfazTrasLogin() {
         UsuariDTO user = SessionManager.getUsuario();
         
@@ -491,7 +480,7 @@ public class MainController {
             System.out.println("OK: Usuario recuperado: " + user.getUsername());
         }
         
-        // 1. Actualizar botones laterales (Tu lógica original intacta)
+        // actualitcem els botons laterals
         btnUserSession.setText(user.getUsername());
         btnLogout.setVisible(true);
         btnLogout.setManaged(true);
@@ -499,28 +488,27 @@ public class MainController {
         btnCrearLlista.setManaged(true);
         btnLlistesPrivades.setVisible(true);
         btnLlistesPrivades.setManaged(true);
-        // (Añade aquí el resto de tus botones si los tienes)
 
-        // 2. PEDIR DATOS FRESCOS (Refresco automático de contadores)
+        //demanar les dades refrescades
         javafx.concurrent.Task<java.util.Map<String, Long>> task = new javafx.concurrent.Task<>() {
             @Override
             protected java.util.Map<String, Long> call() throws Exception {
-                // Llamamos a la API para obtener las estadísticas reales actuales
+                // cridem a l'API per obtenir dades reals
                 return LlistaServiceClient.getStats(user.getUserId());
             }
         };
 
-        // Cuando la API responde con éxito:
+        // si la resposta de l'API te exit
         task.setOnSucceeded(ev -> {
             java.util.Map<String, Long> stats = task.getValue();
             
-            // Actualizamos los números en el objeto 'user' antes de pasarlo a la vista
+            // Actualitcem l'objecte user avans d'obrir la vista
             if (stats != null) {
                 user.setnLlistesPublices(stats.get("publiques").intValue());
                 user.setnLlistesPrivades(stats.get("privades").intValue());
             }
 
-            // 3. Cargar la "página" de usuario desde el FXML (Tu lógica original)
+            // carregar la pagina de usuari desde el FXML
             try {
                 txtTitol.setText("Perfil d'Usuari");
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/perfilUsuari.fxml"));
@@ -531,7 +519,6 @@ public class MainController {
                 if (controller instanceof UsuarioController) { 
                     UsuarioController uc = (UsuarioController) controller;
                     uc.setMainController(this);
-                    // Ahora 'user' ya tiene los datos refrescados de la API
                     uc.cargarDatos(user);
                 }
 
@@ -545,38 +532,42 @@ public class MainController {
             }
         });
 
-        // Si falla la API, cargamos los datos que ya tenemos para no dejar la pantalla vacía
+        // si falla l'API carrgem dades que ja teniam per no deixa la pantalla buida
         task.setOnFailed(ev -> {
-            System.err.println("No se han podido refrescar las stats, usando caché...");
-            // Reutilizamos la lógica de carga aquí o llamamos a un error
+          
         });
 
         new Thread(task).start();
     }
+    
+    /**
+     * Metode per actualitzar els titols si entrem en sessió
+     */
     public void refrescarVistaActualSiEsPerfil() {
         String titol = txtTitol.getText();
         
-        // 1. Si estamos en el Perfil
+        // Si estem en el Perfil
         if ("Perfil d'Usuari".equals(titol)) {
             actualizarInterfazTrasLogin(); 
         } 
-        // 2. Si estamos en las listas privadas (Meves llistes)
+        // Si estem en les llistes privades (Meves llistes)
         else if ("Les meves llistes".equals(titol)) {
             openLlistesPrivades(); 
         }
-        // 3. Si estamos en las listas públicas de otros usuarios
+        // si estem en les llistes públiques de altres usuaris
         else if ("Llistes creades pels usuaris".equals(titol)) {
             openLlistesPubliques();
         }
-        // 4. Si estamos en el Inicio (asumiendo que el título de openInici es algo como "Inici" o similar)
+        // Si estem al inici 
         else {
-            // Por si acaso, si no detecta el título pero el borrado fue bien, 
-            // podrías llamar a openInici() como última opción
-            // openInici();
+              openInici();
         }
     }
     
-    
+    /**
+     * Metode per actualitzar el mode de busqueda del buscador general
+     * segons elecció de productes o llistes
+     */
     public void actualizarModeBusqueda(String mode) {
         this.modeBusqueda = mode; // "PRODUCTES" o "LLISTES"
         if ("PRODUCTES".equals(mode)) {

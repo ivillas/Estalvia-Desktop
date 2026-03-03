@@ -35,7 +35,6 @@ public class UsuariServiceClient {
 		return code == 200;
 	}
 
-
 	/**
 	 * Metode per obtenir el total de llistes privades
 	 * @return
@@ -48,7 +47,6 @@ public class UsuariServiceClient {
 				.uri(URI.create(url))
 				.GET()
 				.build();
-
 		HttpResponse<String> response = HttpClientProvider.getClient()
 				.send(request, HttpResponse.BodyHandlers.ofString());
 

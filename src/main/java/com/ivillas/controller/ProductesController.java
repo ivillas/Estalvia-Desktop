@@ -84,8 +84,7 @@ public class ProductesController implements Initializable {
         if (!SessionManager.isLoggedIn()) {
             ckbFavorit.setVisible(false);
             colAccions.setVisible(false); 
-        }        
-        
+        }                
         // LEER BÚSQUEDA
         String query = SessionManager.getultimaBusqueda();
         if (query != null && !query.isEmpty()) {
@@ -96,8 +95,6 @@ public class ProductesController implements Initializable {
         
         carregarDades();
     }       
-    
-
     /**
      * Metode per configurar el checkbox de la vista
      */
@@ -119,9 +116,7 @@ public class ProductesController implements Initializable {
     /**
      * MEtode per carregar les dades (productes)
      */
-   
-    
-    
+ 
     private void carregarDades() {
         Task<List<ProductePreusDTO>> task = new Task<>() {
             @Override
@@ -130,13 +125,9 @@ public class ProductesController implements Initializable {
                 List<ProductePreusDTO> totsProductes = ProducteServiceClient.getProductes();
                 
                //obtenim els supers actius
-                List<String> supersActiusNoms = new ArrayList<>();
-                
-                
-               
-                
-                try {
+                List<String> supersActiusNoms = new ArrayList<>();    
 
+                try {
                     List<SupermercatDTO> totsSupers = SupermercatServiceClient.getAll();
                     for (SupermercatDTO s : totsSupers) {
                         if (s.isActiu() ) {
@@ -158,7 +149,6 @@ public class ProductesController implements Initializable {
         task.setOnSucceeded(e -> {
             // asignem la llista filtrada que ve del fil
             this.llistaProductes = task.getValue();
-            
             if (llistaProductes != null) {
                 // actualitzem el total de productes a la label
                 lblTotalProductes.setText("Total: " + llistaProductes.size() + " productes");
@@ -175,79 +165,6 @@ public class ProductesController implements Initializable {
         thread.setDaemon(true);
         thread.start();
     }
-
-    /*
-    
-    private void carregarDades() {
-        Task<List<ProductePreusDTO>> task = new Task<>() {
-            @Override
-            protected List<ProductePreusDTO> call() throws Exception {
-                return ProducteServiceClient.getProductes(); 
-            }
-        };
-        
-        List<String> supersActius = null;
-		try {
-		supersActius = SupermercatServiceClient.supersActius();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-
-        try {
-			for(SupermercatDTO l: SupermercatServiceClient.getAll()) {
-				if(l.isActiu()) {
-					supersActius.add(l.getNom());
-				}
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-        
-
-        List<ProductePreusDTO> llistaNeta, LlistaSupers;
-        llistaNeta = task.getValue();
-        for (ProductePreusDTO i : llistaNeta) {
-        	Map<String, BigDecimal> map = i.precios;
-        	for( Map.Entry<String, BigDecimal> p : map.entrySet()) {
-        		if(supersActius.contains(p.getKey())) {
-        			llistaNeta.add(i);
-        			break;
-        		}
-        	}
-        }
-        
-        System.out.println("Supers: " + supersActius);
-        System.out.println(llistaNeta);
-
-
-        task.setOnSucceeded(e -> {
-           // this.llistaProductes = task.getValue();
-            this.llistaProductes = llistaNeta;
-            // verifiquem que no sigui null
-            if (llistaProductes != null) {
-                lblTotalProductes.setText("Total: " + llistaProductes.size() + " productes");
-                renderitzarUI();
-            }
-        });
-        
-        task.setOnFailed(e -> {
-            Throwable exception = task.getException();
-            exception.printStackTrace();
-        });
-
-        Thread thread = new Thread(task);
-        thread.setDaemon(true); // El hilo se cerrará si cierras la app
-        thread.start();
-    }
-    
-    
-    */
-    
-
     /**
      * Metode per rederitzar la IU cad check
      */
@@ -275,7 +192,6 @@ public class ProductesController implements Initializable {
         // 3. Asignamos a la lista final
         this.llistaFiltrada = temporal;
 
-        // 4. El resto de tu código igual...
         lblTotalProductes.setText("Total: " + llistaFiltrada.size() + " productes");
         if (chbLlista.isSelected()) {
             scrollTargetes.setVisible(false);
@@ -287,33 +203,6 @@ public class ProductesController implements Initializable {
             CarregarTargetesDinamiques(llistaFiltrada);
         }
     }
-    
-    
-    /*
-    private void renderitzarUI() {
-        // Filtrem segons el chek de favorits
-        
-        if (ckbFavorit.isSelected()) {
-            llistaFiltrada = llistaProductes.stream()
-                    .filter(p -> SessionManager.esFavorit(p.getProducteId()))
-                    .collect(Collectors.toList());
-           
-        } else {
-            llistaFiltrada = llistaProductes;
-        }
-        lblTotalProductes.setText("Total: " + llistaFiltrada.size() + " productes");
-        if (chbLlista.isSelected()) {
-            scrollTargetes.setVisible(false);
-            taulaProductes.setVisible(true);
-            taulaProductes.setItems(FXCollections.observableArrayList(llistaFiltrada));
-        } else {
-            taulaProductes.setVisible(false);
-            scrollTargetes.setVisible(true);
-            CarregarTargetesDinamiques(llistaFiltrada);
-        }
-    }
-    */
-    
     
     /**
      * Metode per obrir el detall del producte
@@ -407,6 +296,7 @@ public class ProductesController implements Initializable {
             {
                 iconFavorit.setCursor(Cursor.HAND);
                 iconFavorit.setOnMouseClicked(event -> {
+                	event.consume();
                     ProductePreusDTO p = getTableView().getItems().get(getIndex());
                     if (p != null) gestionarFavorit(p, iconFavorit);
                 });
@@ -428,9 +318,6 @@ public class ProductesController implements Initializable {
                 }
             }
         });
-        
-        
-
         // boto mes (afegir)
         colAfegir.setCellFactory(param -> new TableCell<>() {
             private final Button btnPlus = new Button("＋");
@@ -455,7 +342,7 @@ public class ProductesController implements Initializable {
         });
         
         taulaProductes.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2 && taulaProductes.getSelectionModel().getSelectedItem() != null) {
+            if (!event.isConsumed() && event.getClickCount() == 2 && taulaProductes.getSelectionModel().getSelectedItem() != null) {
                 ProductePreusDTO seleccionat = taulaProductes.getSelectionModel().getSelectedItem();
                 obrirDetallPopup(seleccionat);
             }
@@ -518,10 +405,6 @@ public class ProductesController implements Initializable {
         this.filtreBusqueda = text; // Actualizamos la variable que usamos en el paso anterior
         renderitzarUI(); // Re-dibujamos la interfaz con el nuevo filtro
     }
-    
-    
-    
-    
     
     private void afegirALlista(ProductePreusDTO p) {
         if (!SessionManager.isLoggedIn()) {
