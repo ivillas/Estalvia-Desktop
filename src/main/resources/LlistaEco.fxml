@@ -24,8 +24,8 @@
                      <children>
                         <TableView fx:id="tblComparativa" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <columns>
-                              <TableColumn fx:id="colProducto" text="Producte" prefWidth="250.0" />
-                              <TableColumn fx:id="colCantidad" text="Quantitat" prefWidth="100.0" />
+                              <TableColumn fx:id="colProducte" text="Producte" prefWidth="250.0" />
+                              <TableColumn fx:id="colQuantitat" text="Quantitat" prefWidth="100.0" />
                            </columns>
                         </TableView>
                      </children>
@@ -38,7 +38,7 @@
                               <Label text="Estratègia de Compra més Barata:" style="-fx-font-weight: bold; -fx-padding: 5;" />
                               <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
                                  <content>
-                                    <VBox fx:id="vbResultadosCalculo" spacing="10" style="-fx-padding: 10; -fx-background-color: white;" />
+                                    <VBox fx:id="vbResultatCalcul" spacing="10" style="-fx-padding: 10; -fx-background-color: white;" />
                                  </content>
                               </ScrollPane>
                            </children>
@@ -50,7 +50,7 @@
 
              <!-- Botons d'acció -->
             <JFXButton layoutX="40.0" layoutY="615.0" onAction="#volverAtras" prefHeight="34.0" prefWidth="120.0" style="-fx-background-color: white;" text="Tornar" />
-            <JFXButton layoutX="175.0" layoutY="615.0" onAction="#guardarArchivo" prefHeight="34.0" prefWidth="120.0" style="-fx-background-color: white;" text="Guardar .lst" />
+            <JFXButton layoutX="175.0" layoutY="615.0" onAction="#guardarArchiu" prefHeight="34.0" prefWidth="120.0" style="-fx-background-color: white;" text="Guardar .lst" />
             <JFXButton layoutX="310.0" layoutY="615.0" onAction="#enviarEmail" prefHeight="34.0" prefWidth="120.0" style="-fx-background-color: white;" text="Enviar" />
             
             <JFXButton layoutX="660.0" layoutY="610.0" onAction="#calcularEstalvi" prefHeight="45.0" prefWidth="200.0" style="-fx-background-color: #2ecc71; -fx-text-fill: white;" text="CALCULAR ESTALVI">

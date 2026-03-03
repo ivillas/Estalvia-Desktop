@@ -21,56 +21,59 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-	public class LlistesPrivadesController {
-	    @FXML private FlowPane contenedorTarjetas;
-	    @FXML private CheckBox checkPublicas;
-	    @FXML private CheckBox checkPrivadas;
+/**
+ * Clase controladora de les Llistes privades
+ */
 
-	    private List<LlistaDTO> todasMisListas = new ArrayList<>();
+	public class LlistesPrivadesController {
+	    @FXML private FlowPane contenedorTargetes;
+	    @FXML private CheckBox checkPubliques;
+	    @FXML private CheckBox checkPrivades;
+
+	    private List<LlistaDTO> totesLesMevesLlistes = new ArrayList<>();
 	    private MainController mainController;
 
 	    @FXML
 	    public void initialize() {
-	        System.out.println("Vista inicializada.");
-	        // Aseguramos que empiecen marcados antes de recibir cualquier dato
-	        if (checkPublicas != null) checkPublicas.setSelected(true);
-	        if (checkPrivadas != null) checkPrivadas.setSelected(true);
+	        // ens aseguremq ue estiguin totes dos marcades
+	        if (checkPubliques != null) checkPubliques.setSelected(true);
+	        if (checkPrivades != null) checkPrivades.setSelected(true);
 	    }
 
 	    
 	    public void setMainController(MainController mainController) {
 	        this.mainController = mainController;
-	        System.out.println("MainController inyectado. Iniciando carga...");
-	        cargarDatosPrivados(); // <--- IMPORTANTE: Llamar aquí
-	        checkPublicas.setSelected(true);
-	        checkPrivadas.setSelected(true);
+	        cargarDesdePrivades(); 
+	        checkPubliques.setSelected(true);
+	        checkPrivades.setSelected(true);
 	    }
 
-	    public void cargarDatosPrivados() {
+	    /**
+	     * Metode per carregar les llistes privades
+	     * segons l'ID del usuari en sessioó
+	     */
+	    
+	    public void cargarDesdePrivades() {
 	        if (SessionManager.getUsuario() == null) {
-	            System.err.println("Error: No hay usuario en SessionManager");
 	            return;
 	        }
 	        
 	        Long userId = SessionManager.getUsuario().getUserId();
-	        System.out.println("Pidiendo listas al servidor para user: " + userId);
 
 	        Task<List<LlistaDTO>> task = new Task<>() {
 	            @Override
 	            protected List<LlistaDTO> call() throws Exception {
-	                // Forzamos la llamada al método que acepta el ID
+	                // Forzamos cridar al metode que acepta el ID
 	                return LlistaServiceClient.getPerUsuari(userId); 
 	            }
 	        };
 
 	        task.setOnSucceeded(e -> {
-	            todasMisListas = task.getValue();
-	            System.out.println("Total listas recibidas del servidor: " + todasMisListas.size());
-	            aplicarFiltro(); 
+	            totesLesMevesLlistes = task.getValue();
+	            aplicarFiltre(); 
 	        });
 
 	        task.setOnFailed(e -> {
-	            System.err.println("Fallo en la tarea:");
 	            task.getException().printStackTrace();
 	        });
 
@@ -79,16 +82,18 @@ import javafx.stage.Stage;
 	        th.start();
 	    }
 
+	    /**
+	     * Metode per aplicar filtre segons fem els check
+	     */
+	    
 	    @FXML
-	    public void aplicarFiltro() {
-	        // VALIDACIÓN CRÍTICA: Si el FXML llama a esto antes de cargar los datos o los IDs
-	        if (checkPublicas == null || checkPrivadas == null || todasMisListas == null) {
-	            System.out.println("Filtro cancelado: Componentes aún no inyectados o lista vacía.");
+	    public void aplicarFiltre() {
+	        if (checkPubliques == null || checkPrivades == null || totesLesMevesLlistes == null) {
 	            return; 
 	        }
 
 	        try {
-	            List<LlistaDTO> filtradas = todasMisListas.stream()
+	            List<LlistaDTO> filtradas = totesLesMevesLlistes.stream()
 	                .filter(lista -> {
 	                    String vis = lista.getVisibilitat();
 	                    if (vis == null) return false;
@@ -96,21 +101,25 @@ import javafx.stage.Stage;
 	                    boolean esPublica = "PUBLICA".equalsIgnoreCase(vis);
 	                    boolean esPrivada = "PRIVADA".equalsIgnoreCase(vis);
 
-	                    return (checkPublicas.isSelected() && esPublica) || 
-	                           (checkPrivadas.isSelected() && esPrivada);
+	                    return (checkPubliques.isSelected() && esPublica) || 
+	                           (checkPrivades.isSelected() && esPrivada);
 	                })
 	                .collect(Collectors.toList());
 
-	            llenarInterfaz(filtradas);
+	            omplenarInterface(filtradas);
 	        } catch (Exception e) {
-	            System.err.println("Error dentro del stream de filtrado: " + e.getMessage());
+	            System.err.println( e.getMessage());
 	        }
 	    }
 
-	    private void llenarInterfaz(List<LlistaDTO> listas) {
+	    /**
+	     * Metode per omplenar la vista amb les llistes
+	     * @param llistes
+	     */
+	    private void omplenarInterface(List<LlistaDTO> llistes) {
 	        Platform.runLater(() -> {
-	            contenedorTarjetas.getChildren().clear();
-	            for (LlistaDTO dto : listas) {
+	            contenedorTargetes.getChildren().clear();
+	            for (LlistaDTO dto : llistes) {
 	                try {
 	                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/targetaLista.fxml"));
 	                    VBox tarjeta = loader.load();
@@ -118,9 +127,9 @@ import javafx.stage.Stage;
 	                    controller.setData(dto);
 	                    
 	                    tarjeta.setOnMouseClicked(ev -> {
-	                        if (ev.getClickCount() == 2) abrirDetalleLista(dto);
+	                        if (ev.getClickCount() == 2) obrirDetallLlista(dto);
 	                    });
-	                    contenedorTarjetas.getChildren().add(tarjeta);
+	                    contenedorTargetes.getChildren().add(tarjeta);
 	                } catch (Exception e) {
 	                    e.printStackTrace();
 	                }
@@ -128,20 +137,23 @@ import javafx.stage.Stage;
 	        });
 	    }
 
-    
-    private void abrirDetalleLista(LlistaDTO lista) {
+    /**
+     * Metode per obrri el popup del detall de la llista
+     * @param lista
+     */
+    private void obrirDetallLlista(LlistaDTO lista) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/detalleLista.fxml"));
             Parent root = loader.load();
             
-            // Supongamos que creas un DetalleController
+            // instanciem 
             DetallController controller = loader.getController();
             controller.carregarDades(lista);
 
             Stage stage = new Stage();
-            stage.setTitle("Detalle de " + lista.getNombre());
+            stage.setTitle("Detall de " + lista.getNombre());
             stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL); // Bloquea la ventana de atrás
+            stage.initModality(Modality.APPLICATION_MODAL); 
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

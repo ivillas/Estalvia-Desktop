@@ -19,24 +19,28 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+/**
+ * Clase controladora de les Llistes publiques
+ */
+
 public class LlistesPubliquesController {
 
-    @FXML private FlowPane contenedorTarjetas;
+    @FXML private FlowPane contenedorTargetes;
     private MainController mainController;
     private static LlistesPubliquesController instance;
 
-    private List<LlistaDTO> todasLasListasCache = new ArrayList<>();
+    private List<LlistaDTO> totesLesLlistesCache = new ArrayList<>();
     
     
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
     }
 
-    // 3. ESTE ES EL MÉTODO: Se ejecuta al cargar la pantalla
+    
     @FXML
     public void initialize() {
     	instance = this;
-        // Avisamos al MainController
+
         if (SessionManager.getMainController() != null) {
             SessionManager.getMainController().actualizarModeBusqueda("LLISTES");
         }
@@ -46,38 +50,46 @@ public class LlistesPubliquesController {
         if (query != null && !query.isEmpty()) {
             System.out.println("Buscant llista: " + query);
             
-            // Aquí crides al teu mètode de càrrega passant-li el filtre
+            // Aquí cridem al  mètode de càrrega passant-li el filtre
             cargarListasPubliquesFiltradas(query); 
             
             SessionManager.setultimaBusqueda(null); 
         } else {
-            cargarListasPubliques();
+            carregarLlistesPubliques();
         }
 
     }
    
+    /*
+     * Creem una instancia del controlador
+     */
     public static LlistesPubliquesController getInstance() { 
     	return instance; 
     }
+    
+    /**
+     * Metode per carregar les llistes privades
+     * @param query
+     */
     
     public void cargarListasPubliquesFiltradas(String query) {
         Task<List<LlistaDTO>> task = new Task<>() {
             @Override
             protected List<LlistaDTO> call() throws Exception {
-                // Reutilizamos la misma llamada a la API que ya tienes
+                // cridem a la api per demanar les llistes publiques
                 return LlistaServiceClient.getPubliques(); 
             }
         };
 
         task.setOnSucceeded(e -> {
-            List<LlistaDTO> todas = task.getValue();
-            this.todasLasListasCache = todas; // <-- IMPORTANTE: GUARDAR AQUÍ TAMBIÉN
+            List<LlistaDTO> totes = task.getValue();
+            this.totesLesLlistesCache = totes; 
 
-            List<LlistaDTO> filtradas = todas.stream()
+            List<LlistaDTO> filtrades = totes.stream()
                 .filter(l -> l.getNombre().toLowerCase().contains(query.toLowerCase()))
                 .toList();
 
-            llenarInterfaz(filtradas); 
+            llenarInterfaz(filtrades); 
         });
 
         task.setOnFailed(e -> {
@@ -90,69 +102,75 @@ public class LlistesPubliquesController {
     }
     
     
-    public void cargarListasPubliques() {
-        // 1. Crear una tarea en segundo plano
+    public void carregarLlistesPubliques() {
+        // creem una tasca en segon pla
         Task<List<LlistaDTO>> task = new Task<>() {
             @Override
             protected List<LlistaDTO> call() throws Exception {
-                // Esto se ejecuta fuera del hilo de la UI (sin bloquear la app)
+                // aixo sexecutara fora del fil de la UI aixi evitem bloquejar
                 return LlistaServiceClient.getPubliques(); 
             }
         };
         
-        // UN SOLO setOnSucceeded para todo
+       
         task.setOnSucceeded(e -> {
-            List<LlistaDTO> publicas = task.getValue();
-            this.todasLasListasCache = publicas; // <-- GUARDAMOS EN CACHÉ
-            llenarInterfaz(publicas);           // <-- PINTAMOS
+            List<LlistaDTO> publiques = task.getValue();
+            this.totesLesLlistesCache = publiques; // guardme el cache
+            llenarInterfaz(publiques);           // les mostrem
         });
 
-        // 3. Qué hacer si falla (error de red)
+      //Per si volem fer algo al fallar (error de red)
         task.setOnFailed(e -> {
             Throwable exception = task.getException();
-            System.err.println("Error de red: " + exception.getMessage());
-            // Aquí podrías mostrar un aviso al usuario sin colgar la app
+            
         });
 
-        // 4. Arrancar la tarea en un hilo nuevo
+        // arranquem la tasca en un fil nou
         Thread th = new Thread(task);
         th.setDaemon(true); 
         th.start();
     }
     
- // Método para el filtrado en caliente
+    /**
+     * metode per anar filtrant segons el buscador
+     * @param text
+     */
+ 
     public void filtrarDesdeFora(String text) {
         if (text == null || text.isEmpty()) {
-            llenarInterfaz(todasLasListasCache);
+            llenarInterfaz(totesLesLlistesCache);
         } else {
             String q = text.toLowerCase();
-            List<LlistaDTO> filtradas = todasLasListasCache.stream()
+            List<LlistaDTO> filtradas = totesLesLlistesCache.stream()
                 .filter(l -> l.getNombre().toLowerCase().contains(q))
                 .toList();
             llenarInterfaz(filtradas);
         }
     }
 
-    private void llenarInterfaz(List<LlistaDTO> publicas) {
+    /**
+     * Metode per omplir
+     * @param publiques
+     */
+    private void llenarInterfaz(List<LlistaDTO> publiques) {
         Platform.runLater(() -> {
-            contenedorTarjetas.getChildren().clear();
-            for (LlistaDTO dto : publicas) {
+            contenedorTargetes.getChildren().clear();
+            for (LlistaDTO dto : publiques) {
                 try {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/targetaLista.fxml"));
                     VBox tarjeta = loader.load();
-                    
-                    // Quitamos estilos de debug y usamos los del FXML
+
                     TargetaController controller = loader.getController();
                     controller.setData(dto);
                     
-                    // EVENTO PARA HACERLA GRANDE (Detalle)
+                    // eent per fer la targeta gran
                     tarjeta.setOnMouseClicked(event -> {
-                        if (event.getClickCount() == 2) { // Doble clic para abrir detalle
-                            abrirDetalleLista(dto);
+                        if (event.getClickCount() == 2) { // doble clic
+                            obrirDetalleLista(dto);
                         }
                     });
 
-                    contenedorTarjetas.getChildren().add(tarjeta);
+                    contenedorTargetes.getChildren().add(tarjeta);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -160,19 +178,22 @@ public class LlistesPubliquesController {
         });
     }
     
-    private void abrirDetalleLista(LlistaDTO lista) {
+    /**
+     * Metode per obrir els detalls de la llista
+     * @param lista
+     */
+    private void obrirDetalleLista(LlistaDTO lista) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/detalleLista.fxml"));
             Parent root = loader.load();
-            
-            // Supongamos que creas un DetalleController
+
             DetallController controller = loader.getController();
             controller.carregarDades(lista);
 
             Stage stage = new Stage();
-            stage.setTitle("Detalle de " + lista.getNombre());
+            stage.setTitle("Detall de " + lista.getNombre());
             stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL); // Bloquea la ventana de atrás
+            stage.initModality(Modality.APPLICATION_MODAL); // Bloquejem la finestra de darrera
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
