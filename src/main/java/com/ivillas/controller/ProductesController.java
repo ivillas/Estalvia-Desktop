@@ -45,6 +45,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.text.Text;
 
 public class ProductesController implements Initializable {
 	@FXML private Label lblTotalProductes;
@@ -64,7 +65,9 @@ public class ProductesController implements Initializable {
             .registerModule(new JavaTimeModule()); 
     private String filtreBusqueda = "";
     private static ProductesController instance;
-    
+    private static final int PAGE_SIZE = 100;
+    private int paginaActual = 0;
+    private List<ProductePreusDTO> productesPerMostrar = new ArrayList<>();
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
     }   
@@ -75,7 +78,7 @@ public class ProductesController implements Initializable {
         configurarTaula();
         configurarCheckboxes();
 
-        // Avisamos al MainController de que cambie el modo
+        // Avisemos al MainController de que cambi el modoe
         if (SessionManager.getMainController() != null) {
             SessionManager.getMainController().actualizarModeBusqueda("PRODUCTES");
         }
@@ -85,16 +88,56 @@ public class ProductesController implements Initializable {
             ckbFavorit.setVisible(false);
             colAccions.setVisible(false); 
         }                
-        // LEER BÚSQUEDA
+        // llegim busqueda 
         String query = SessionManager.getultimaBusqueda();
         if (query != null && !query.isEmpty()) {
-            // Guardamos la query en una variable para usarla en renderitzarUI
+            // guardem la query en una variable per usarla en  renderitzarUI
             this.filtreBusqueda = query; 
             SessionManager.setultimaBusqueda(null); 
         }
         
         carregarDades();
+        scrollTargetes.vvalueProperty().addListener((obs, oldVal, newVal) -> {
+
+            if (newVal.doubleValue() == 1.0) {
+                carregarMesTargetes();
+            }
+        });
     }       
+    /**
+     * Metode per carregar mes targetes segons la pagina actual i el tamany de pagina
+     */
+    
+    private void carregarMesTargetes() {
+
+        int inici = paginaActual * PAGE_SIZE;
+        int fi = Math.min(inici + PAGE_SIZE, productesPerMostrar.size());
+
+        if (inici >= fi) return; // ya hi ha mes productes
+
+        List<ProductePreusDTO> subllista =
+                productesPerMostrar.subList(inici, fi);
+
+        for (ProductePreusDTO p : subllista) {
+            try {
+                FXMLLoader loader = new FXMLLoader(
+                        getClass().getResource("/ProducteCard.fxml")
+                );
+
+                Node card = loader.load();
+                ProducteItemController controller = loader.getController();
+                controller.setData(p);
+
+                containerProductes.getChildren().add(card);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        paginaActual++;
+    }
+    
     /**
      * Metode per configurar el checkbox de la vista
      */
@@ -170,7 +213,7 @@ public class ProductesController implements Initializable {
      */
     
     private void renderitzarUI() {
-        // 1. Filtramos por favoritos
+        // Filtrem per favorits
         List<ProductePreusDTO> temporal;
         if (ckbFavorit.isSelected()) {
             temporal = llistaProductes.stream()
@@ -180,7 +223,7 @@ public class ProductesController implements Initializable {
             temporal = llistaProductes;
         }
 
-        // 2. Filtramos por el texto de búsqueda (NUEVO)
+        // Filtrem per text de búsqueda 
         if (filtreBusqueda != null && !filtreBusqueda.isEmpty()) {
             String q = filtreBusqueda.toLowerCase();
             temporal = temporal.stream()
@@ -189,7 +232,7 @@ public class ProductesController implements Initializable {
                     .collect(Collectors.toList());
         }
 
-        // 3. Asignamos a la lista final
+        // Asignem a la llista final
         this.llistaFiltrada = temporal;
 
         lblTotalProductes.setText("Total: " + llistaFiltrada.size() + " productes");
@@ -200,7 +243,12 @@ public class ProductesController implements Initializable {
         } else {
             taulaProductes.setVisible(false);
             scrollTargetes.setVisible(true);
-            CarregarTargetesDinamiques(llistaFiltrada);
+            //CarregarTargetesDinamiques(llistaFiltrada);
+            paginaActual = 0;
+            productesPerMostrar = new ArrayList<>(llistaFiltrada);
+            containerProductes.getChildren().clear();
+
+            carregarMesTargetes();
         }
     }
     
@@ -292,30 +340,40 @@ public class ProductesController implements Initializable {
 
         // columnes  accions favorits
         colAccions.setCellFactory(param -> new TableCell<>() {
-            private final Label iconFavorit = new Label("❤");
+
+            private final Text heart = new Text("❤");
+
             {
-                iconFavorit.setCursor(Cursor.HAND);
-                iconFavorit.setOnMouseClicked(event -> {
-                	event.consume();
+                heart.setStyle("-fx-font-size: 20px;");
+                heart.setFill(javafx.scene.paint.Color.GRAY);
+
+                heart.setOnMouseClicked(event -> {
+                    event.consume();
                     ProductePreusDTO p = getTableView().getItems().get(getIndex());
-                    if (p != null) gestionarFavorit(p, iconFavorit);
+                    if (p != null) gestionarFavorit(p);
                 });
+
+                setAlignment(Pos.CENTER);
             }
+
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || getTableView().getItems().get(getIndex()) == null) {
+
+                if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
                     setGraphic(null);
-                } else {
-                    ProductePreusDTO p = getTableView().getItems().get(getIndex());
-                    if (SessionManager.esFavorit(p.getProducteId())) {
-                        iconFavorit.setStyle("-fx-text-fill: #e74c3c; -fx-font-size: 20px;");
-                    } else {
-                        iconFavorit.setStyle("-fx-text-fill: #ccc; -fx-font-size: 20px;");
-                    }
-                    setGraphic(iconFavorit);
-                    setAlignment(Pos.CENTER);
+                    return;
                 }
+
+                ProductePreusDTO p = getTableView().getItems().get(getIndex());
+
+                if (SessionManager.esFavorit(p.getProducteId())) {
+                    heart.setFill(javafx.scene.paint.Color.web("#e74c3c"));
+                } else {
+                    heart.setFill(javafx.scene.paint.Color.web("#ccc"));
+                }
+
+                setGraphic(heart);
             }
         });
         // boto mes (afegir)
@@ -349,7 +407,7 @@ public class ProductesController implements Initializable {
         });
     }
     
-    private void gestionarFavorit(ProductePreusDTO p, Label icon) {
+    private void gestionarFavorit(ProductePreusDTO p) {
         if (!SessionManager.isLoggedIn()) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Sessió necessària");
@@ -369,24 +427,19 @@ public class ProductesController implements Initializable {
                 boolean exito = ProducteServiceClient.gestionarFavoritAPI(userId, prodId, !yaEsFavorit);
                 
                 if (exito) {
-                    // Actualizem la memoria del SessionManager
-                    if (yaEsFavorit) SessionManager.getIdsFavorits().remove(prodId);
-                    else SessionManager.getIdsFavorits().add(prodId);
 
-                    // Refresquem el color en el fil de JavaFX
+                    if (yaEsFavorit)
+                        SessionManager.getIdsFavorits().remove(prodId);
+                    else
+                        SessionManager.getIdsFavorits().add(prodId);
+
                     Platform.runLater(() -> {
-                        // si estem filtran per favorits, hem de refrescar la UI
                         if (ckbFavorit.isSelected()) {
-                            renderitzarUI(); // aqui desapareixera el producte
+                            // estem en la vista sol favorits
+                            renderitzarUI();   // aqui filtrem unaltra vegada per que si treus un favorit de la llista, desaparegui directament sense necessitat de refrescar tota la vista
                         } else {
-                            // si no filtrem nome cambiem el producte
-                            if (yaEsFavorit) icon.setStyle("-fx-text-fill: #ccc;");
-                            else icon.setStyle("-fx-text-fill: #e74c3c;");
-                        }
-                        
-                        // actualitcem el controlador si es necesari
-                        if (SessionManager.getMainController() != null) {
-                            SessionManager.getMainController().refrescarVistaActualSiEsPerfil();
+                            // Sol refresquem la taula per canviar el color del cor
+                            taulaProductes.refresh();
                         }
                     });
                 }
@@ -400,15 +453,22 @@ public class ProductesController implements Initializable {
     	return instance; 
     }
     
- // Método para filtrar sin recargar de la base de datos
+    /**
+     * Metode per filtrar desde fora de la vista, el que fa es actualitzar la variable de filtre i re-renderitzar la UI
+     * @param text
+     */
     public void filtrarDesdeFora(String text) {
-        this.filtreBusqueda = text; // Actualizamos la variable que usamos en el paso anterior
-        renderitzarUI(); // Re-dibujamos la interfaz con el nuevo filtro
+        this.filtreBusqueda = text; // Actualitzem el filtre de búsqueda
+        renderitzarUI(); // Re-renderitzem la UI per aplicar el nou filtre
     }
     
+    /**
+     * Metode per afegir un producte a la llista temporal del sessionmanager, que es la que es passa a crear llista per crear una nova llista amb els items seleccionats
+     * @param p
+     */
     private void afegirALlista(ProductePreusDTO p) {
         if (!SessionManager.isLoggedIn()) {
-            // Alerta per iniciar sessio
+            // Alerta per iniciar sessió
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setContentText("Has de iniciar sessió.");
             alert.showAndWait();
