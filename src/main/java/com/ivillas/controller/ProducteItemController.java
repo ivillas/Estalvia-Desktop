@@ -4,6 +4,7 @@ import com.ivillas.model.ProductePreusDTO;
 import com.ivillas.request.ItemLlistaRequest;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -14,6 +15,8 @@ import com.ivillas.service.ProducteServiceClient;
 import com.ivillas.utils.SessionManager;
 import javafx.application.Platform;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
+
 import java.util.Collections;
 
 /**
@@ -138,7 +141,19 @@ public class ProducteItemController {
         alert.setTitle("Detalls del Producte");
         alert.setHeaderText(producte.getNombre() + " (" + (producte.getMarca() != null ? producte.getMarca() : "") + ")");
         
+        ImageView imageView = new ImageView();
+        try {
+            // Asumiendo que p.getUrlImagen() devuelve la ruta o URL
+            Image image = new Image(producte.getImatge(), 150, 150, true, true); 
+            imageView.setImage(image);
+        } catch (Exception e) {
+            // Imagen por defecto si falla la carga
+            // imageView.setImage(new Image("file:default.png"));
+        }
+        
         StringBuilder sb = new StringBuilder();
+        Label infoLabel = new Label(sb.toString()); 
+        infoLabel.setWrapText(true);
         sb.append("Descripció: ").append(producte.getDescripcio()).append("\n\n");
         sb.append("Comparativa de Preus:\n");
         
@@ -147,6 +162,11 @@ public class ProducteItemController {
                 sb.append("- ").append(supermercado.toUpperCase()).append(": ").append(precio).append(" €\n");
             });
         }
+        
+        // 3. Organizar Imagen y Texto en un Layout (VBox o HBox)
+        VBox content = new VBox(15); // 15px de espacio entre elementos
+        content.getChildren().addAll(imageView, infoLabel);
+        content.setAlignment(Pos.CENTER); // Centrar contenido
         alert.setContentText(sb.toString());
         alert.getDialogPane().setStyle("-fx-background-color: #F3F4F6;");
         alert.showAndWait();

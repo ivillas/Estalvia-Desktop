@@ -44,7 +44,10 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 public class ProductesController implements Initializable {
@@ -256,6 +259,7 @@ public class ProductesController implements Initializable {
      * Metode per obrir el detall del producte
      * @param p
      */
+    
     
     private void obrirDetallPopup(ProductePreusDTO p) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
