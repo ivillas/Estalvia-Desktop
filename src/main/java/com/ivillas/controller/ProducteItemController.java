@@ -13,6 +13,8 @@ import java.math.BigDecimal;
 
 import com.ivillas.service.ProducteServiceClient;
 import com.ivillas.utils.SessionManager;
+import com.ivillas.utils.UIUtils;
+
 import javafx.application.Platform;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -137,38 +139,10 @@ public class ProducteItemController {
      */
     @FXML
     private void obrirDetall() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Detalls del Producte");
-        alert.setHeaderText(producte.getNombre() + " (" + (producte.getMarca() != null ? producte.getMarca() : "") + ")");
-        
-        ImageView imageView = new ImageView();
-        try {
-            // Asumiendo que p.getUrlImagen() devuelve la ruta o URL
-            Image image = new Image(producte.getImatge(), 150, 150, true, true); 
-            imageView.setImage(image);
-        } catch (Exception e) {
-            // Imagen por defecto si falla la carga
-            // imageView.setImage(new Image("file:default.png"));
+        // Simplemente llamamos al método centralizado pasando el objeto 'producte'
+        // Esto asegura que el diseño sea idéntico en toda la aplicación
+        if (this.producte != null) {
+            UIUtils.obrirDetallPopup(this.producte);
         }
-        
-        StringBuilder sb = new StringBuilder();
-        Label infoLabel = new Label(sb.toString()); 
-        infoLabel.setWrapText(true);
-        sb.append("Descripció: ").append(producte.getDescripcio()).append("\n\n");
-        sb.append("Comparativa de Preus:\n");
-        
-        if (producte.getPrecios() != null) {
-            producte.getPrecios().forEach((supermercado, precio) -> {
-                sb.append("- ").append(supermercado.toUpperCase()).append(": ").append(precio).append(" €\n");
-            });
-        }
-        
-        // 3. Organizar Imagen y Texto en un Layout (VBox o HBox)
-        VBox content = new VBox(15); // 15px de espacio entre elementos
-        content.getChildren().addAll(imageView, infoLabel);
-        content.setAlignment(Pos.CENTER); // Centrar contenido
-        alert.setContentText(sb.toString());
-        alert.getDialogPane().setStyle("-fx-background-color: #F3F4F6;");
-        alert.showAndWait();
     }
 }

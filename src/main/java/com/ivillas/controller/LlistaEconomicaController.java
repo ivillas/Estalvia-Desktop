@@ -63,8 +63,17 @@ public class LlistaEconomicaController {
     private List<SupermercatDTO> llistaSupers;
     private Map<String, TableColumn<ItemLlistaRequest, BigDecimal>> mapaColumnes = new HashMap<>();
 
+    /**
+     * Inicialitza el controlador, configura les columnes i gestiona l'estat visual
+     * de la taula mentre es carreguen les dades.
+     */
     @FXML
     public void initialize() {
+        // Estableix un missatge personalitzat mentre la taula no té dades
+        Label placeholder = new Label("Preparant la comparativa de preus...");
+        placeholder.setStyle("-fx-text-fill: #666666; -fx-font-style: italic;");
+        tblComparativa.setPlaceholder(placeholder);
+
         configurarColumnesFixes();
         carregarDadesInicials();
     }
@@ -94,6 +103,7 @@ public class LlistaEconomicaController {
      */
 
     private void carregarDadesInicials() {
+    	
         Task<Void> task = new Task<>() {
             @Override protected Void call() throws Exception {
                 llistaSupers = SupermercatServiceClient.getAll();

@@ -1,15 +1,21 @@
 package com.ivillas.request;
 
 /**
- * Clase request de resetejar contrasenya
+ * Classe Request per a la petició de restabliment de contrasenya.
+ * S'utilitza per enviar la nova contrasenya associada al correu electrònic
+ * de l'usuari un cop verificat el procés de recuperació.
  */
 public class ResetRequest {
-    private String email;
-    private String newPassword;
+    // --- Atributs de la petició ---
+    private String email;       // Correu electrònic de l'usuari que vol canviar la contrasenya
+    private String newPassword; // La nova contrasenya que s'aplicarà al compte
 
+    /**
+     * Constructor per defecte necessari per a la serialització/deserialització JSON.
+     */
     public ResetRequest() {}
     
-    //Getters & Setters
+    // --- Getters i Setters ---
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }

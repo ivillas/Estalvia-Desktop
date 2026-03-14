@@ -1,16 +1,21 @@
 package com.ivillas.request;
 
 /**
- * Clase request del registre
+ * Classe Request per a la petició de registre de nou usuari.
+ * S'utilitza per enviar les dades necessàries per crear un compte al servidor.
  */
 public class RegisterRequest {
-    private String username;
-    private String email;
-    private String password;
+    // --- Atributs de la petició ---
+    private String username; // Nom d'usuari o àlies escollit
+    private String email;    // Adreça de correu electrònic
+    private String password; // Contrasenya per al nou compte
 
+    /**
+     * Constructor per defecte necessari per a la serialització/deserialització JSON.
+     */
     public RegisterRequest() {}
     
-    //Getters & Setters
+    // --- Getters i Setters ---
     
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }

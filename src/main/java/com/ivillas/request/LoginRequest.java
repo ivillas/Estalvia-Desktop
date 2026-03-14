@@ -1,15 +1,21 @@
 package com.ivillas.request;
 
 /**
- * Clase request del Login
+ * Classe Request per a la petició d'inici de sessió (Login).
+ * S'utilitza per enviar les credencials de l'usuari al servidor
+ * per a la seva autenticació.
  */
 public class LoginRequest {
-	private String username;
-	private String password;
+    // --- Atributs de la petició ---
+	private String username; // Nom d'usuari o àlies per a l'accés
+	private String password; // Contrasenya de l'usuari
 
+    /**
+     * Constructor per defecte necessari per a la serialització/deserialització JSON.
+     */
 	public LoginRequest() {}
 
-	//Getters & Setters
+	// --- Getters i Setters ---
 
 	public String getUsername() { return username; }
 	public void setUsername(String username) { this.username = username; }

@@ -26,6 +26,7 @@ import com.ivillas.request.ItemLlistaRequest;
 import com.ivillas.service.ProducteServiceClient;
 import com.ivillas.service.SupermercatServiceClient;
 import com.ivillas.utils.SessionManager;
+import com.ivillas.utils.UIUtils;
 import com.jfoenix.controls.JFXCheckBox;
 
 import javafx.application.Platform;
@@ -49,31 +50,47 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
+/**
+ * Controlador principal de la vista de Productes.
+ * Gestiona la visualització de productes en formats de Llista (TableView) i Targetes (FlowPane),
+ * implementant scroll infinit, filtratge per cerca i favorits.
+ */
 public class ProductesController implements Initializable {
-	@FXML private Label lblTotalProductes;
-	@FXML private Button btnFavorit;
-    @FXML private FlowPane containerProductes;
-    @FXML private JFXCheckBox chbTarget, chbLlista, ckbFavorit;
-    @FXML private TableView<ProductePreusDTO> taulaProductes;
-    @FXML private TableColumn<ProductePreusDTO, String> colNom, colMarca;
-    @FXML private TableColumn<ProductePreusDTO, String> colPreu;
-    @FXML private ScrollPane scrollTargetes;
-    private MainController mainController;
-    @FXML private TableColumn<ProductePreusDTO, Void> colAccions;
-    @FXML private TableColumn<ProductePreusDTO, Void> colAfegir;
-    private List<ProductePreusDTO> llistaFiltrada;
-    private List<ProductePreusDTO> llistaProductes = new ArrayList<>();
-    private final ObjectMapper objectMapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule()); 
-    private String filtreBusqueda = "";
+    // --- Referència estàtica per a accés extern ---
     private static ProductesController instance;
-    private static final int PAGE_SIZE = 100;
-    private int paginaActual = 0;
+    
+	  // --- Elements de la Interfície (FXML) ---
+    @FXML private Label lblTotalProductes;          // Etiqueta per al recompte de resultats
+    @FXML private FlowPane containerProductes;      // Contenidor dinàmic per al mode Targetes
+    @FXML private JFXCheckBox chbTarget, chbLlista, ckbFavorit; // Selectors de mode de vista i filtre
+    @FXML private TableView<ProductePreusDTO> taulaProductes;   // Taula per al mode Llista
+    @FXML private TableColumn<ProductePreusDTO, String> colNom, colMarca, colPreu;
+    @FXML private TableColumn<ProductePreusDTO, Void> colAccions, colAfegir;
+    @FXML private ScrollPane scrollTargetes;        // Scroll que permet la càrrega infinita
+
+    // --- Estat i Dades ---
+    private MainController mainController;
+    private List<ProductePreusDTO> llistaFiltrada;   // Resultats després d'aplicar filtres
+    private List<ProductePreusDTO> llistaProductes = new ArrayList<>(); // Dades mestres del servidor
+    private String filtreBusqueda = "";             // Emmagatzema el text de cerca actual
+    
+    // --- Configuració de Paginació ---
+    private static final int PAGE_SIZE = 100;       // Quantitat de productes a carregar per bloc
+    private int paginaActual = 0;                   // Índex de pàgina per a càrrega progressiva
     private List<ProductePreusDTO> productesPerMostrar = new ArrayList<>();
+
+    /**
+     * Estableix la referència al controlador principal.
+     */
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
     }   
+    
+    /**
+     * Inicialització del controlador en carregar la vista.
+     */
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -81,7 +98,7 @@ public class ProductesController implements Initializable {
         configurarTaula();
         configurarCheckboxes();
 
-        // Avisemos al MainController de que cambi el modoe
+        // Avisem al MainController de que cambi el modoe
         if (SessionManager.getMainController() != null) {
             SessionManager.getMainController().actualizarModeBusqueda("PRODUCTES");
         }
@@ -146,17 +163,30 @@ public class ProductesController implements Initializable {
      */
     
     private void configurarCheckboxes() {
-        // Per tarjetes o llista
         chbTarget.selectedProperty().addListener((obs, oldV, newV) -> {
-            if (newV) { chbLlista.setSelected(false); renderitzarUI(); }
+            if (!newV && !chbLlista.isSelected()) { 
+                chbTarget.setSelected(true); // Impide que ambos estén vacíos
+                return;
+            }
+            if (newV) { 
+                chbLlista.setSelected(false); 
+                renderitzarUI(); 
+            }
         });
+
         chbLlista.selectedProperty().addListener((obs, oldV, newV) -> {
-            if (newV) { chbTarget.setSelected(false); renderitzarUI(); }
+            if (!newV && !chbTarget.isSelected()) { 
+                chbLlista.setSelected(true); // Impide que ambos estén vacíos
+                return;
+            }
+            if (newV) { 
+                chbTarget.setSelected(false); 
+                renderitzarUI(); 
+            }
         });
-        // filtre favorits
-        ckbFavorit.selectedProperty().addListener((obs, oldV, newV) -> renderitzarUI());
         
-        chbTarget.setSelected(true); //estat inicial
+        ckbFavorit.selectedProperty().addListener((obs, oldV, newV) -> renderitzarUI());
+        chbTarget.setSelected(true); 
     }
 
     /**
@@ -255,44 +285,13 @@ public class ProductesController implements Initializable {
         }
     }
     
+        
     /**
-     * Metode per obrir el detall del producte
-     * @param p
+     * Carrega de manera dinàmica les targetes de producte al FlowPane.
+     * Limita la càrrega inicial a 100 elements per optimitzar el rendiment visual.
+     * 
+     * @param lista Llista de productes a mostrar.
      */
-    
-    
-    private void obrirDetallPopup(ProductePreusDTO p) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Especificacions: " + p.getNombre());
-        alert.setHeaderText(p.getNombre().toUpperCase());
-
-        // construccio del contingut segons la logica del filtre
-        StringBuilder sb = new StringBuilder();
-        sb.append("Marca: ").append(p.getMarca() != null ? p.getMarca() : "N/A").append("\n");
-        sb.append("Envàs: ").append(p.getEnvase() != null ? p.getEnvase() : "N/A").append("\n");
-        sb.append("Última actualització: ").append(p.getLastUpdate()).append("\n\n");
-        
-        sb.append("COMPARATIVA DE PREUS ACTIUS:\n");
-        sb.append("------------------------------------------\n");
-
-        if (p.getPrecios() != null && !p.getPrecios().isEmpty()) {
-            p.getPrecios().forEach((superNombre, precio) -> {
-                // usem la logica per filtrar
-                if (SupermercatServiceClient.getLocalStatus(superNombre)) {
-                    sb.append(String.format(" • %-15s : %s €\n", superNombre.toUpperCase(), precio));
-                }
-            });
-        } else {
-            sb.append("No hi ha preus disponibles actualment.");
-        }
-
-        // apliquem estil per que no e vegi sec
-        alert.getDialogPane().setPrefWidth(450);
-        alert.setContentText(sb.toString());
-        
-        // metode per obrir els detalls en els clicks
-        alert.showAndWait();
-    }
     
     private void CarregarTargetesDinamiques(List<ProductePreusDTO> lista) {
         containerProductes.getChildren().clear();
@@ -319,6 +318,10 @@ public class ProductesController implements Initializable {
             }
         }
     }        
+    
+    /**
+     * Configura el comportament de la TableView: columnes, cel·les personalitzades i esdeveniments.
+     */
     
     private void configurarTaula() {
         // Columnes basiques
@@ -406,10 +409,17 @@ public class ProductesController implements Initializable {
         taulaProductes.setOnMouseClicked(event -> {
             if (!event.isConsumed() && event.getClickCount() == 2 && taulaProductes.getSelectionModel().getSelectedItem() != null) {
                 ProductePreusDTO seleccionat = taulaProductes.getSelectionModel().getSelectedItem();
-                obrirDetallPopup(seleccionat);
+                UIUtils.obrirDetallPopup(seleccionat);
             }
         });
     }
+    
+    /**
+     * Gestiona l'addició o eliminació d'un producte de la llista de favorits de l'usuari.
+     * Realitza una cridada asíncrona a l'API per no bloquejar la interfície d'usuari.
+     * 
+     * @param p El producte a gestionar.
+     */
     
     private void gestionarFavorit(ProductePreusDTO p) {
         if (!SessionManager.isLoggedIn()) {
@@ -453,6 +463,9 @@ public class ProductesController implements Initializable {
         }).start();
     }
 
+    /**
+     * Retorna la instància activa d'aquest controlador (patró Singleton parcial per a JavaFX).
+     */
     public static ProductesController getInstance() { 
     	return instance; 
     }
