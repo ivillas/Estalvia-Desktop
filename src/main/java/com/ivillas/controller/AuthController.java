@@ -24,10 +24,14 @@ public class AuthController {
 	@FXML
 	private PasswordField txtPassLogin, txtPassReg;
 	@FXML
-	private VBox paneLogin, paneRegister, paneForgot;
+	private VBox paneLogin, paneRegister, paneForgot, paneReset ;
 	@FXML
 	private javafx.scene.control.Button btnEntrar;
-
+	@FXML
+	private TextField txtCodeReset;
+	@FXML
+	private PasswordField txtNewPassReset, txtConfirmPassReset;
+	
 	
 	/**
 	 * Metode inicialitzacions
@@ -77,20 +81,42 @@ public class AuthController {
 
 	@FXML
 	private void processRecovery() {
-		String email = txtEmailForgot.getText();
+	    String email = txtEmailForgot.getText();
+	    if (email == null || email.isBlank()) {
+	        mostrarAlerta("Error", "Introdueix un email vàlid.");
+	        return;
+	    }
 
-		if (email == null || email.isBlank()) {
-			mostrarAlerta("Error", "Per favor, introdueix un email vàlid.");
-			return;
-		}
-
-		// Cridem al service que hem llimpiat abans
-		AuthServiceClient.processRecovery(email, () -> Platform.runLater(() -> {
-			mostrarAlertaExit("Enviat", "S'ha enviat un correu amb les instruccions.");
-			showLogin(); // Tornar al panel del login
-		}), error -> Platform.runLater(() -> mostrarAlerta("Error", error)));
+	    AuthServiceClient.processRecovery(email, () -> Platform.runLater(() -> {
+	        mostrarAlertaExit("Enviat", "Codi enviat! Revisa el teu correu, si no apareix revisa la carpeta de spam.");
+	        cambiarPanel(paneReset); // <--- Ara saltem al panell de posar el codi
+	    }), error -> Platform.runLater(() -> mostrarAlerta("Error", error)));
 	}
 
+	
+	@FXML
+	private void handleResetPassword() {
+	    String email = txtEmailForgot.getText(); // Aprofitem l'email que ja ha escrit
+	    String code = txtCodeReset.getText();
+	    String newPass = txtNewPassReset.getText();
+	    String confirmPass = txtConfirmPassReset.getText();
+
+	    if (camposVacios(txtCodeReset, txtNewPassReset, txtConfirmPassReset)) return;
+
+	    if (!newPass.equals(confirmPass)) {
+	        mostrarAlerta("Error", "Les contrasenyes no coincideixen.");
+	        return;
+	    }
+
+	    AuthServiceClient.resetPassword(email, code, newPass, 
+	        () -> Platform.runLater(() -> {
+	            mostrarAlertaExit("Èxit", "Contrasenya canviada correctament.");
+	            showLogin();
+	        }),
+	        error -> Platform.runLater(() -> mostrarAlerta("Error", error))
+	    );
+	}
+	
 	// Navegacio simplificada cambian de panells
 	@FXML
 	private void showRegister() {
@@ -115,6 +141,8 @@ public class AuthController {
 		paneRegister.setManaged(panelVisible == paneRegister);
 		paneForgot.setVisible(panelVisible == paneForgot);
 		paneForgot.setManaged(panelVisible == paneForgot);
+		paneReset.setVisible(panelVisible == paneReset);
+	    paneReset.setManaged(panelVisible == paneReset);
 	}
 
 	// per mirar camps buits

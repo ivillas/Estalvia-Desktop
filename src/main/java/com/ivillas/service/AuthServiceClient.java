@@ -160,4 +160,20 @@ public class AuthServiceClient {
 			onError.accept("Error al preparar la petición: " + e.getMessage());
 		}
 	}
+	
+	/**
+	 * Pas 2: Envia el correu, el codi rebut i la nova contrasenya al servidor
+	 */
+	
+	public static void resetPassword(String email, String code, String newPassword, Runnable onSuccess, Consumer<String> onError) {
+	    // Creem el mapa amb els 3 camps que espera el ResetPasswordRequest del Backend
+	    Map<String, String> dades = Map.of(
+	        "email", email,
+	        "code", code,
+	        "newPassword", newPassword
+	    );
+
+	    // Enviem la petició al endpoint que hem creat al AuthController del Java
+	    enviarPeticio("/reset-password", dades, res -> onSuccess.run(), onError);
+	}
 }

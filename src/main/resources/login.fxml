@@ -64,5 +64,20 @@
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
          </padding>
       </VBox>
+      
+      <!-- PANEL RESTABLIR CONTRASENYA (PAS 2) -->
+	<VBox fx:id="paneReset" alignment="CENTER" managed="false" spacing="15.0" style="-fx-background-color: white;" visible="false">
+	   <children>
+	      <Text style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Nova Contrasenya" />
+	      <TextField fx:id="txtCodeReset" maxWidth="250.0" promptText="Codi de 6 dígits" />
+	      <PasswordField fx:id="txtNewPassReset" maxWidth="250.0" promptText="Nova contrasenya" />
+	      <PasswordField fx:id="txtConfirmPassReset" maxWidth="250.0" promptText="Confirma contrasenya" />
+	      <Button onAction="#handleResetPassword" prefWidth="250.0" style="-fx-background-color: #E91E63; -fx-text-fill: white;" text="Canviar Contrasenya" />
+	      <Hyperlink onAction="#showLogin" text="Cancel·lar" />
+	   </children>
+	   <padding>
+	      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+	   </padding>
+	</VBox>
    </children>
 </StackPane>
