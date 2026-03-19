@@ -2,7 +2,6 @@ package com.ivillas.controller;
 
 import com.ivillas.model.ProductePreusDTO;
 import com.ivillas.request.ItemLlistaRequest;
-
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -10,7 +9,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.math.BigDecimal;
-
 import com.ivillas.service.ProducteServiceClient;
 import com.ivillas.utils.SessionManager;
 import com.ivillas.utils.UIUtils;
@@ -46,8 +44,26 @@ public class ProducteItemController {
             lblPreu.setText(minPrecio.toString() + " €");
         }
 
-        if (p.getImatge() != null && !p.getImatge().isBlank()) {
-            imgProducte.setImage(new Image(p.getImatge(), true));
+        String urlString = p.getImatge();
+        if (urlString != null && !urlString.isBlank()) {
+            // asegurem el protocol
+            if (!urlString.contains("://")) {
+                urlString = "https://" + urlString;
+            }
+
+            // Usar el constructor de Imatge amb backgroundLoading = true
+            // aixo evita "Connection timed out" que bloqueja l'interficie
+            Image img = new Image(urlString, true); 
+
+            // per veure errors
+            img.errorProperty().addListener((obs, old, isError) -> {
+                if (isError) {
+                    System.err.println("Error en: " + p.getImatge());
+                    img.getException().printStackTrace();
+                }
+            });
+
+            imgProducte.setImage(img);
         }
 
         // Actualizar l'estat del cor segons el SessionManager

@@ -53,6 +53,7 @@ public class HttpClientProvider {
      * @param port
      */
     public static synchronized void configureProxy(boolean use, String host, int port) {
+        // 1. Actualitzem les variables d'estat i guardem a Preferences
         useProxy = use;
         proxyHost = host;
         proxyPort = port;
@@ -62,12 +63,34 @@ public class HttpClientProvider {
         prefs.putInt("proxy_port", port);
         try { prefs.flush(); } catch (Exception e) {}
 
+        // 2. Preparem el Builder per al HttpClient (API)
         HttpClient.Builder builder = HttpClient.newBuilder();
+
         if (use && host != null && !host.isBlank()) {
+            // --- CAS AMB PROXY ACTIVAT ---
+            
+            // Configura el proxy per al HttpClient de la API
             builder.proxy(ProxySelector.of(new InetSocketAddress(host, port)));
+
+            // CONFIGURACIÓ GLOBAL: Això permet que JavaFX Image (i altres) funcionin
+            System.setProperty("http.proxyHost", host);
+            System.setProperty("http.proxyPort", String.valueOf(port));
+            System.setProperty("https.proxyHost", host);
+            System.setProperty("https.proxyPort", String.valueOf(port));
+        } else {
+            // --- CAS SENSE PROXY ---
+            
+            // Netegem les propietats del sistema per evitar errors de connexió
+            System.clearProperty("http.proxyHost");
+            System.clearProperty("http.proxyPort");
+            System.clearProperty("https.proxyHost");
+            System.clearProperty("https.proxyPort");
         }
+
+        // 3. Creem el client una sola vegada amb la configuració aplicada
         httpClient = builder.build();
     }
+
     
     /**
      * MEtode per saver l'estat del proxi
