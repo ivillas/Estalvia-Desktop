@@ -80,12 +80,12 @@
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
-            <Label fx:id="lblVersioApp" layoutX="81.0" layoutY="347.0" text="Desktop V1.0.9" AnchorPane.leftAnchor="460.0" AnchorPane.topAnchor="335.0">
+            <Label fx:id="lblVersioApp" layoutX="81.0" layoutY="347.0" text="Desktop V1.2.6" AnchorPane.leftAnchor="460.0" AnchorPane.topAnchor="335.0">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
-            <Label fx:id="lbldataVersio" layoutX="460.0" layoutY="416.0" text="06/02/2026" AnchorPane.leftAnchor="460.0" AnchorPane.topAnchor="415.0">
+            <Label fx:id="lbldataVersio" layoutX="460.0" layoutY="416.0" text="06/04/2026" AnchorPane.leftAnchor="460.0" AnchorPane.topAnchor="415.0">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
