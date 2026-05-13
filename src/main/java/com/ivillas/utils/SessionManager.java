@@ -157,4 +157,21 @@ public class SessionManager {
 		mainController = controller;
 	}
 
+	/**
+	 * Mètode per assignar una nova llista temporal a la sessió (Edició).
+	 * @param novaLlista El nou borrador amb els productes carregats.
+	 */
+	public static void setLlistaTemporal(CrearLlistaRequest novaLlista) {
+		if (novaLlista == null) {
+			llistaTemporal = new CrearLlistaRequest();
+			llistaTemporal.setItems(new ArrayList<>());
+		} else {
+			llistaTemporal = novaLlista;
+			// Ens assegurem que la llista d'ítems no sigui nul·la internament
+			if (llistaTemporal.getItems() == null) {
+				llistaTemporal.setItems(new ArrayList<>());
+			}
+		}
+	}
+	
 }

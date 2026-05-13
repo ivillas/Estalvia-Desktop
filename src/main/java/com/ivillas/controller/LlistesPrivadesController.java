@@ -63,7 +63,7 @@ import javafx.stage.Stage;
 	        Task<List<LlistaDTO>> task = new Task<>() {
 	            @Override
 	            protected List<LlistaDTO> call() throws Exception {
-	                // Forzamos cridar al metode que acepta el ID
+	                
 	                return LlistaServiceClient.getPerUsuari(userId); 
 	            }
 	        };

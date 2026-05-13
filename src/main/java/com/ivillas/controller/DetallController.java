@@ -34,7 +34,7 @@ import com.ivillas.service.LlistaServiceClient;
 
 public class DetallController {
     @FXML private Label lblTitol, lblAutor, lblDescripcio;
-    @FXML private Button btnCopiarDetall, btnEliminarLlista;
+    @FXML private Button btnCopiarDetall, btnEliminarLlista, btnEditarLlista;
     @FXML private TableView<ItemLlistaDTO> taulaProductes;
     @FXML private TableColumn<ItemLlistaDTO, String> colNom, colQuantitat, colUnitat;
     
@@ -63,8 +63,10 @@ public class DetallController {
             String nombreLogueado = SessionManager.getUsuario().getUsername();
             boolean esAutor = llista.getNomAutor().equals(nombreLogueado);
             btnEliminarLlista.setVisible(esAutor);
+            btnEditarLlista.setVisible(esAutor);
         } else {
             btnEliminarLlista.setVisible(false);
+            btnEditarLlista.setVisible(false);
         }
     }
     
@@ -195,4 +197,78 @@ public class DetallController {
     private void tancarFinestra() {
         ((Stage) lblTitol.getScene().getWindow()).close();
     }
+    
+    
+    /**
+     * Metode per editar una llista, carrega els productes a la llista temporal i obre la vista de creació
+     */
+        
+    @FXML
+    private void editarLlista() {
+        if (this.llistaActual == null) return;
+
+        // Obte la llista temporal actual de la sessió per comprovar si hi ha productes pendents
+        CrearLlistaRequest listaTemporalActual = SessionManager.getLlistaTemporal();
+
+        // Si tenim productes a la llista temporal, demanem confirmació abans de carregar la nova llista per editar
+        if (listaTemporalActual != null && listaTemporalActual.getItems() != null && !listaTemporalActual.getItems().isEmpty()) {
+            
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Editar llista");
+            alert.setHeaderText(null);
+            alert.setContentText("Si edites aquesta llista, es perdran els productes que tens actualment a la cistella de creació. Vols continuar?");
+
+            // carreguem la nova llista només si l'usuari confirma que vol continuar
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                carregarLlistaPerEditar(this.llistaActual);
+            }
+        } else {
+            // Si la cistella de creació està buida, carreguem directament la llista per editar sense demanar confirmació
+            carregarLlistaPerEditar(this.llistaActual);
+        }
+    }
+    
+    private void carregarLlistaPerEditar(LlistaDTO llista) {
+        try {
+            CrearLlistaRequest nouBorrador = new CrearLlistaRequest();
+            nouBorrador.setItems(new java.util.ArrayList<>());
+
+            nouBorrador.setListaId(llista.getListaId()); 
+            nouBorrador.setNombre(llista.getNombre());    
+            nouBorrador.setDescripcion(llista.getDescripcion());
+            nouBorrador.setVisibilidad(llista.getVisibilitat());
+            
+            List<ProductePreusDTO> mestra = ProducteServiceClient.getProductes();
+
+            for (ItemLlistaDTO item : llista.getItems()) {
+                ItemLlistaRequest nouItem = new ItemLlistaRequest();
+                nouItem.setProductoId(item.getProductoId());
+                nouItem.setProductoNombre(item.getNombreProducto());
+                nouItem.setCantidad(item.getCantidad() != null ? item.getCantidad() : java.math.BigDecimal.ONE);
+                nouItem.setUnidad(item.getUnidad());
+
+                mestra.stream()
+                    .filter(p -> p.getProducteId().equals(item.getProductoId()))
+                    .findFirst()
+                    .ifPresent(p -> nouItem.setPrecios(p.getPrecios()));
+
+                nouBorrador.getItems().add(nouItem);
+            }
+
+            SessionManager.setLlistaTemporal(nouBorrador);
+            tancarFinestra();
+            
+            if (SessionManager.getMainController() != null) {
+                SessionManager.getMainController().openCrearLlista(); 
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            crearAlerta("Error", "No s'ha pogut carregar la llista per editar: " + ex.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+    
+    
+    
 }

@@ -182,4 +182,28 @@ public class LlistaServiceClient {
 		// Reutilitzem el metode de validaó
 		validarResposta(response);
 	}
+	
+	/**
+	 * Mètode per actualitzar una llista existent.
+	 * @param llistaId Identificador de la llista a modificar.
+	 * @param req Objecte amb les noves dades i ítems.
+	 * @throws Exception Si el servidor respon amb error.
+	 */
+	public static void actualitzarLlista(Long llistaId, CrearLlistaRequest req) throws Exception {
+		String json = mapper.writeValueAsString(req);
+		// El endpoint estructurado sigue el estándar REST: /listas/{id}
+		String url = HttpClientProvider.getBaseUrl() + "/listas/" + llistaId;
+
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create(url))
+				.header("Content-Type", "application/json")
+				.PUT(HttpRequest.BodyPublishers.ofString(json)) // Petición PUT para actualizar
+				.build();
+
+		HttpResponse<String> response = HttpClientProvider.getClient()
+				.send(request, HttpResponse.BodyHandlers.ofString());
+
+		// Reutilizamos tu método de validación ya existente
+		validarResposta(response);
+	}
 }

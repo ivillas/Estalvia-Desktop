@@ -19,7 +19,12 @@
                     <Label fx:id="lblTitol" style="-fx-font-weight: bold; -fx-font-size: 24; -fx-text-fill: #2C3E50;" text="Nombre de la Lista" />
                     <Label fx:id="lblAutor" style="-fx-text-fill: #7F8C8D;" text="Creado por: Usuario" />
                 </VBox>
-                <Button onAction="#tancarFinestra" style="-fx-background-color: #E74C3C; -fx-text-fill: white;" text="Cerrar" />
+                <HBox alignment="CENTER_RIGHT" spacing="10">
+                    <children>
+                        <Button fx:id="btnEditarLlista" onAction="#editarLlista" style="-fx-background-color: #3498DB; -fx-text-fill: white; -fx-font-weight: bold;" text="✏ Editar" />
+                        <Button onAction="#tancarFinestra" style="-fx-background-color: #E74C3C; -fx-text-fill: white;" text="Cerrar" />
+                    </children>
+                </HBox>
             </children>
         </HBox>
 

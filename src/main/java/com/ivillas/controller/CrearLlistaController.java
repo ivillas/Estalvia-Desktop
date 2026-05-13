@@ -42,6 +42,7 @@ public class CrearLlistaController {
     @FXML private JFXListView<ItemLlistaRequest> listaVisual;
     @FXML private JFXCheckBox chbNomesFavorits;
     @FXML private JFXButton btnAfegirFavorit;
+    @FXML private JFXButton btnGuardarLlista; 
     // Llistes de dades
     private ObservableList<ProductePreusDTO> llistaMestraProductes = FXCollections.observableArrayList();
     private FilteredList<ProductePreusDTO> productesFiltrats;
@@ -56,7 +57,18 @@ public class CrearLlistaController {
         // Carregar el que hi avia
         itemsEnLlista.setAll(SessionManager.getLlistaTemporal().getItems());
         
+        txtNomLlista.setText(SessionManager.getLlistaTemporal().getNombre());
+        txtDescripcio.setText(SessionManager.getLlistaTemporal().getDescripcion());
 
+        
+         
+        // Si el objecte temporal conte un ListaId, significa que venim  de "Editar"
+        if (SessionManager.getLlistaTemporal().getListaId() != null) {
+            btnGuardarLlista.setText("Actualitzar llista");
+            btnGuardarLlista.setStyle("-fx-background-color: #2ECC71; -fx-text-fill: white; -fx-font-weight: bold;");
+        } else {
+            btnGuardarLlista.setText("Guardar llista");
+        }
         
         txtNomLlista.setText(SessionManager.getLlistaTemporal().getNombre());
         txtDescripcio.setText(SessionManager.getLlistaTemporal().getDescripcion());
@@ -488,4 +500,51 @@ public class CrearLlistaController {
         alert.setContentText(missatge);
         alert.showAndWait();
     }
+    
+    /**
+     * Acción vinculada al botó Guardar / Actualizar
+     */
+    @FXML
+    private void accioGuardarLlista() {
+        CrearLlistaRequest borrador = SessionManager.getLlistaTemporal();
+        
+        if (SessionManager.getUsuario() == null) {
+        	mostrarAlerta("Atenció", "Sessió no iniciada.");
+            return;
+        }
+        
+        borrador.setUsuariId(SessionManager.getUsuario().getUserId());
+        
+        // Forcem que la visibilitat sigui sempre PRIVADA al guardar, per evitar errors de validació al backend
+        borrador.setNombre(txtNomLlista.getText().trim());
+        borrador.setDescripcion(txtDescripcio.getText().trim());
+        
+        
+        // Si no s'ha seleccionat cap visibilitat, per defecte serà PRIVADA. Això evita que el backend rebutgi la petició per falta de camp o valor invàlid.
+        if (borrador.getVisibilidad() == null || borrador.getVisibilidad().isEmpty()) {
+            borrador.setVisibilidad("PRIVADA"); 
+        } else {
+            // 	assegurem que el valor de visibilitat està en majúscules i sense espais per evitar errors de validació al backend (que només accepta "PUBLICA" o "PRIVADA")
+            borrador.setVisibilidad(borrador.getVisibilidad().toUpperCase().trim());
+        }
+
+        try {
+            if (borrador.getListaId() != null) {
+                LlistaServiceClient.actualitzarLlista(borrador.getListaId(), borrador);
+                mostrarAlerta("Èxit", "La llista s'ha actualitzat correctament.");
+            } else {
+                LlistaServiceClient.crearLlista(borrador);
+                mostrarAlerta("Èxit", "La llista s'ha guardat correctament.");
+            }
+            
+            SessionManager.resetListaTemporal();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No s'ha pogut processar la llista: " + e.getMessage());
+        }
+    }
+
+
+
 }

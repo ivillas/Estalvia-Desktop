@@ -43,7 +43,7 @@
                </font>
             </Label>
             <JFXButton fx:id="btnAfegirFavorit"  layoutX="598.0" layoutY="57.0" pickOnBounds="false" prefHeight="34.0" prefWidth="132.0" snapToPixel="false" styleClass="jfx-button" text="Afegir a favorits" />
-            <JFXButton fx:id="btnGuardarLlista" onAction="#guardarLlistaPrivada" layoutX="71.0" layoutY="642.0" pickOnBounds="false" prefHeight="34.0" prefWidth="163.0" snapToPixel="false" styleClass="jfx-button" text="Guardar llista privada" textFill="#dd0f1a">
+            <JFXButton fx:id="btnGuardarLlista" onAction="#accioGuardarLlista" layoutX="71.0" layoutY="642.0" pickOnBounds="false" prefHeight="34.0" prefWidth="163.0" snapToPixel="false" styleClass="jfx-button" text="Guardar llista privada" textFill="#dd0f1a">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>

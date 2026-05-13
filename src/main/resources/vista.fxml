@@ -47,7 +47,7 @@
                         <Font size="14.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton fx:id="btnCrearLlista" alignment="BASELINE_LEFT" managed="false" onAction="#openCrearLlista" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Crear llista" textFill="#a0a0a0" visible="false">
+                  <JFXButton fx:id="btnCrearLlista" alignment="BASELINE_LEFT" managed="false" onAction="#openCrearLlista" prefHeight="45.0" prefWidth="220.0" style="-fx-background-radius: 0 20 20 0;" text="Llista Actual" textFill="#a0a0a0" visible="false">
                      <font>
                         <Font size="14.0" />
                      </font>
